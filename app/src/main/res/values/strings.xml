@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Space-Time Tagger</string>
+    <string name="delete">Delete</string>
+    <string name="delete_all">Delete All</string>
 </resources>

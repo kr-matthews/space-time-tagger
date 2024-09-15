@@ -1,6 +1,5 @@
 package com.example.space_timetagger.ui.taglist
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,13 +10,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.domain.model.TagListCallbacks
 import com.example.space_timetagger.domain.model.TagModel
@@ -28,27 +27,11 @@ import java.time.format.DateTimeFormatter
 fun TagListView(
     modifier: Modifier = Modifier,
 ) {
-    val tagList = remember { mutableStateListOf<TagModel>() }
+    val viewModel = viewModel<TagListViewModel>()
 
-    val callbacks = object : TagListCallbacks {
-        override fun addTag(tag: TagModel) {
-            Log.d("TagList", "adding ${tag.dateTime}")
-            tagList.add(tag)
-        }
+    val tagList = viewModel.tagList.collectAsState().value
 
-        override fun deleteTag(tag: TagModel) {
-            Log.d("TagList", "deleting ${tag.dateTime}")
-            tagList.remove(tag)
-        }
-
-        override fun deleteAllTags() {
-            Log.d("TagList", "deleting all")
-            tagList.clear()
-        }
-
-    }
-
-    TagList(tags = tagList.toList(), callbacks, modifier)
+    TagList(tagList, viewModel.callbacks, modifier)
 }
 
 @Composable

@@ -113,7 +113,7 @@ private val dummyCallbacks = object : TagListCallbacks {
 
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun TagListPreview() {
     TagList(
@@ -126,7 +126,7 @@ private fun TagListPreview() {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun TagPreview() {
     Tag(

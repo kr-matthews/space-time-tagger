@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -17,10 +17,10 @@ fun TagListView(
 ) {
     // temporary hard-coded list until ui exists to add new items
     val tagList = rememberSaveable {
-        mutableListOf<LocalDateTime>(
-            LocalDateTime.now().minusHours(4),
-            LocalDateTime.now().minusMinutes(5),
-            LocalDateTime.now().minusSeconds(6),
+        mutableListOf(
+            TagModel(OffsetDateTime.now().minusHours(4)),
+            TagModel(OffsetDateTime.now().minusMinutes(5)),
+            TagModel(OffsetDateTime.now().minusSeconds(6)),
         )
     }
 
@@ -29,11 +29,11 @@ fun TagListView(
 
 @Composable
 private fun TagList(
-    items: List<LocalDateTime>,
+    items: List<TagModel>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier) {
-        itemsIndexed(items, key = { _, item -> item }) { index, item ->
+        itemsIndexed(items, key = { _, item -> item.dateTime }) { index, item ->
             TagItem(index, item)
         }
     }
@@ -41,12 +41,13 @@ private fun TagList(
 
 @Composable
 private fun TagItem(
-    index: Int, item: LocalDateTime,
+    index: Int,
+    item: TagModel,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier) {
         Text(text = "${index + 1}.")
-        Text(text = item.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm.ss")))
+        Text(text = item.dateTime.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm.ss")))
     }
 }
 
@@ -55,9 +56,9 @@ private fun TagItem(
 private fun TagListPreview() {
     TagList(
         listOf(
-            LocalDateTime.now().minusMinutes(8),
-            LocalDateTime.now().minusMinutes(5),
-            LocalDateTime.now().minusSeconds(23),
+            TagModel(OffsetDateTime.now().minusMinutes(8)),
+            TagModel(OffsetDateTime.now().minusMinutes(5)),
+            TagModel(OffsetDateTime.now().minusSeconds(23)),
         )
     )
 }
@@ -67,6 +68,6 @@ private fun TagListPreview() {
 private fun TagItemPreview() {
     TagItem(
         index = 1,
-        item = LocalDateTime.now().minusSeconds(23),
+        item = TagModel(OffsetDateTime.now().minusSeconds(23)),
     )
 }

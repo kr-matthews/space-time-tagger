@@ -76,7 +76,7 @@ private fun TagSessionOptions(
     callbacks: TagSessionCallbacks,
 ) {
     Row {
-        IconButton(onClick = { callbacks.addTag(TagModel(OffsetDateTime.now())) }) {
+        IconButton(onClick = { callbacks.addTag() }) {
             Icon(
                 painter = painterResource(android.R.drawable.ic_input_add),
                 contentDescription = stringResource(R.string.delete),
@@ -93,7 +93,7 @@ private fun TagSessionOptions(
 
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : TagSessionCallbacks {
-    override fun addTag(tag: TagModel) {}
+    override fun addTag() {}
     override fun deleteTag(tag: TagModel) {}
     override fun clear() {}
 

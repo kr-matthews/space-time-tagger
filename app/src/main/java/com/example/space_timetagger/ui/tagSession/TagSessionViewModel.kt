@@ -6,6 +6,7 @@ import com.example.space_timetagger.domain.model.TagSessionCallbacks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.OffsetDateTime
 
 class TagSessionViewModel(
     initialList: List<TagModel> = listOf(),
@@ -15,7 +16,9 @@ class TagSessionViewModel(
 
 
     val callbacks = object : TagSessionCallbacks {
-        override fun addTag(tag: TagModel) {
+        override fun addTag() {
+            val now = OffsetDateTime.now()
+            val tag = TagModel(now)
             _tags.update { it.toMutableList().apply { add(tag) } }
         }
 

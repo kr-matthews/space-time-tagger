@@ -1,4 +1,4 @@
-package com.example.space_timetagger.ui.taglist
+package com.example.space_timetagger.domain.model
 
 import java.time.OffsetDateTime
 

@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class TagListViewModel : ViewModel() {
-    private val _tagList = MutableStateFlow<List<TagModel>>(listOf())
+class TagListViewModel(
+    initialList: List<TagModel> = listOf(),
+) : ViewModel() {
+    private val _tagList = MutableStateFlow(initialList)
     val tagList = _tagList.asStateFlow()
 
 

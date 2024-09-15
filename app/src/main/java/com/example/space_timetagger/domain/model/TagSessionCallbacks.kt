@@ -1,7 +1,7 @@
 package com.example.space_timetagger.domain.model
 
-interface TagListCallbacks {
+interface TagSessionCallbacks {
     fun addTag(tag: TagModel)
     fun deleteTag(tag: TagModel)
-    fun deleteAllTags()
+    fun clear()
 }

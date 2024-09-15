@@ -1,4 +1,4 @@
-package com.example.space_timetagger.ui.taglist
+package com.example.space_timetagger.ui.tagSession
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,26 +18,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
-import com.example.space_timetagger.domain.model.TagListCallbacks
 import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.domain.model.TagSessionCallbacks
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun TagListView(
+fun TagSessionView(
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = viewModel<TagListViewModel>()
+    val viewModel = viewModel<TagSessionViewModel>()
 
-    val tagList = viewModel.tagList.collectAsState().value
+    val tags = viewModel.tags.collectAsState().value
 
-    TagList(tagList, viewModel.callbacks, modifier)
+    TagSession(tags, viewModel.callbacks, modifier)
 }
 
 @Composable
-private fun TagList(
+private fun TagSession(
     tags: List<TagModel>,
-    callbacks: TagListCallbacks,
+    callbacks: TagSessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -46,7 +46,7 @@ private fun TagList(
                 Tag(index, tag, callbacks)
             }
         }
-        TagListOptions(callbacks)
+        TagSessionOptions(callbacks)
     }
 }
 
@@ -54,7 +54,7 @@ private fun TagList(
 private fun Tag(
     index: Int,
     tag: TagModel,
-    callbacks: TagListCallbacks,
+    callbacks: TagSessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier) {
@@ -72,8 +72,8 @@ private fun Tag(
 }
 
 @Composable
-private fun TagListOptions(
-    callbacks: TagListCallbacks,
+private fun TagSessionOptions(
+    callbacks: TagSessionCallbacks,
 ) {
     Row {
         IconButton(onClick = { callbacks.addTag(TagModel(OffsetDateTime.now())) }) {
@@ -82,7 +82,7 @@ private fun TagListOptions(
                 contentDescription = stringResource(R.string.delete),
             )
         }
-        IconButton(onClick = { callbacks.deleteAllTags() }) {
+        IconButton(onClick = { callbacks.clear() }) {
             Icon(
                 painter = painterResource(android.R.drawable.ic_delete),
                 contentDescription = stringResource(R.string.delete_all),
@@ -92,17 +92,17 @@ private fun TagListOptions(
 }
 
 @Suppress("EmptyFunctionBlock")
-private val dummyCallbacks = object : TagListCallbacks {
+private val dummyCallbacks = object : TagSessionCallbacks {
     override fun addTag(tag: TagModel) {}
     override fun deleteTag(tag: TagModel) {}
-    override fun deleteAllTags() {}
+    override fun clear() {}
 
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun TagListPreview() {
-    TagList(
+private fun TagSessionPreview() {
+    TagSession(
         listOf(
             TagModel(OffsetDateTime.now().minusMinutes(8)),
             TagModel(OffsetDateTime.now().minusMinutes(5)),

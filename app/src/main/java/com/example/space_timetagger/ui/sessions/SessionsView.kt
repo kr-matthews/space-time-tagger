@@ -1,6 +1,7 @@
 package com.example.space_timetagger.ui.sessions
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,13 @@ fun SessionsView(
 
     val sessions = viewModel.sessions.collectAsState().value
 
-    Sessions(sessions, viewModel.callbacks, modifier.padding(8.dp))
+    Sessions(
+        sessions,
+        viewModel.callbacks,
+        modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(8.dp)
+    )
 }
 
 @Composable
@@ -146,7 +153,9 @@ private fun SessionsPreview() {
                 SessionModel("Session 7"),
             ),
             dummyCallbacks,
-            Modifier.padding(8.dp)
+            Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(8.dp)
         )
     }
 }
@@ -159,7 +168,9 @@ private fun SessionBoxPreview() {
         SessionBox(
             SessionModel("Session Preview"),
             dummyCallbacks,
-            Modifier.padding(8.dp)
+            Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(8.dp)
         )
     }
 }

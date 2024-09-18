@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Space-Time Tagger</string>
-    <string name="add_new">New</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="word_new">New</string>
     <string name="delete">Delete</string>
     <string name="delete_all">Delete All</string>
 </resources>

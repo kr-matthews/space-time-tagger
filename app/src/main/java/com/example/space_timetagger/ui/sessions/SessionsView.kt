@@ -83,7 +83,7 @@ private fun SessionsOptions(
         IconButton(onClick = { callbacks.new() }) {
             Icon(
                 painter = painterResource(android.R.drawable.ic_input_add),
-                contentDescription = stringResource(R.string.add_new),
+                contentDescription = stringResource(R.string.word_new),
             )
         }
         IconButton(onClick = { callbacks.clearAll() }) {

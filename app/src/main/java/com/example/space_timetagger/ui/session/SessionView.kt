@@ -1,5 +1,6 @@
 package com.example.space_timetagger.ui.session
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -122,6 +123,7 @@ private val dummyCallbacks = object : SessionCallbacks {
 }
 
 @Preview(showBackground = true, heightDp = 600)
+@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SessionPreview() {
     SpaceTimeTaggerTheme {
@@ -138,6 +140,7 @@ private fun SessionPreview() {
 }
 
 @Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun TagPreview() {
     SpaceTimeTaggerTheme {

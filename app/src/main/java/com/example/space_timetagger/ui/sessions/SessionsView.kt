@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.domain.model.SessionModel
 import com.example.space_timetagger.domain.model.SessionsCallbacks
+import com.example.space_timetagger.ui.common.ConfirmationDialog
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import java.util.UUID
 
@@ -82,6 +85,8 @@ private fun SessionBox(
     callbacks: SessionsCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
+
     Card(modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -96,13 +101,19 @@ private fun SessionBox(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = { callbacks.delete(session.id) }) {
+            IconButton(onClick = { setDialogIsOpen(true) }) {
                 Icon(
                     painter = painterResource(android.R.drawable.ic_menu_delete),
                     contentDescription = stringResource(R.string.delete),
                     modifier = Modifier.size(26.dp)
                 )
             }
+        }
+    }
+
+    if (dialogIsOpen) {
+        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
+            callbacks.delete(session.id)
         }
     }
 }
@@ -112,6 +123,8 @@ private fun SessionsOptions(
     callbacks: SessionsCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
@@ -120,10 +133,16 @@ private fun SessionsOptions(
             Text(stringResource(R.string.new_session))
         }
         Button(
-            onClick = { callbacks.clearAll() },
+            onClick = { setDialogIsOpen(true) },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         ) {
             Text(stringResource(R.string.delete_all))
+        }
+    }
+
+    if (dialogIsOpen) {
+        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
+            callbacks.clearAll()
         }
     }
 }

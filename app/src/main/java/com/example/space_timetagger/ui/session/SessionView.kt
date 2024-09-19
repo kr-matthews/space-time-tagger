@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.domain.model.SessionCallbacks
 import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.ui.common.ConfirmationDialog
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -80,6 +83,8 @@ private fun Tag(
     callbacks: SessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
+
     Card(modifier) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -89,13 +94,19 @@ private fun Tag(
             Text(text = "#${index + 1}", fontWeight = FontWeight.W800)
             Text(text = tag.dateTime.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm.ss")))
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = { callbacks.deleteTag(tag) }) {
+            IconButton(onClick = { setDialogIsOpen(true) }) {
                 Icon(
                     painter = painterResource(android.R.drawable.ic_menu_delete),
                     contentDescription = stringResource(R.string.delete),
                     modifier = Modifier.size(26.dp)
                 )
             }
+        }
+    }
+
+    if (dialogIsOpen) {
+        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
+            callbacks.deleteTag(tag)
         }
     }
 }
@@ -105,6 +116,8 @@ private fun SessionOptions(
     callbacks: SessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
@@ -113,10 +126,16 @@ private fun SessionOptions(
             Text(stringResource(R.string.add_tag))
         }
         Button(
-            onClick = { callbacks.clearTags() },
+            onClick = { setDialogIsOpen(true) },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         ) {
             Text(stringResource(R.string.delete_all))
+        }
+    }
+
+    if (dialogIsOpen) {
+        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
+            callbacks.clearTags()
         }
     }
 }

@@ -4,4 +4,7 @@
     <string name="add_tag">Add Tag</string>
     <string name="delete">Delete</string>
     <string name="delete_all">Delete All</string>
+    <string name="are_you_sure">Are you sure? This action cannot be undone.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>

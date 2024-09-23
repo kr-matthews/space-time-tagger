@@ -7,11 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.space_timetagger.ui.session.SessionView
-import com.example.space_timetagger.ui.sessions.SessionsView
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,18 +18,7 @@ class MainActivity : ComponentActivity() {
 
             SpaceTimeTaggerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(navController, startDestination = "sessions") {
-                        composable("sessions") {
-                            SessionsView(
-                                modifier = Modifier.padding(innerPadding)
-                            )
-                        }
-                        composable("session") {
-                            SessionView(
-                                modifier = Modifier.padding(innerPadding)
-                            )
-                        }
-                    }
+                    SttNavHost(navController, Modifier.padding(innerPadding))
                 }
             }
         }

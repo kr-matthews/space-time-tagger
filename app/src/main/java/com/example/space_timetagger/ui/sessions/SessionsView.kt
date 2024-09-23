@@ -40,6 +40,7 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 @Composable
 fun SessionsView(
     modifier: Modifier = Modifier,
+    onSessionClick: (String) -> Unit,
 ) {
     val viewModel = viewModel<SessionsViewModel>()
 
@@ -48,6 +49,7 @@ fun SessionsView(
     Sessions(
         sessions,
         viewModel.callbacks,
+        onSessionClick,
         modifier
             .background(MaterialTheme.colorScheme.background)
             .padding(8.dp)
@@ -58,6 +60,7 @@ fun SessionsView(
 private fun Sessions(
     sessions: List<SessionModel>,
     callbacks: SessionsCallbacks,
+    onSessionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -71,7 +74,7 @@ private fun Sessions(
             modifier = Modifier.weight(1f)
         ) {
             items(sessions, key = { it.id }) { session ->
-                SessionBox(session, callbacks)
+                SessionBox(session, callbacks) { onSessionClick(session.id) }
             }
         }
         SessionsOptions(callbacks)
@@ -83,10 +86,11 @@ private fun SessionBox(
     session: SessionModel,
     callbacks: SessionsCallbacks,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
 
-    Card(modifier) {
+    Card(modifier.clickable(onClick = onClick)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -152,6 +156,7 @@ private val dummyCallbacks = object : SessionsCallbacks {
     override fun clearAll() {}
 }
 
+@Suppress("EmptyFunctionBlock")
 @Preview(showBackground = true, heightDp = 600)
 @Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(showBackground = true, heightDp = 300, widthDp = 600)
@@ -169,6 +174,7 @@ private fun SessionsPreview() {
                 SessionModel("Session 7"),
             ),
             dummyCallbacks,
+            {},
             Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
@@ -176,6 +182,7 @@ private fun SessionsPreview() {
     }
 }
 
+@Suppress("EmptyFunctionBlock")
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -187,6 +194,6 @@ private fun SessionBoxPreview() {
             Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
-        )
+        ) {}
     }
 }

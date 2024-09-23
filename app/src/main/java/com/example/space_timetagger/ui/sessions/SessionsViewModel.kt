@@ -6,7 +6,6 @@ import com.example.space_timetagger.domain.model.SessionsCallbacks
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.UUID
 
 class SessionsViewModel(
     initialList: List<SessionModel> = listOf(),
@@ -14,7 +13,7 @@ class SessionsViewModel(
     private val _sessions = MutableStateFlow(initialList)
     val sessions = _sessions.asStateFlow()
 
-    private val _selectedSessionId = MutableStateFlow<UUID?>(null)
+    private val _selectedSessionId = MutableStateFlow<String?>(null)
     val selectedSessionId = _selectedSessionId.asStateFlow()
 
     val callbacks = object : SessionsCallbacks {
@@ -24,7 +23,7 @@ class SessionsViewModel(
             }
         }
 
-        override fun delete(id: UUID) {
+        override fun delete(id: String) {
             if (selectedSessionId.value == id) {
                 _selectedSessionId.update { null }
             }

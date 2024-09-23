@@ -36,7 +36,6 @@ import com.example.space_timetagger.domain.model.SessionModel
 import com.example.space_timetagger.domain.model.SessionsCallbacks
 import com.example.space_timetagger.ui.common.ConfirmationDialog
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
-import java.util.UUID
 
 @Composable
 fun SessionsView(
@@ -149,7 +148,7 @@ private fun SessionsOptions(
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : SessionsCallbacks {
     override fun new(name: String?) {}
-    override fun delete(id: UUID) {}
+    override fun delete(id: String) {}
     override fun clearAll() {}
 }
 

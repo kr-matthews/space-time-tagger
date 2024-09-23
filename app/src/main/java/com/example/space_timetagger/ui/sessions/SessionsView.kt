@@ -92,7 +92,6 @@ private fun SessionBox(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { callbacks.select(session.id) }
                 .padding(horizontal = 8.dp)
         ) {
             Text(
@@ -150,7 +149,6 @@ private fun SessionsOptions(
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : SessionsCallbacks {
     override fun new(name: String?) {}
-    override fun select(id: UUID?) {}
     override fun delete(id: UUID) {}
     override fun clearAll() {}
 }

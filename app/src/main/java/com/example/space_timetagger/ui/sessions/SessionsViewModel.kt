@@ -24,10 +24,6 @@ class SessionsViewModel(
             }
         }
 
-        override fun select(id: UUID?) {
-            _selectedSessionId.update { id }
-        }
-
         override fun delete(id: UUID) {
             if (selectedSessionId.value == id) {
                 _selectedSessionId.update { null }

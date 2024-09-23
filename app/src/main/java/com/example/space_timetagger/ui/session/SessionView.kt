@@ -40,9 +40,10 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun SessionView(
+    id: String,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = viewModel<SessionViewModel>()
+    val viewModel = viewModel<SessionViewModel>(key = id)
 
     val tags = viewModel.tags.collectAsState().value
 

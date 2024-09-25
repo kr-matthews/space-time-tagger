@@ -16,7 +16,7 @@ class SessionsViewModel(
     val callbacks = object : SessionsCallbacks {
         override fun new(name: String?) {
             _sessions.update {
-                it.toMutableList().apply { add(SessionModel(name ?: "Untitled")) }
+                it.toMutableList().apply { add(SessionModel(name)) }
             }
         }
 

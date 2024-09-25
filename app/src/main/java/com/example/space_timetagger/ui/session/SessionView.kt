@@ -23,11 +23,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -101,6 +105,14 @@ private fun Header(
     val textStyle = if (name.isNullOrBlank()) FontStyle.Italic else null
 
     val (editModeIsOn, setEditModeIsOn) = rememberSaveable { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    // unfortunately, the cursor will go to the front of the input, not the end
+    LaunchedEffect(editModeIsOn) {
+        if (editModeIsOn) {
+            focusRequester.requestFocus()
+        }
+    }
 
     if (editModeIsOn) {
         TextField(
@@ -114,7 +126,8 @@ private fun Header(
             keyboardActions = KeyboardActions(onDone = {
                 setName(name?.trim())
                 setEditModeIsOn(false)
-            })
+            }),
+            modifier = Modifier.focusRequester(focusRequester),
         )
     } else {
         Text(

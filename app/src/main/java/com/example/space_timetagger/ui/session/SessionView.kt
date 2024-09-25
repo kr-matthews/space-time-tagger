@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,9 +47,11 @@ fun SessionView(
 ) {
     val viewModel = viewModel<SessionViewModel>(key = id)
 
+    val name = viewModel.name.collectAsState().value
     val tags = viewModel.tags.collectAsState().value
 
     Session(
+        name,
         tags,
         viewModel.callbacks,
         modifier
@@ -58,13 +62,27 @@ fun SessionView(
 
 @Composable
 private fun Session(
+    name: String?,
     tags: List<TagModel>,
     callbacks: SessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val title = if (name.isNullOrBlank()) stringResource(R.string.untitled) else name
+    val textStyle = if (name.isNullOrBlank()) FontStyle.Italic else null
+
     Column(
-        modifier = modifier
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
+        Text(
+            text = title,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.W800,
+            fontStyle = textStyle,
+        )
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.weight(1f)
@@ -156,6 +174,7 @@ private val dummyCallbacks = object : SessionCallbacks {
 private fun SessionPreview() {
     SpaceTimeTaggerTheme {
         Session(
+            "Preview Title",
             listOf(
                 TagModel(OffsetDateTime.now().minusMinutes(8)),
                 TagModel(OffsetDateTime.now().minusMinutes(5)),

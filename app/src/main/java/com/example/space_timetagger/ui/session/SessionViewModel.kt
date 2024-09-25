@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.OffsetDateTime
 
-class SessionViewModel(
-    initialList: List<TagModel> = listOf(),
-) : ViewModel() {
-    private val _tags = MutableStateFlow(initialList)
-    val tags = _tags.asStateFlow()
+class SessionViewModel : ViewModel() {
+    private val _name = MutableStateFlow<String?>(null)
+    val name = _name.asStateFlow()
 
+    private val _tags = MutableStateFlow(listOf<TagModel>())
+    val tags = _tags.asStateFlow()
 
     val callbacks = object : SessionCallbacks {
         override fun addTag() {

@@ -16,6 +16,10 @@ class SessionViewModel : ViewModel() {
     val tags = _tags.asStateFlow()
 
     val callbacks = object : SessionCallbacks {
+        override fun setName(name: String?) {
+            _name.update { name }
+        }
+
         override fun addTag() {
             val now = OffsetDateTime.now()
             val tag = TagModel(now)

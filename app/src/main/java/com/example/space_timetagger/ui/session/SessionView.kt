@@ -2,6 +2,7 @@ package com.example.space_timetagger.ui.session
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -18,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +32,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.domain.model.SessionCallbacks
@@ -67,22 +73,12 @@ private fun Session(
     callbacks: SessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
-    val title = if (name.isNullOrBlank()) stringResource(R.string.untitled) else name
-    val textStyle = if (name.isNullOrBlank()) FontStyle.Italic else null
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        Text(
-            text = title,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.W800,
-            fontStyle = textStyle,
-        )
+        Header(name) { callbacks.setName(it) }
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.weight(1f)
@@ -92,6 +88,43 @@ private fun Session(
             }
         }
         SessionOptions(callbacks)
+    }
+}
+
+@Composable
+private fun Header(
+    name: String?,
+    setName: (String?) -> Unit,
+) {
+    val title = if (name.isNullOrBlank()) stringResource(R.string.untitled) else name
+    val textStyle = if (name.isNullOrBlank()) FontStyle.Italic else null
+
+    val (editModeIsOn, setEditModeIsOn) = rememberSaveable { mutableStateOf(false) }
+
+    if (editModeIsOn) {
+        TextField(
+            value = name ?: "",
+            onValueChange = setName,
+            placeholder = { stringResource(R.string.untitled) },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                setName(name?.trim())
+                setEditModeIsOn(false)
+            })
+        )
+    } else {
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.W800,
+            fontStyle = textStyle,
+            modifier = Modifier
+                .clickable { setEditModeIsOn(true) }
+                .padding(8.dp)
+        )
     }
 }
 
@@ -161,6 +194,7 @@ private fun SessionOptions(
 
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : SessionCallbacks {
+    override fun setName(name: String?) {}
     override fun addTag() {}
     override fun deleteTag(tag: TagModel) {}
     override fun clearTags() {}

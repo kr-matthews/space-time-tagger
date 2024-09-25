@@ -96,7 +96,7 @@ private fun Header(
     name: String?,
     setName: (String?) -> Unit,
 ) {
-    val title = if (name.isNullOrBlank()) stringResource(R.string.untitled) else name
+    val title = if (name.isNullOrBlank()) stringResource(R.string.tap_to_add_title) else name
     val textStyle = if (name.isNullOrBlank()) FontStyle.Italic else null
 
     val (editModeIsOn, setEditModeIsOn) = rememberSaveable { mutableStateOf(false) }

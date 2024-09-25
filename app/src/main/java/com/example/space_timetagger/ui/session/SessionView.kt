@@ -92,7 +92,7 @@ private fun Session(
                 Tag(index, tag, callbacks)
             }
         }
-        SessionOptions(callbacks)
+        SessionOptions(callbacks, tags.isNotEmpty())
     }
 }
 
@@ -183,6 +183,7 @@ private fun Tag(
 @Composable
 private fun SessionOptions(
     callbacks: SessionCallbacks,
+    deleteEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
@@ -196,6 +197,7 @@ private fun SessionOptions(
         }
         Button(
             onClick = { setDialogIsOpen(true) },
+            enabled = deleteEnabled,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         ) {
             Text(stringResource(R.string.delete_all))

@@ -138,7 +138,7 @@ private fun SessionsOptions(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
     ) {
-        Button(onClick = { callbacks.new() }) {
+        Button(onClick = callbacks::new) {
             Text(stringResource(R.string.new_session))
         }
         Button(
@@ -151,9 +151,7 @@ private fun SessionsOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
-            callbacks.clearAll()
-        }
+        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::clearAll)
     }
 }
 

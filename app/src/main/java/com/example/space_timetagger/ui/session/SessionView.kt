@@ -83,7 +83,7 @@ private fun Session(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        Header(name) { callbacks.setName(it) }
+        Header(name, callbacks::setName)
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.weight(1f)
@@ -192,7 +192,7 @@ private fun SessionOptions(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
     ) {
-        Button(onClick = { callbacks.addTag() }) {
+        Button(onClick = callbacks::addTag) {
             Text(stringResource(R.string.add_tag))
         }
         Button(
@@ -205,9 +205,7 @@ private fun SessionOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
-            callbacks.clearTags()
-        }
+        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::clearTags)
     }
 }
 

@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,16 +42,24 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 @Composable
 fun SessionsView(
     modifier: Modifier = Modifier,
-    onSessionClick: (String) -> Unit,
+    navigateToSession: (String) -> Unit,
 ) {
     val viewModel = viewModel<SessionsViewModel>()
 
     val sessions = viewModel.sessions.collectAsState().value
+    val sessionIdToNavigateTo = viewModel.sessionIdToNavigateTo.collectAsState().value
+
+    LaunchedEffect(sessionIdToNavigateTo) {
+        sessionIdToNavigateTo?.let { id ->
+            navigateToSession(id)
+            viewModel.clearSessionIdToNavigateTo()
+        }
+    }
 
     Sessions(
         sessions,
         viewModel.callbacks,
-        onSessionClick,
+        navigateToSession,
         modifier
             .background(MaterialTheme.colorScheme.background)
             .padding(8.dp)
@@ -61,7 +70,7 @@ fun SessionsView(
 private fun Sessions(
     sessions: List<SessionModel>,
     callbacks: SessionsCallbacks,
-    onSessionClick: (String) -> Unit,
+    navigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -75,7 +84,7 @@ private fun Sessions(
             modifier = Modifier.weight(1f)
         ) {
             items(sessions, key = { it.id }) { session ->
-                SessionBox(session, callbacks) { onSessionClick(session.id) }
+                SessionBox(session, callbacks) { navigateToSession(session.id) }
             }
         }
         SessionsOptions(callbacks, sessions.isNotEmpty())
@@ -87,7 +96,7 @@ private fun SessionBox(
     session: SessionModel,
     callbacks: SessionsCallbacks,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    navigateToSession: () -> Unit,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
 
@@ -95,7 +104,7 @@ private fun SessionBox(
     val title = if (isUnnamed) stringResource(R.string.untitled) else session.name!!
     val textStyle = if (isUnnamed) null else FontStyle.Italic
 
-    Card(modifier.clickable(onClick = onClick)) {
+    Card(modifier.clickable(onClick = navigateToSession)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier

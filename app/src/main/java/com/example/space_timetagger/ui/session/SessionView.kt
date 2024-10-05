@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
@@ -38,8 +39,11 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -84,13 +88,17 @@ private fun Session(
         modifier = modifier.fillMaxWidth()
     ) {
         Header(name, callbacks::setName)
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            itemsIndexed(tags, key = { _, item -> item.dateTime }) { index, tag ->
-                Tag(index, tag, callbacks)
+        if (tags.isNotEmpty()) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                itemsIndexed(tags, key = { _, item -> item.dateTime }) { index, tag ->
+                    Tag(index, tag, callbacks)
+                }
             }
+        } else {
+            NoTags(Modifier.weight(1f))
         }
         SessionOptions(callbacks, tags.isNotEmpty())
     }
@@ -209,6 +217,30 @@ private fun SessionOptions(
     }
 }
 
+@Composable
+private fun NoTags(
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(R.string.no_tags),
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .padding(16.dp)
+            .wrapContentSize()
+    )
+}
+
+class TagListProvider : PreviewParameterProvider<List<TagModel>> {
+    override val values = listOf(
+        listOf(),
+        listOf(
+            TagModel(OffsetDateTime.now().minusMinutes(8)),
+            TagModel(OffsetDateTime.now().minusMinutes(5)),
+            TagModel(OffsetDateTime.now().minusSeconds(23)),
+        ),
+    ).asSequence()
+}
+
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : SessionCallbacks {
     override fun setName(name: String?) {}
@@ -216,27 +248,6 @@ private val dummyCallbacks = object : SessionCallbacks {
     override fun deleteTag(tag: TagModel) {}
     override fun clearTags() {}
 
-}
-
-@Preview(showBackground = true, heightDp = 600)
-@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(showBackground = true, heightDp = 300, widthDp = 600)
-@Composable
-private fun SessionPreview() {
-    SpaceTimeTaggerTheme {
-        Session(
-            "Preview Title",
-            listOf(
-                TagModel(OffsetDateTime.now().minusMinutes(8)),
-                TagModel(OffsetDateTime.now().minusMinutes(5)),
-                TagModel(OffsetDateTime.now().minusSeconds(23)),
-            ),
-            dummyCallbacks,
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
-        )
-    }
 }
 
 @Preview(showBackground = true)
@@ -247,6 +258,25 @@ private fun TagPreview() {
         Tag(
             index = 1,
             tag = TagModel(OffsetDateTime.now().minusSeconds(23)),
+            dummyCallbacks,
+            Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(8.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 600)
+@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, heightDp = 300, widthDp = 600)
+@Composable
+private fun SessionPreview(
+    @PreviewParameter(TagListProvider::class) tags: List<TagModel>,
+) {
+    SpaceTimeTaggerTheme {
+        Session(
+            "Preview Title",
+            tags,
             dummyCallbacks,
             Modifier
                 .background(MaterialTheme.colorScheme.background)

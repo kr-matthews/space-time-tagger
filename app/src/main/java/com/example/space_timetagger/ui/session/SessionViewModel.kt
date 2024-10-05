@@ -20,8 +20,7 @@ class SessionViewModel : ViewModel() {
             _name.update { name }
         }
 
-        override fun addTag() {
-            val now = OffsetDateTime.now()
+        override fun addTag(now: OffsetDateTime) {
             val tag = TagModel(now)
             _tags.update { it.toMutableList().apply { add(tag) } }
         }

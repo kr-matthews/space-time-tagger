@@ -244,7 +244,7 @@ class TagListProvider : PreviewParameterProvider<List<TagModel>> {
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : SessionCallbacks {
     override fun setName(name: String?) {}
-    override fun addTag() {}
+    override fun addTag(now: OffsetDateTime) {}
     override fun deleteTag(tag: TagModel) {}
     override fun clearTags() {}
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -29,8 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
@@ -46,8 +51,8 @@ fun SessionsView(
 ) {
     val viewModel = viewModel<SessionsViewModel>()
 
-    val sessions = viewModel.sessions.collectAsState().value
-    val sessionIdToNavigateTo = viewModel.sessionIdToNavigateTo.collectAsState().value
+    val sessions by viewModel.sessions.collectAsState()
+    val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsState()
 
     LaunchedEffect(sessionIdToNavigateTo) {
         sessionIdToNavigateTo?.let { id ->
@@ -77,15 +82,19 @@ private fun Sessions(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.FixedSize(175.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            items(sessions, key = { it.id }) { session ->
-                SessionBox(session, callbacks) { navigateToSession(session.id) }
+        if (sessions.isNotEmpty()) {
+            LazyVerticalGrid(
+                columns = GridCells.FixedSize(175.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(sessions, key = { it.id }) { session ->
+                    SessionBox(session, callbacks) { navigateToSession(session.id) }
+                }
             }
+        } else {
+            NoSessions(Modifier.weight(1f))
         }
         SessionsOptions(callbacks, sessions.isNotEmpty())
     }
@@ -164,37 +173,39 @@ private fun SessionsOptions(
     }
 }
 
+@Composable
+private fun NoSessions(
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(R.string.no_sessions),
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .padding(16.dp)
+            .wrapContentSize()
+    )
+}
+
+class SessionListProvider : PreviewParameterProvider<List<SessionModel>> {
+    override val values = listOf(
+        listOf(),
+        listOf(
+            SessionModel("Session 1"),
+            SessionModel("Session 2"),
+            SessionModel("Session 3"),
+            SessionModel("Session 4 long name"),
+            SessionModel("Session 5 longest name, so long it doesn't fit"),
+            SessionModel("Session 6"),
+            SessionModel("Session 7"),
+        ),
+    ).asSequence()
+}
+
 @Suppress("EmptyFunctionBlock")
 private val dummyCallbacks = object : SessionsCallbacks {
     override fun new(name: String?) {}
     override fun delete(id: String) {}
     override fun clearAll() {}
-}
-
-@Suppress("EmptyFunctionBlock")
-@Preview(showBackground = true, heightDp = 600)
-@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(showBackground = true, heightDp = 300, widthDp = 600)
-@Composable
-private fun SessionsPreview() {
-    SpaceTimeTaggerTheme {
-        Sessions(
-            listOf(
-                SessionModel("Session 1"),
-                SessionModel("Session 2"),
-                SessionModel("Session 3"),
-                SessionModel("Session 4 long name"),
-                SessionModel("Session 5 longest name, so long it doesn't fit"),
-                SessionModel("Session 6"),
-                SessionModel("Session 7"),
-            ),
-            dummyCallbacks,
-            {},
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
-        )
-    }
 }
 
 @Suppress("EmptyFunctionBlock")
@@ -210,5 +221,25 @@ private fun SessionBoxPreview() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         ) {}
+    }
+}
+
+@Suppress("EmptyFunctionBlock")
+@Preview(showBackground = true, heightDp = 600)
+@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, heightDp = 300, widthDp = 600)
+@Composable
+private fun SessionsPreview(
+    @PreviewParameter(SessionListProvider::class) sessions: List<SessionModel>,
+) {
+    SpaceTimeTaggerTheme {
+        Sessions(
+            sessions,
+            dummyCallbacks,
+            {},
+            Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(8.dp)
+        )
     }
 }

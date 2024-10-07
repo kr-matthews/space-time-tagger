@@ -49,7 +49,7 @@ fun SessionsView(
     modifier: Modifier = Modifier,
     navigateToSession: (String) -> Unit,
 ) {
-    val viewModel = viewModel<SessionsViewModel>()
+    val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
 
     val sessions by viewModel.sessions.collectAsState()
     val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsState()

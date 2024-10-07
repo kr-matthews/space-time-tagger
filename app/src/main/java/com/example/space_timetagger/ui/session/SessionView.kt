@@ -60,7 +60,7 @@ fun SessionView(
     id: String,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = viewModel<SessionViewModel>(key = id)
+    val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory())
 
     val name = viewModel.name.collectAsState().value
     val tags = viewModel.tags.collectAsState().value

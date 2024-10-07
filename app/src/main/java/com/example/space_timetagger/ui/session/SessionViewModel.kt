@@ -1,14 +1,19 @@
 package com.example.space_timetagger.ui.session
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.space_timetagger.App
 import com.example.space_timetagger.domain.model.SessionCallbacks
 import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.domain.repository.SessionsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.OffsetDateTime
 
-class SessionViewModel : ViewModel() {
+class SessionViewModel(
+    private val sessionsRepository: SessionsRepository,
+) : ViewModel() {
     private val _name = MutableStateFlow<String?>(null)
     val name = _name.asStateFlow()
 
@@ -33,5 +38,11 @@ class SessionViewModel : ViewModel() {
             _tags.update { listOf() }
         }
 
+    }
+}
+
+class SessionViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return SessionViewModel(App.appModule.sessionsRepository) as T
     }
 }

@@ -1,6 +1,7 @@
 package com.example.space_timetagger.data.repository
 
 import com.example.space_timetagger.domain.model.SessionModel
+import com.example.space_timetagger.domain.model.TagModel
 import com.example.space_timetagger.domain.repository.SessionsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,13 +22,49 @@ class SessionsRepositoryImpl : SessionsRepository {
         return newSession.id
     }
 
-    // provide more precise update functions?
-    override suspend fun updateSession(session: SessionModel) {
+    override suspend fun renameSession(id: String, newName: String?) {
         _sessions.update { list ->
             list.apply {
-                val index = list.indexOfFirst { it.id == session.id }
+                val index = list.indexOfFirst { it.id == id }
                 if (index > -1) {
-                    list[index] = session
+                    list[index] = get(index).copy(name = newName)
+                }
+            }
+        }
+    }
+
+    override suspend fun addTagToSession(id: String, tag: TagModel) {
+        _sessions.update { list ->
+            list.apply {
+                val index = list.indexOfFirst { it.id == id }
+                if (index > -1) {
+                    val session = get(index)
+                    val newTags = session.tags.toMutableList().apply { add(tag) }
+                    list[index] = session.copy(tags = newTags)
+                }
+            }
+        }
+    }
+
+    override suspend fun removeTagFromSession(id: String, tag: TagModel) {
+        _sessions.update { list ->
+            list.apply {
+                val index = list.indexOfFirst { it.id == id }
+                if (index > -1) {
+                    val session = get(index)
+                    val newTags = session.tags.toMutableList().apply { remove(tag) }
+                    list[index] = session.copy(tags = newTags)
+                }
+            }
+        }
+    }
+
+    override suspend fun removeAllTagsFromSession(id: String) {
+        _sessions.update { list ->
+            list.apply {
+                val index = list.indexOfFirst { it.id == id }
+                if (index > -1) {
+                    list[index] = get(index).copy(tags = listOf())
                 }
             }
         }

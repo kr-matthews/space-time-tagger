@@ -4,5 +4,6 @@ import java.util.UUID
 
 data class SessionModel(
     val name: String? = null,
-    val id: String = UUID.randomUUID().toString()
+    val id: String = UUID.randomUUID().toString(),
+    val tags: List<TagModel> = listOf(),
 )

@@ -26,6 +26,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -60,19 +61,20 @@ fun SessionView(
     id: String,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory())
+    val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
 
-    val name = viewModel.name.collectAsState().value
-    val tags = viewModel.tags.collectAsState().value
+    val session by viewModel.session.collectAsState(null)
 
-    Session(
-        name,
-        tags,
-        viewModel.callbacks,
-        modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp)
-    )
+    session?.let {
+        Session(
+            it.name,
+            it.tags,
+            viewModel.callbacks,
+            modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(8.dp)
+        )
+    } ?: Text("Something went wrong") // todo
 }
 
 @Composable

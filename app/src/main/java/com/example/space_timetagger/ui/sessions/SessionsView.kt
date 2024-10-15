@@ -51,7 +51,7 @@ fun SessionsView(
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
 
-    val sessions by viewModel.sessions.collectAsState()
+    val sessions by viewModel.sessions.collectAsState(listOf())
     val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsState()
 
     LaunchedEffect(sessionIdToNavigateTo) {

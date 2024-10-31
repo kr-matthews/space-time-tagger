@@ -1,4 +1,4 @@
-package com.example.space_timetagger.ui.sessions
+package com.example.space_timetagger.ui.sessionsList
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -45,7 +45,7 @@ import com.example.space_timetagger.ui.common.ConfirmationDialog
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
-fun SessionsView(
+fun SessionsListView(
     modifier: Modifier = Modifier,
     navigateToSession: (String) -> Unit,
 ) {

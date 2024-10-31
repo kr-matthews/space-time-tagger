@@ -1,4 +1,4 @@
-package com.example.space_timetagger.ui.session
+package com.example.space_timetagger.ui.sessionDetail
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -57,7 +57,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun SessionView(
+fun SessionDetailView(
     id: String,
     modifier: Modifier = Modifier,
 ) {

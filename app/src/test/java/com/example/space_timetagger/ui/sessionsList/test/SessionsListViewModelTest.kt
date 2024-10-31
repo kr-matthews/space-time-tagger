@@ -1,9 +1,9 @@
-package com.example.space_timetagger.ui.sessions.test
+package com.example.space_timetagger.ui.sessionsList.test
 
 import com.example.space_timetagger.domain.repository.SessionsRepository
 import com.example.space_timetagger.ui.CoroutineTestRule
 import com.example.space_timetagger.ui.mockSessions
-import com.example.space_timetagger.ui.sessions.SessionsViewModel
+import com.example.space_timetagger.ui.sessionsList.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -26,7 +26,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
-class SessionsViewModelTest {
+class SessionsListViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule

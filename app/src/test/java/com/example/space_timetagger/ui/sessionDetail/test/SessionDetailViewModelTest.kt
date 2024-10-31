@@ -1,4 +1,4 @@
-package com.example.space_timetagger.ui.session.test
+package com.example.space_timetagger.ui.sessionDetail.test
 
 import com.example.space_timetagger.domain.model.TagModel
 import com.example.space_timetagger.domain.repository.SessionsRepository
@@ -6,7 +6,7 @@ import com.example.space_timetagger.ui.CoroutineTestRule
 import com.example.space_timetagger.ui.mockDateTime
 import com.example.space_timetagger.ui.mockSession
 import com.example.space_timetagger.ui.mockTag
-import com.example.space_timetagger.ui.session.SessionViewModel
+import com.example.space_timetagger.ui.sessionDetail.SessionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf

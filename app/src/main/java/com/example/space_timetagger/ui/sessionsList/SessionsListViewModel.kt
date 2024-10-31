@@ -1,4 +1,4 @@
-package com.example.space_timetagger.ui.sessions
+package com.example.space_timetagger.ui.sessionsList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

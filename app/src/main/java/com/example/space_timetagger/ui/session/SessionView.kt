@@ -215,7 +215,7 @@ private fun SessionOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::clearTags)
+        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::deleteAllTags)
     }
 }
 
@@ -248,7 +248,7 @@ private val dummyCallbacks = object : SessionCallbacks {
     override fun setName(name: String?) {}
     override fun addTag(now: OffsetDateTime) {}
     override fun deleteTag(tag: TagModel) {}
-    override fun clearTags() {}
+    override fun deleteAllTags() {}
 
 }
 

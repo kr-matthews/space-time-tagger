@@ -96,8 +96,8 @@ class SessionsViewModelTest {
     }
 
     @Test
-    fun clearAllSessionsCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.clearAll()
+    fun deleteAllSessionsCallback_callsRepositoryFunc() = runTest {
+        viewModel.callbacks.deleteAll()
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).deleteAllSessions()
     }

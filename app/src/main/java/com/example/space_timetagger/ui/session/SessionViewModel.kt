@@ -36,7 +36,7 @@ class SessionViewModel(
             }
         }
 
-        override fun clearTags() {
+        override fun deleteAllTags() {
             viewModelScope.launch {
                 sessionsRepository.removeAllTagsFromSession(sessionId)
             }

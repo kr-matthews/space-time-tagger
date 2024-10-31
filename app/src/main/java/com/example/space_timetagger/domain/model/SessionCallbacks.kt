@@ -6,5 +6,5 @@ interface SessionCallbacks {
     fun setName(name: String?)
     fun addTag(now: OffsetDateTime = OffsetDateTime.now())
     fun deleteTag(tag: TagModel)
-    fun clearTags()
+    fun deleteAllTags()
 }

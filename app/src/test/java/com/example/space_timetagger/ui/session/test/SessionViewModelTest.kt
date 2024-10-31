@@ -80,8 +80,8 @@ class SessionViewModelTest {
     }
 
     @Test
-    fun clearTagsCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.clearTags()
+    fun deleteAllTagsCallback_callsRepositoryFunc() = runTest {
+        viewModel.callbacks.deleteAllTags()
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeAllTagsFromSession(sessionId)
     }

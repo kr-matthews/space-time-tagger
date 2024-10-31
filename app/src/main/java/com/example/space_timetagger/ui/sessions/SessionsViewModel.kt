@@ -37,7 +37,7 @@ class SessionsViewModel(
             }
         }
 
-        override fun clearAll() {
+        override fun deleteAll() {
             viewModelScope.launch {
                 sessionsRepository.deleteAllSessions()
             }

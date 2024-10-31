@@ -169,7 +169,7 @@ private fun SessionsOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::clearAll)
+        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::deleteAll)
     }
 }
 
@@ -205,7 +205,7 @@ class SessionListProvider : PreviewParameterProvider<List<SessionModel>> {
 private val dummyCallbacks = object : SessionsCallbacks {
     override fun new(name: String?) {}
     override fun delete(id: String) {}
-    override fun clearAll() {}
+    override fun deleteAll() {}
 }
 
 @Suppress("EmptyFunctionBlock")

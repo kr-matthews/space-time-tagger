@@ -1,84 +1,88 @@
 package com.example.space_timetagger.ui.session.test
 
 import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.domain.repository.SessionsRepository
+import com.example.space_timetagger.ui.CoroutineTestRule
+import com.example.space_timetagger.ui.mockDateTime
+import com.example.space_timetagger.ui.mockSession
+import com.example.space_timetagger.ui.mockTag
 import com.example.space_timetagger.ui.session.SessionViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import java.time.OffsetDateTime
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+const val sessionId = "fake-id"
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(MockitoJUnitRunner::class)
 class SessionViewModelTest {
-    private val viewModel = SessionViewModel()
 
-    @Test
-    fun initially_hasNoName() {
-        val initialName = viewModel.name.value
-        assertNull(initialName)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @get:Rule
+    var coroutineTestRule = CoroutineTestRule()
+
+    @Mock
+    private val mockSessionsRepository = mock<SessionsRepository>()
+
+    private lateinit var viewModel: SessionViewModel
+
+    @Before
+    fun setup() = runTest {
+        whenever(mockSessionsRepository.session(sessionId)).thenReturn(flowOf(mockSession))
+        viewModel = SessionViewModel(sessionId, mockSessionsRepository)
     }
 
     @Test
-    fun initially_hasNoTags() {
-        val initialTags = viewModel.tags.value
-        assert(initialTags.isEmpty())
+    fun initialState_hasNameFromRepository() = runTest {
+        val initialSession = viewModel.session.first()
+        assertEquals(mockSession.name, initialSession?.name)
     }
 
     @Test
-    fun setNameCallback_updatesName() {
-        val newName = "Test Session Name"
+    fun initialState_hasTagsFromRepository() = runTest {
+        val initialSession = viewModel.session.first()
+        assertEquals(mockSession.tags, initialSession?.tags)
+    }
+
+    @Test
+    fun setNameCallback_callsRepositoryFunc() = runTest {
+        val newName = "Updated Name String"
         viewModel.callbacks.setName(newName)
-        val updatedName = viewModel.name.value
-        assertEquals(newName, updatedName)
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).renameSession(sessionId, newName)
     }
 
     @Test
-    fun addTagCallback_addsANewTag() {
-        val tag0Time = OffsetDateTime.now()
-        val tag1Time = tag0Time.plusSeconds(7)
-        val tag2Time = tag0Time.plusSeconds(8)
-
-        viewModel.callbacks.addTag(tag0Time)
-        val tagsAfterFirstTag = viewModel.tags.value
-        assertEquals(1, tagsAfterFirstTag.size)
-        assertEquals(tag0Time, tagsAfterFirstTag[0].dateTime)
-
-        viewModel.callbacks.addTag(tag1Time)
-        viewModel.callbacks.addTag(tag2Time)
-        val tagsAfterAllTags = viewModel.tags.value
-        assertEquals(3, tagsAfterAllTags.size)
-        assertEquals(tag1Time, tagsAfterAllTags[1].dateTime)
-        assertEquals(tag2Time, tagsAfterAllTags[2].dateTime)
+    fun addTagCallback_callsRepositoryFunc() = runTest {
+        viewModel.callbacks.addTag(mockDateTime)
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).addTagToSession(sessionId, TagModel(mockDateTime))
     }
 
     @Test
-    fun deleteTagCallback_deletesExistingSession() {
-        repeat(4) { viewModel.callbacks.addTag() }
-        val preDeletionTags = viewModel.tags.value
-        val deletedTag = preDeletionTags[2]
-        viewModel.callbacks.deleteTag(deletedTag)
-        val postDeletionTags = viewModel.tags.value
-        assertEquals(preDeletionTags.size - 1, postDeletionTags.size)
-        assertEquals(
-            preDeletionTags.toMutableList().apply { remove(deletedTag) }.toList(),
-            postDeletionTags,
-        )
+    fun deleteTagCallback_callsRepositoryFunc() = runTest {
+        viewModel.callbacks.deleteTag(mockTag)
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).removeTagFromSession(sessionId, mockTag)
     }
 
     @Test
-    fun deleteTagCallback_doesNothingWithInvalidTag() {
-        val now = OffsetDateTime.now()
-        repeat(4) { viewModel.callbacks.addTag(now.plusSeconds(it.toLong())) }
-        val preDeletionTags = viewModel.tags.value
-        val unusedTag = TagModel(now.plusSeconds(preDeletionTags.size.toLong()))
-        viewModel.callbacks.deleteTag(unusedTag)
-        val postDeletionTags = viewModel.tags.value
-        assertEquals(preDeletionTags, postDeletionTags)
-    }
-
-    @Test
-    fun clearTagsCallback_deletesAllTags() {
-        repeat(4) { viewModel.callbacks.addTag() }
+    fun clearTagsCallback_callsRepositoryFunc() = runTest {
         viewModel.callbacks.clearTags()
-        val postDeletionTags = viewModel.tags.value
-        assert(postDeletionTags.isEmpty())
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).removeAllTagsFromSession(sessionId)
     }
 }

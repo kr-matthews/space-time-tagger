@@ -1,6 +1,6 @@
 package com.example.space_timetagger.ui.sessionDetail.test
 
-import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.domain.models.Tag
 import com.example.space_timetagger.domain.repository.SessionsRepository
 import com.example.space_timetagger.ui.CoroutineTestRule
 import com.example.space_timetagger.ui.mockDateTime
@@ -69,14 +69,17 @@ class SessionViewModelTest {
     fun addTagCallback_callsRepositoryFunc() = runTest {
         viewModel.callbacks.addTag(mockDateTime)
         advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).addTagToSession(sessionId, TagModel(mockDateTime))
+        verify(mockSessionsRepository, times(1)).addTagToSession(
+            sessionId,
+            Tag(dateTime = mockDateTime),
+        )
     }
 
     @Test
     fun deleteTagCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.deleteTag(mockTag)
+        viewModel.callbacks.deleteTag(mockTag.id)
         advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).removeTagFromSession(sessionId, mockTag)
+        verify(mockSessionsRepository, times(1)).removeTagFromSession(sessionId, mockTag.id)
     }
 
     @Test

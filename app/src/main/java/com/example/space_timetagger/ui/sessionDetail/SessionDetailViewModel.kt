@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
-import com.example.space_timetagger.domain.model.SessionCallbacks
-import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.domain.models.SessionCallbacks
+import com.example.space_timetagger.domain.models.Tag
 import com.example.space_timetagger.domain.repository.SessionsRepository
+import com.example.space_timetagger.ui.models.toDetailUiModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
 
@@ -14,7 +16,7 @@ class SessionViewModel(
     sessionId: String,
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
-    val session = sessionsRepository.session(sessionId)
+    val session = sessionsRepository.session(sessionId).map { it?.toDetailUiModel() }
 
     val callbacks = object : SessionCallbacks {
         override fun setName(name: String?) {
@@ -24,15 +26,15 @@ class SessionViewModel(
         }
 
         override fun addTag(now: OffsetDateTime) {
-            val tag = TagModel(now)
+            val tag = Tag(dateTime = now)
             viewModelScope.launch {
                 sessionsRepository.addTagToSession(sessionId, tag)
             }
         }
 
-        override fun deleteTag(tag: TagModel) {
+        override fun deleteTag(id: String) {
             viewModelScope.launch {
-                sessionsRepository.removeTagFromSession(sessionId, tag)
+                sessionsRepository.removeTagFromSession(sessionId, id)
             }
         }
 

@@ -1,4 +1,4 @@
-package com.example.space_timetagger.domain.model
+package com.example.space_timetagger.domain.models
 
 interface SessionsCallbacks {
     fun new(name: String? = null)

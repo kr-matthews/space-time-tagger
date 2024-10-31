@@ -4,17 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
-import com.example.space_timetagger.domain.model.SessionsCallbacks
+import com.example.space_timetagger.domain.models.SessionsCallbacks
 import com.example.space_timetagger.domain.repository.SessionsRepository
+import com.example.space_timetagger.ui.models.toOverviewUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SessionsViewModel(
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
-    val sessions = sessionsRepository.sessions()
+    val sessions = sessionsRepository.sessions().map { sessions ->
+        sessions.map { session -> session.toOverviewUiModel() }
+    }
 
     private val _sessionIdToNavigateTo = MutableStateFlow<String?>(null)
     val sessionIdToNavigateTo = _sessionIdToNavigateTo.asStateFlow()

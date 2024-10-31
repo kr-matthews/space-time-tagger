@@ -49,9 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
-import com.example.space_timetagger.domain.model.SessionCallbacks
-import com.example.space_timetagger.domain.model.TagModel
+import com.example.space_timetagger.domain.models.SessionCallbacks
 import com.example.space_timetagger.ui.common.ConfirmationDialog
+import com.example.space_timetagger.ui.models.TagUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -80,7 +80,7 @@ fun SessionDetailView(
 @Composable
 private fun Session(
     name: String?,
-    tags: List<TagModel>,
+    tags: List<TagUi>,
     callbacks: SessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -158,7 +158,7 @@ private fun Header(
 @Composable
 private fun Tag(
     index: Int,
-    tag: TagModel,
+    tag: TagUi,
     callbacks: SessionCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -185,7 +185,7 @@ private fun Tag(
 
     if (dialogIsOpen) {
         ConfirmationDialog(close = { setDialogIsOpen(false) }) {
-            callbacks.deleteTag(tag)
+            callbacks.deleteTag(tag.id)
         }
     }
 }
@@ -232,13 +232,13 @@ private fun NoTags(
     )
 }
 
-class TagListProvider : PreviewParameterProvider<List<TagModel>> {
+class TagListProvider : PreviewParameterProvider<List<TagUi>> {
     override val values = listOf(
         listOf(),
         listOf(
-            TagModel(OffsetDateTime.now().minusMinutes(8)),
-            TagModel(OffsetDateTime.now().minusMinutes(5)),
-            TagModel(OffsetDateTime.now().minusSeconds(23)),
+            TagUi(dateTime = OffsetDateTime.now().minusMinutes(8)),
+            TagUi(dateTime = OffsetDateTime.now().minusMinutes(5)),
+            TagUi(dateTime = OffsetDateTime.now().minusSeconds(23)),
         ),
     ).asSequence()
 }
@@ -247,7 +247,7 @@ class TagListProvider : PreviewParameterProvider<List<TagModel>> {
 private val dummyCallbacks = object : SessionCallbacks {
     override fun setName(name: String?) {}
     override fun addTag(now: OffsetDateTime) {}
-    override fun deleteTag(tag: TagModel) {}
+    override fun deleteTag(id: String) {}
     override fun deleteAllTags() {}
 
 }
@@ -258,8 +258,8 @@ private val dummyCallbacks = object : SessionCallbacks {
 private fun TagPreview() {
     SpaceTimeTaggerTheme {
         Tag(
-            index = 1,
-            tag = TagModel(OffsetDateTime.now().minusSeconds(23)),
+            index = 2,
+            tag = TagUi(dateTime = OffsetDateTime.now().minusSeconds(23)),
             dummyCallbacks,
             Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -273,7 +273,7 @@ private fun TagPreview() {
 @Preview(showBackground = true, heightDp = 300, widthDp = 600)
 @Composable
 private fun SessionPreview(
-    @PreviewParameter(TagListProvider::class) tags: List<TagModel>,
+    @PreviewParameter(TagListProvider::class) tags: List<TagUi>,
 ) {
     SpaceTimeTaggerTheme {
         Session(

@@ -39,9 +39,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
-import com.example.space_timetagger.domain.model.SessionModel
-import com.example.space_timetagger.domain.model.SessionsCallbacks
+import com.example.space_timetagger.domain.models.SessionsCallbacks
 import com.example.space_timetagger.ui.common.ConfirmationDialog
+import com.example.space_timetagger.ui.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -73,7 +73,7 @@ fun SessionsListView(
 
 @Composable
 private fun Sessions(
-    sessions: List<SessionModel>,
+    sessions: List<SessionOverviewUi>,
     callbacks: SessionsCallbacks,
     navigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -102,7 +102,7 @@ private fun Sessions(
 
 @Composable
 private fun SessionBox(
-    session: SessionModel,
+    session: SessionOverviewUi,
     callbacks: SessionsCallbacks,
     modifier: Modifier = Modifier,
     navigateToSession: () -> Unit,
@@ -186,17 +186,17 @@ private fun NoSessions(
     )
 }
 
-class SessionListProvider : PreviewParameterProvider<List<SessionModel>> {
+class SessionListProvider : PreviewParameterProvider<List<SessionOverviewUi>> {
     override val values = listOf(
         listOf(),
         listOf(
-            SessionModel("Session 1"),
-            SessionModel("Session 2"),
-            SessionModel("Session 3"),
-            SessionModel("Session 4 long name"),
-            SessionModel("Session 5 longest name, so long it doesn't fit"),
-            SessionModel("Session 6"),
-            SessionModel("Session 7"),
+            SessionOverviewUi(name = "Session 1"),
+            SessionOverviewUi(name = "Session 2"),
+            SessionOverviewUi(name = "Session 3"),
+            SessionOverviewUi(name = "Session 4 long name"),
+            SessionOverviewUi(name = "Session 5 longest name, so long it doesn't fit in the space"),
+            SessionOverviewUi(name = "Session 6"),
+            SessionOverviewUi(name = "Session 7"),
         ),
     ).asSequence()
 }
@@ -215,7 +215,7 @@ private val dummyCallbacks = object : SessionsCallbacks {
 private fun SessionBoxPreview() {
     SpaceTimeTaggerTheme {
         SessionBox(
-            SessionModel("Session Preview"),
+            SessionOverviewUi(name = "Session Preview"),
             dummyCallbacks,
             Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -230,7 +230,7 @@ private fun SessionBoxPreview() {
 @Preview(showBackground = true, heightDp = 300, widthDp = 600)
 @Composable
 private fun SessionsPreview(
-    @PreviewParameter(SessionListProvider::class) sessions: List<SessionModel>,
+    @PreviewParameter(SessionListProvider::class) sessions: List<SessionOverviewUi>,
 ) {
     SpaceTimeTaggerTheme {
         Sessions(

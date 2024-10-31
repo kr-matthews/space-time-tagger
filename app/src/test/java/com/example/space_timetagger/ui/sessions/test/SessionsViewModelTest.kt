@@ -1,9 +1,8 @@
 package com.example.space_timetagger.ui.sessions.test
 
-import com.example.space_timetagger.domain.model.SessionModel
-import com.example.space_timetagger.domain.model.TagModel
 import com.example.space_timetagger.domain.repository.SessionsRepository
 import com.example.space_timetagger.ui.CoroutineTestRule
+import com.example.space_timetagger.ui.mockSessions
 import com.example.space_timetagger.ui.sessions.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -24,22 +23,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import kotlin.random.Random
-
-val mockDateTime: OffsetDateTime = OffsetDateTime.of(2024, 7, 28, 16, 0, 58, 0, ZoneOffset.UTC)
-val mockTags = List(13) { i ->
-    TagModel(
-        mockDateTime.plusSeconds(Random.nextInt(i * i, (i + 1) * (i + 1)).toLong())
-    )
-}
-val mockSession1 = SessionModel(name = "Test Session", tags = mockTags)
-val mockSession2 = SessionModel(
-    name = "2nd session",
-    tags = mockTags.map { TagModel(it.dateTime.plusDays(2).plusSeconds(94)) },
-)
-val mockSessions = listOf(mockSession1, mockSession2)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -56,9 +39,7 @@ class SessionsViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(mockSessionsRepository.sessions()).thenReturn(
-            flowOf(mockSessions)
-        )
+        whenever(mockSessionsRepository.sessions()).thenReturn(flowOf(mockSessions))
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
         )

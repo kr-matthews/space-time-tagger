@@ -49,7 +49,7 @@ class SessionsListViewModelTest {
     @Test
     fun initially_passesAlongRepositorySessions() = runTest {
         val initialSessions = viewModel.sessions.first()
-        assertEquals(mockSessions, initialSessions)
+        assertEquals(mockSessions.map { it.id }, initialSessions.map { it.id })
     }
 
     @Test

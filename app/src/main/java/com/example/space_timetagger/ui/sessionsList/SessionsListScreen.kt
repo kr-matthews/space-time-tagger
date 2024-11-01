@@ -1,6 +1,5 @@
 package com.example.space_timetagger.ui.sessionsList
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +35,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -228,8 +228,7 @@ private val dummyCallbacks = object : SessionsCallbacks {
 }
 
 @Suppress("EmptyFunctionBlock")
-@Preview(showBackground = true)
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 private fun SessionBoxPreview() {
     SpaceTimeTaggerTheme {
@@ -244,9 +243,8 @@ private fun SessionBoxPreview() {
 }
 
 @Suppress("EmptyFunctionBlock")
-@Preview(showBackground = true, heightDp = 600)
-@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(showBackground = true, heightDp = 300, widthDp = 600)
+@PreviewLightDark
+@Preview(widthDp = 720, heightDp = 360)
 @Composable
 private fun SessionsPreview(
     @PreviewParameter(SessionListProvider::class) sessions: List<SessionOverviewUi>,
@@ -263,7 +261,7 @@ private fun SessionsPreview(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun ErrorPreview() {
     SpaceTimeTaggerTheme {

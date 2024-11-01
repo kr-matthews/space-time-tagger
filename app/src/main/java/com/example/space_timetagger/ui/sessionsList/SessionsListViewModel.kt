@@ -10,15 +10,19 @@ import com.example.space_timetagger.ui.models.toOverviewUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SessionsViewModel(
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
     val sessions = sessionsRepository.sessions().map { sessions ->
         sessions.map { session -> session.toOverviewUiModel() }
-    }
+    }.onEach { _isLoading.update { false } }
 
     private val _sessionIdToNavigateTo = MutableStateFlow<String?>(null)
     val sessionIdToNavigateTo = _sessionIdToNavigateTo.asStateFlow()

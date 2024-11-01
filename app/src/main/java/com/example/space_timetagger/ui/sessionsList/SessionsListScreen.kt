@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +47,7 @@ import com.example.space_timetagger.ui.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
-fun SessionsListView(
+fun SessionsListScreen(
     modifier: Modifier = Modifier,
     navigateToSession: (String) -> Unit,
 ) {
@@ -53,6 +55,7 @@ fun SessionsListView(
 
     val sessions by viewModel.sessions.collectAsState(listOf())
     val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     LaunchedEffect(sessionIdToNavigateTo) {
         sessionIdToNavigateTo?.let { id ->
@@ -61,14 +64,17 @@ fun SessionsListView(
         }
     }
 
-    Sessions(
-        sessions,
-        viewModel.callbacks,
-        navigateToSession,
-        modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(8.dp)
-    )
+    Box(modifier.background(MaterialTheme.colorScheme.background)) {
+        Sessions(
+            sessions,
+            viewModel.callbacks,
+            navigateToSession,
+            Modifier.padding(8.dp)
+        )
+        if (isLoading) {
+            CircularProgressIndicator(modifier.align(Alignment.Center))
+        }
+    }
 }
 
 @Composable
@@ -180,6 +186,19 @@ private fun NoSessions(
     Text(
         text = stringResource(R.string.no_sessions),
         textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+            .padding(16.dp)
+            .wrapContentSize()
+    )
+}
+
+@Composable
+fun Error(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.something_went_wrong),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.error,
         modifier = modifier
             .padding(16.dp)
             .wrapContentSize()
@@ -188,7 +207,6 @@ private fun NoSessions(
 
 class SessionListProvider : PreviewParameterProvider<List<SessionOverviewUi>> {
     override val values = listOf(
-        listOf(),
         listOf(
             SessionOverviewUi(name = "Session 1"),
             SessionOverviewUi(name = "Session 2"),
@@ -198,6 +216,7 @@ class SessionListProvider : PreviewParameterProvider<List<SessionOverviewUi>> {
             SessionOverviewUi(name = "Session 6"),
             SessionOverviewUi(name = "Session 7"),
         ),
+        listOf(),
     ).asSequence()
 }
 
@@ -241,5 +260,13 @@ private fun SessionsPreview(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         )
+    }
+}
+
+@Preview
+@Composable
+private fun ErrorPreview() {
+    SpaceTimeTaggerTheme {
+        Error(Modifier.background(MaterialTheme.colorScheme.background))
     }
 }

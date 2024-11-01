@@ -26,12 +26,11 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-const val validId = "existing-id"
-const val nonExistentId = "not-found-id"
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class SessionDetailViewModelTest {
+    private val validId = "existing-id"
+    private val nonExistentId = "not-found-id"
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule

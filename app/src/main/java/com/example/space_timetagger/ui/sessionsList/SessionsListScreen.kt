@@ -90,8 +90,9 @@ private fun Sessions(
     ) {
         if (sessions.isNotEmpty()) {
             LazyVerticalGrid(
+                // TODO: more dynamic size
                 columns = GridCells.FixedSize(175.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f)
             ) {

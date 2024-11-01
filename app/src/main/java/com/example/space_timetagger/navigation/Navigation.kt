@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.space_timetagger.ui.sessionDetail.SessionDetailView
-import com.example.space_timetagger.ui.sessionsList.SessionsListView
+import com.example.space_timetagger.ui.sessionsList.SessionsListScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,7 +20,7 @@ data class Session(val id: String)
 fun SttNavHost(navController: NavHostController, modifier: Modifier) {
     NavHost(navController = navController, startDestination = Sessions) {
         composable<Sessions> {
-            SessionsListView(modifier) { id -> navController.navigate(Session(id)) }
+            SessionsListScreen(modifier) { id -> navController.navigate(Session(id)) }
         }
         composable<Session> { entry ->
             val session = entry.toRoute<Session>()

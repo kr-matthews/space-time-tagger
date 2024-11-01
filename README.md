@@ -17,7 +17,7 @@ The app is not (currently) directly available anywhere, but you can clone/fork t
 
 - Basic UI to see/add/delete sessions and open them up.
 - Basic UI to see/add/delete tags (which only have the capture time) within a session.
-- No data is persisted after a screen closes (for now), so once you close a session the data is lost.
+- Note: No data is persisted after the app closes (for now).
 
 ### Potential Future
 

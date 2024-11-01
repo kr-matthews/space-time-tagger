@@ -1,4 +1,4 @@
-package com.example.space_timetagger
+package com.example.space_timetagger.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
-import com.example.space_timetagger.sessions.presentation.common.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 

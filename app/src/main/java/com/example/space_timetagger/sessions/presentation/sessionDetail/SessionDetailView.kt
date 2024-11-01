@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
-import com.example.space_timetagger.sessions.presentation.common.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.sessions.presentation.models.TagUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import java.time.OffsetDateTime

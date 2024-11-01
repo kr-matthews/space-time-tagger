@@ -1,4 +1,4 @@
-package com.example.space_timetagger.sessions.presentation.common
+package com.example.space_timetagger.core.presentation
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background

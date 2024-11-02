@@ -5,6 +5,7 @@ import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
+import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailState
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -12,7 +13,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,21 +51,27 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun nonExistentIdInitialState_isNullSession() = runTest {
-        val initialSession = viewModelNonExistentSession.session.first()
-        assertNull(initialSession)
+    fun nonExistentIdInitialState_producesErrorState() = runTest {
+        val initialViewState = viewModelNonExistentSession.viewState.first()
+        assert(initialViewState is SessionDetailState.Error)
     }
 
     @Test
-    fun initialState_hasNameFromRepository() = runTest {
-        val initialSession = viewModel.session.first()
-        assertEquals(mockSession.name, initialSession?.name)
+    fun initialState_isSuccessState() = runTest {
+        val initialViewState = viewModel.viewState.first()
+        assert(initialViewState is SessionDetailState.Success)
     }
 
     @Test
-    fun initialState_hasTagsFromRepository() = runTest {
-        val initialSession = viewModel.session.first()
-        assertEquals(mockSession.tags.map { it.id }, initialSession?.tags?.map { it.id })
+    fun initialSuccessState_hasNameFromRepository() = runTest {
+        val initialViewState = viewModel.viewState.first() as SessionDetailState.Success
+        assertEquals(mockSession.name, initialViewState.session.name)
+    }
+
+    @Test
+    fun initialSuccessState_hasTagsFromRepository() = runTest {
+        val initialViewState = viewModel.viewState.first() as SessionDetailState.Success
+        assertEquals(mockSession.tags.map { it.id }, initialViewState.session.tags.map { it.id })
     }
 
     @Test

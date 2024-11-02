@@ -3,6 +3,7 @@ package com.example.space_timetagger.sessions.presentation.sessionsList.test
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
+import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListState
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -47,9 +48,15 @@ class SessionsListViewModelTest {
     }
 
     @Test
+    fun initialState_isSuccessState() = runTest {
+        val initialViewState = viewModel.viewState.first()
+        assert(initialViewState is SessionsListState.Success)
+    }
+
+    @Test
     fun initially_passesAlongRepositorySessions() = runTest {
-        val initialSessions = viewModel.sessions.first()
-        assertEquals(mockSessions.map { it.id }, initialSessions.map { it.id })
+        val initialViewState = viewModel.viewState.first() as SessionsListState.Success
+        assertEquals(mockSessions.map { it.id }, initialViewState.sessions.map { it.id })
     }
 
     @Test

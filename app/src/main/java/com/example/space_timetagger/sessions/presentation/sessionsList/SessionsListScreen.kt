@@ -62,19 +62,19 @@ fun SessionsListScreen(
         }
     }
 
-    val viewState by viewModel.viewState.collectAsState(SessionListState.Loading)
+    val viewState by viewModel.viewState.collectAsState(SessionsListState.Loading)
 
     Box(modifier.background(MaterialTheme.colorScheme.background)) {
         when (val state = viewState) {
-            is SessionListState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
-            is SessionListState.Success -> Sessions(
+            is SessionsListState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
+            is SessionsListState.Success -> Sessions(
                 state.sessions,
                 viewModel.callbacks,
                 navigateToSession,
                 Modifier.padding(8.dp)
             )
 
-            is SessionListState.Refreshing -> {
+            is SessionsListState.Refreshing -> {
                 Sessions(
                     state.sessions,
                     viewModel.callbacks,
@@ -84,7 +84,7 @@ fun SessionsListScreen(
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            is SessionListState.Error -> Error()
+            is SessionsListState.Error -> Error()
         }
     }
 }

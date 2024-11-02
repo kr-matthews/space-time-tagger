@@ -26,8 +26,8 @@ class SessionsViewModel(
 
     val viewState = combine(sessions, isLoading) { sessions, isLoading ->
         when {
-            isLoading -> SessionListState.Refreshing(sessions)
-            else -> SessionListState.Success(sessions)
+            isLoading -> SessionsListState.Refreshing(sessions)
+            else -> SessionsListState.Success(sessions)
         }
     }
 

@@ -11,5 +11,5 @@
     <string name="are_you_sure">Are you sure? This action cannot be undone.</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
-    <string name="something_went_wrong">Something went wrong.</string>
+    <string name="could_not_load_sessions">Could not load sessions, something went wrong.</string>
 </resources>

@@ -41,8 +41,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
-import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
@@ -53,9 +53,7 @@ fun SessionsListScreen(
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
 
-    val sessions by viewModel.sessions.collectAsState(listOf())
     val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
 
     LaunchedEffect(sessionIdToNavigateTo) {
         sessionIdToNavigateTo?.let { id ->
@@ -64,15 +62,29 @@ fun SessionsListScreen(
         }
     }
 
+    val viewState by viewModel.viewState.collectAsState(SessionListState.Loading)
+
     Box(modifier.background(MaterialTheme.colorScheme.background)) {
-        Sessions(
-            sessions,
-            viewModel.callbacks,
-            navigateToSession,
-            Modifier.padding(8.dp)
-        )
-        if (isLoading) {
-            CircularProgressIndicator(modifier.align(Alignment.Center))
+        when (val state = viewState) {
+            is SessionListState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
+            is SessionListState.Success -> Sessions(
+                state.sessions,
+                viewModel.callbacks,
+                navigateToSession,
+                Modifier.padding(8.dp)
+            )
+
+            is SessionListState.Refreshing -> {
+                Sessions(
+                    state.sessions,
+                    viewModel.callbacks,
+                    navigateToSession,
+                    Modifier.padding(8.dp)
+                )
+                CircularProgressIndicator(modifier.align(Alignment.Center))
+            }
+
+            is SessionListState.Error -> Error()
         }
     }
 }
@@ -195,9 +207,9 @@ private fun NoSessions(
 }
 
 @Composable
-fun Error(modifier: Modifier = Modifier) {
+private fun Error(modifier: Modifier = Modifier) {
     Text(
-        text = stringResource(R.string.something_went_wrong),
+        text = stringResource(R.string.could_not_load_sessions),
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.error,
         modifier = modifier

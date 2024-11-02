@@ -35,7 +35,7 @@ fun Error(
 private fun ErrorPreview() {
     SpaceTimeTaggerTheme {
         Error(
-            R.string.could_not_load_sessions,
+            R.string.error_sessions_list,
             Modifier.background(MaterialTheme.colorScheme.background)
         )
     }

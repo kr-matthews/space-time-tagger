@@ -94,7 +94,7 @@ fun SessionDetailView(
             }
 
             SessionDetailState.Error -> Error(
-                R.string.could_not_load_sessions,
+                R.string.error_session_detail,
                 modifier.align(Alignment.Center)
             )
         }

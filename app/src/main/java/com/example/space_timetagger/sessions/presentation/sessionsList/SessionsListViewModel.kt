@@ -7,11 +7,12 @@ import com.example.space_timetagger.App
 import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toOverviewUiModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -31,18 +32,14 @@ class SessionsViewModel(
         }
     }
 
-    private val _sessionIdToNavigateTo = MutableStateFlow<String?>(null)
-    val sessionIdToNavigateTo = _sessionIdToNavigateTo.asStateFlow()
-
-    fun clearSessionIdToNavigateTo() {
-        _sessionIdToNavigateTo.update { null }
-    }
+    private val _sessionIdToNavigateTo = Channel<String>()
+    val sessionIdToNavigateTo = _sessionIdToNavigateTo.receiveAsFlow()
 
     val callbacks = object : SessionsCallbacks {
         override fun new(name: String?) {
             viewModelScope.launch {
                 val newSessionId = sessionsRepository.newSession(name)
-                _sessionIdToNavigateTo.update { newSessionId }
+                _sessionIdToNavigateTo.send(newSessionId)
             }
         }
 

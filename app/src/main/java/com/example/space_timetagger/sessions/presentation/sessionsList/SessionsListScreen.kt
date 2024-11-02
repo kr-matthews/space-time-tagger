@@ -39,12 +39,18 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SessionsListScreen(
@@ -53,14 +59,7 @@ fun SessionsListScreen(
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
 
-    val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsState()
-
-    LaunchedEffect(sessionIdToNavigateTo) {
-        sessionIdToNavigateTo?.let { id ->
-            navigateToSession(id)
-            viewModel.clearSessionIdToNavigateTo()
-        }
-    }
+    HandleNavigatingToNewSession(viewModel.sessionIdToNavigateTo, navigateToSession)
 
     val viewState by viewModel.viewState.collectAsState(SessionsListState.Loading)
 
@@ -85,6 +84,22 @@ fun SessionsListScreen(
             }
 
             is SessionsListState.Error -> Error()
+        }
+    }
+}
+
+@Composable
+fun HandleNavigatingToNewSession(
+    sessionIdToNavigateTo: Flow<String>,
+    navigateToSession: (String) -> Unit
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            // to ensure it doesn't get lost during, say, screen rotation
+            withContext(Dispatchers.Main.immediate) {
+                sessionIdToNavigateTo.collect(navigateToSession)
+            }
         }
     }
 }

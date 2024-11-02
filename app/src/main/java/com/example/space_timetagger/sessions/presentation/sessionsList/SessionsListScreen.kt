@@ -45,6 +45,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
@@ -83,7 +84,7 @@ fun SessionsListScreen(
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            is SessionsListState.Error -> Error()
+            is SessionsListState.Error -> Error(R.string.could_not_load_sessions)
         }
     }
 }
@@ -221,18 +222,6 @@ private fun NoSessions(
     )
 }
 
-@Composable
-private fun Error(modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(R.string.could_not_load_sessions),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.error,
-        modifier = modifier
-            .padding(16.dp)
-            .wrapContentSize()
-    )
-}
-
 class SessionListProvider : PreviewParameterProvider<List<SessionOverviewUi>> {
     override val values = listOf(
         listOf(
@@ -286,13 +275,5 @@ private fun SessionsPreview(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun ErrorPreview() {
-    SpaceTimeTaggerTheme {
-        Error(Modifier.background(MaterialTheme.colorScheme.background))
     }
 }

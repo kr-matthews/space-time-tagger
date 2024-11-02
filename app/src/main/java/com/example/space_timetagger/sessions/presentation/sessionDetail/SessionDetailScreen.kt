@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
 import com.example.space_timetagger.sessions.presentation.models.TagUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
@@ -87,7 +88,7 @@ fun SessionDetailView(
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            SessionDetailState.Error -> Error()
+            SessionDetailState.Error -> Error(R.string.could_not_load_sessions)
         }
     }
 }
@@ -242,19 +243,6 @@ private fun NoTags(
         text = stringResource(R.string.no_tags),
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurface,
-        modifier = modifier
-            .padding(16.dp)
-            .wrapContentSize()
-    )
-}
-
-// TODO: extract to core
-@Composable
-private fun Error(modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(R.string.could_not_load_sessions),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.error,
         modifier = modifier
             .padding(16.dp)
             .wrapContentSize()

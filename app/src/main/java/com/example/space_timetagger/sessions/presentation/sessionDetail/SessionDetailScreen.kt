@@ -3,6 +3,7 @@ package com.example.space_timetagger.sessions.presentation.sessionDetail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,18 +65,31 @@ fun SessionDetailView(
 ) {
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
 
-    val session by viewModel.session.collectAsState(null)
+    val viewState by viewModel.viewState.collectAsState(SessionDetailState.Loading)
 
-    session?.let {
-        Session(
-            it.name,
-            it.tags,
-            viewModel.callbacks,
-            modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
-        )
-    } ?: Text("Something went wrong") // todo
+    Box(modifier.background(MaterialTheme.colorScheme.background)) {
+        when (val state = viewState) {
+            is SessionDetailState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
+            is SessionDetailState.Success -> Session(
+                state.session.name,
+                state.session.tags,
+                viewModel.callbacks,
+                modifier.padding(8.dp)
+            )
+
+            is SessionDetailState.Refreshing -> {
+                Session(
+                    state.session.name,
+                    state.session.tags,
+                    viewModel.callbacks,
+                    modifier.padding(8.dp)
+                )
+                CircularProgressIndicator(modifier.align(Alignment.Center))
+            }
+
+            SessionDetailState.Error -> Error()
+        }
+    }
 }
 
 @Composable
@@ -226,7 +241,20 @@ private fun NoTags(
     Text(
         text = stringResource(R.string.no_tags),
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurface ,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+            .padding(16.dp)
+            .wrapContentSize()
+    )
+}
+
+// TODO: extract to core
+@Composable
+private fun Error(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.could_not_load_sessions),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.error,
         modifier = modifier
             .padding(16.dp)
             .wrapContentSize()

@@ -8,7 +8,11 @@ import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toDetailUiModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
 
@@ -16,7 +20,18 @@ class SessionViewModel(
     sessionId: String,
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
-    val session = sessionsRepository.session(sessionId).map { it?.toDetailUiModel() }
+    private val isLoading = MutableStateFlow(true)
+
+    private val session = sessionsRepository.session(sessionId).map { it?.toDetailUiModel() }
+        .onEach { isLoading.update { false } }
+
+    val viewState = combine(session, isLoading) { session, isLoading ->
+        when {
+            session == null -> SessionDetailState.Error
+            isLoading -> SessionDetailState.Refreshing(session)
+            else -> SessionDetailState.Success(session)
+        }
+    }
 
     val callbacks = object : SessionCallbacks {
         override fun setName(name: String?) {

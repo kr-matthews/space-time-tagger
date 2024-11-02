@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -64,7 +65,11 @@ fun SessionsListScreen(
 
     val viewState by viewModel.viewState.collectAsState(SessionsListState.Loading)
 
-    Box(modifier.background(MaterialTheme.colorScheme.background)) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         when (val state = viewState) {
             is SessionsListState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
             is SessionsListState.Success -> Sessions(
@@ -84,7 +89,10 @@ fun SessionsListScreen(
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            is SessionsListState.Error -> Error(R.string.could_not_load_sessions)
+            is SessionsListState.Error -> Error(
+                R.string.could_not_load_sessions,
+                modifier.align(Alignment.Center)
+            )
         }
     }
 }

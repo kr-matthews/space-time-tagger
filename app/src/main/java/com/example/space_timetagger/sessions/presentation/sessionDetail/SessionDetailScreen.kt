@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -68,7 +69,11 @@ fun SessionDetailView(
 
     val viewState by viewModel.viewState.collectAsState(SessionDetailState.Loading)
 
-    Box(modifier.background(MaterialTheme.colorScheme.background)) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         when (val state = viewState) {
             is SessionDetailState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
             is SessionDetailState.Success -> Session(
@@ -88,7 +93,10 @@ fun SessionDetailView(
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            SessionDetailState.Error -> Error(R.string.could_not_load_sessions)
+            SessionDetailState.Error -> Error(
+                R.string.could_not_load_sessions,
+                modifier.align(Alignment.Center)
+            )
         }
     }
 }

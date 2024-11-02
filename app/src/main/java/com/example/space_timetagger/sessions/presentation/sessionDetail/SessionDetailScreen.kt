@@ -1,6 +1,5 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,14 +42,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
-import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
 import com.example.space_timetagger.sessions.presentation.models.TagUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import java.time.OffsetDateTime
@@ -226,6 +226,7 @@ private fun NoTags(
     Text(
         text = stringResource(R.string.no_tags),
         textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurface ,
         modifier = modifier
             .padding(16.dp)
             .wrapContentSize()
@@ -234,12 +235,12 @@ private fun NoTags(
 
 class TagListProvider : PreviewParameterProvider<List<TagUi>> {
     override val values = listOf(
-        listOf(),
         listOf(
             TagUi(dateTime = OffsetDateTime.now().minusMinutes(8)),
             TagUi(dateTime = OffsetDateTime.now().minusMinutes(5)),
             TagUi(dateTime = OffsetDateTime.now().minusSeconds(23)),
         ),
+        listOf(),
     ).asSequence()
 }
 
@@ -252,8 +253,7 @@ private val dummyCallbacks = object : SessionCallbacks {
 
 }
 
-@Preview(showBackground = true)
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 private fun TagPreview() {
     SpaceTimeTaggerTheme {
@@ -268,9 +268,8 @@ private fun TagPreview() {
     }
 }
 
-@Preview(showBackground = true, heightDp = 600)
-@Preview(showBackground = true, heightDp = 600, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(showBackground = true, heightDp = 300, widthDp = 600)
+@PreviewLightDark
+@Preview(widthDp = 720, heightDp = 360)
 @Composable
 private fun SessionPreview(
     @PreviewParameter(TagListProvider::class) tags: List<TagUi>,

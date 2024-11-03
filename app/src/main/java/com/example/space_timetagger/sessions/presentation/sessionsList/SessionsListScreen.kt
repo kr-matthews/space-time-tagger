@@ -90,7 +90,7 @@ fun SessionsListScreen(
             }
 
             is SessionsListState.Error -> Error(
-                R.string.error_sessions_list,
+                stringResource(R.string.error_sessions_list),
                 modifier.align(Alignment.Center)
             )
         }

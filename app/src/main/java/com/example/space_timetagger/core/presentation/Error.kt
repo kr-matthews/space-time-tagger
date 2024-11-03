@@ -1,6 +1,5 @@
 package com.example.space_timetagger.core.presentation
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -17,11 +16,11 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun Error(
-    @StringRes textId: Int,
+    text: String,
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = stringResource(textId),
+        text = text,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.error,
         modifier = modifier
@@ -35,7 +34,7 @@ fun Error(
 private fun ErrorPreview() {
     SpaceTimeTaggerTheme {
         Error(
-            R.string.error_sessions_list,
+            stringResource(R.string.error_sessions_list),
             Modifier.background(MaterialTheme.colorScheme.background)
         )
     }

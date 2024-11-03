@@ -94,7 +94,7 @@ fun SessionDetailView(
             }
 
             SessionDetailState.Error -> Error(
-                R.string.error_session_detail,
+                stringResource(R.string.error_session_detail),
                 modifier.align(Alignment.Center)
             )
         }

@@ -5,6 +5,7 @@ coreKtx = "1.13.1"
 junit = "4.13.2"
 mockito = "5.14.1"
 mockitoKotlin = "5.4.0"
+mockitoAndroid = "5.14.2"
 kotlinxCoroutinesTest = "1.6.1"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -21,6 +22,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 org-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 org-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+org-mockito-android = { group = "org.mockito", name = "mockito-android", version.ref = "mockitoAndroid" }
 org-jetbrains-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

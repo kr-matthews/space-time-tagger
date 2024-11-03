@@ -208,7 +208,7 @@ private fun Tag(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
+        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }) {
             callbacks.deleteTag(tag.id)
         }
     }
@@ -239,7 +239,7 @@ private fun SessionOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::deleteAllTags)
+        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }, action = callbacks::deleteAllTags)
     }
 }
 

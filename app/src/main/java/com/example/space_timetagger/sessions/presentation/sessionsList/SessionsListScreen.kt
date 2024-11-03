@@ -181,7 +181,7 @@ private fun SessionBox(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }) {
+        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }) {
             callbacks.delete(session.id)
         }
     }
@@ -212,7 +212,7 @@ private fun SessionsOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(close = { setDialogIsOpen(false) }, action = callbacks::deleteAll)
+        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }, action = callbacks::deleteAll)
     }
 }
 

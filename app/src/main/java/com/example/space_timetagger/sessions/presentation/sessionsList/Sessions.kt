@@ -78,7 +78,7 @@ private fun SessionBox(
 
     val isUnnamed = session.name.isNullOrBlank()
     val title = if (isUnnamed) stringResource(R.string.untitled) else session.name!!
-    val textStyle = if (isUnnamed) null else FontStyle.Italic
+    val textStyle = if (isUnnamed) FontStyle.Italic else null
 
     Card(modifier.clickable(onClick = navigateToSession)) {
         Row(

@@ -60,29 +60,38 @@ fun SessionsListScreen(
     navigateToSession: (String) -> Unit,
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
+    val viewState by viewModel.viewState.collectAsState(SessionsListState.Loading)
 
     HandleNavigatingToNewSession(viewModel.sessionIdToNavigateTo, navigateToSession)
 
-    val viewState by viewModel.viewState.collectAsState(SessionsListState.Loading)
+    SessionsListView(viewState, viewModel.callbacks, navigateToSession, modifier)
+}
 
+@Composable
+fun SessionsListView(
+    viewState: SessionsListState,
+    callbacks: SessionsCallbacks,
+    navigateToSession: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        when (val state = viewState) {
+        when (viewState) {
             is SessionsListState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
             is SessionsListState.Success -> Sessions(
-                state.sessions,
-                viewModel.callbacks,
+                viewState.sessions,
+                callbacks,
                 navigateToSession,
                 Modifier.padding(8.dp)
             )
 
             is SessionsListState.Refreshing -> {
                 Sessions(
-                    state.sessions,
-                    viewModel.callbacks,
+                    viewState.sessions,
+                    callbacks,
                     navigateToSession,
                     Modifier.padding(8.dp)
                 )
@@ -212,7 +221,10 @@ private fun SessionsOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }, action = callbacks::deleteAll)
+        ConfirmationDialog(
+            onDismissRequest = { setDialogIsOpen(false) },
+            action = callbacks::deleteAll,
+        )
     }
 }
 
@@ -230,18 +242,24 @@ private fun NoSessions(
     )
 }
 
-class SessionListProvider : PreviewParameterProvider<List<SessionOverviewUi>> {
+private val noSessions = listOf<SessionOverviewUi>()
+val someSessions = listOf(
+    SessionOverviewUi(name = "Session 1"),
+    SessionOverviewUi(name = "Session 2"),
+    SessionOverviewUi(name = "Session 3"),
+    SessionOverviewUi(name = "Session 4 long name"),
+    SessionOverviewUi(name = "Session 5 longest name, so long it doesn't fit in the space"),
+    SessionOverviewUi(name = "Session 6"),
+    SessionOverviewUi(name = "Session 7"),
+)
+
+class SessionsListStateProvider : PreviewParameterProvider<SessionsListState> {
     override val values = listOf(
-        listOf(
-            SessionOverviewUi(name = "Session 1"),
-            SessionOverviewUi(name = "Session 2"),
-            SessionOverviewUi(name = "Session 3"),
-            SessionOverviewUi(name = "Session 4 long name"),
-            SessionOverviewUi(name = "Session 5 longest name, so long it doesn't fit in the space"),
-            SessionOverviewUi(name = "Session 6"),
-            SessionOverviewUi(name = "Session 7"),
-        ),
-        listOf(),
+        SessionsListState.Success(someSessions),
+        SessionsListState.Success(noSessions),
+        SessionsListState.Loading,
+        SessionsListState.Error,
+        SessionsListState.Refreshing(someSessions),
     ).asSequence()
 }
 
@@ -250,6 +268,18 @@ private val dummyCallbacks = object : SessionsCallbacks {
     override fun new(name: String?) {}
     override fun delete(id: String) {}
     override fun deleteAll() {}
+}
+
+@Suppress("EmptyFunctionBlock")
+@PreviewLightDark
+@Preview(widthDp = 720, heightDp = 360)
+@Composable
+private fun SessionsPreview(
+    @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListState,
+) {
+    SpaceTimeTaggerTheme {
+        SessionsListView(viewState, dummyCallbacks, {})
+    }
 }
 
 @Suppress("EmptyFunctionBlock")
@@ -264,24 +294,5 @@ private fun SessionBoxPreview() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
         ) {}
-    }
-}
-
-@Suppress("EmptyFunctionBlock")
-@PreviewLightDark
-@Preview(widthDp = 720, heightDp = 360)
-@Composable
-private fun SessionsPreview(
-    @PreviewParameter(SessionListProvider::class) sessions: List<SessionOverviewUi>,
-) {
-    SpaceTimeTaggerTheme {
-        Sessions(
-            sessions,
-            dummyCallbacks,
-            {},
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
-        )
     }
 }

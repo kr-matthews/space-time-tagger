@@ -55,39 +55,48 @@ import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
+import com.example.space_timetagger.sessions.presentation.models.SessionDetailUi
 import com.example.space_timetagger.sessions.presentation.models.TagUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun SessionDetailView(
+fun SessionDetailScreen(
     id: String,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
-
     val viewState by viewModel.viewState.collectAsState(SessionDetailState.Loading)
 
+    SessionDetailView(viewState, viewModel.callbacks, modifier)
+}
+
+@Composable
+fun SessionDetailView(
+    viewState: SessionDetailState,
+    callbacks: SessionCallbacks,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        when (val state = viewState) {
+        when (viewState) {
             is SessionDetailState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
             is SessionDetailState.Success -> Session(
-                state.session.name,
-                state.session.tags,
-                viewModel.callbacks,
+                viewState.session.name,
+                viewState.session.tags,
+                callbacks,
                 modifier.padding(8.dp)
             )
 
             is SessionDetailState.Refreshing -> {
                 Session(
-                    state.session.name,
-                    state.session.tags,
-                    viewModel.callbacks,
+                    viewState.session.name,
+                    viewState.session.tags,
+                    callbacks,
                     modifier.padding(8.dp)
                 )
                 CircularProgressIndicator(modifier.align(Alignment.Center))
@@ -239,7 +248,10 @@ private fun SessionOptions(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }, action = callbacks::deleteAllTags)
+        ConfirmationDialog(
+            onDismissRequest = { setDialogIsOpen(false) },
+            action = callbacks::deleteAllTags,
+        )
     }
 }
 
@@ -257,14 +269,48 @@ private fun NoTags(
     )
 }
 
-class TagListProvider : PreviewParameterProvider<List<TagUi>> {
+private val noTags = listOf<TagUi>()
+private val someTags = listOf(
+    TagUi(dateTime = OffsetDateTime.now().minusMinutes(8)),
+    TagUi(dateTime = OffsetDateTime.now().minusMinutes(5)),
+    TagUi(dateTime = OffsetDateTime.now().minusSeconds(23)),
+)
+private val manyTags = List(20) { i ->
+    TagUi(dateTime = OffsetDateTime.now().minusSeconds(2 * i + 3L))
+}
+
+class ViewStateProvider : PreviewParameterProvider<SessionDetailState> {
     override val values = listOf(
-        listOf(
-            TagUi(dateTime = OffsetDateTime.now().minusMinutes(8)),
-            TagUi(dateTime = OffsetDateTime.now().minusMinutes(5)),
-            TagUi(dateTime = OffsetDateTime.now().minusSeconds(23)),
+        SessionDetailState.Success(
+            SessionDetailUi(
+                id = "id",
+                name = "Shopping Trip",
+                tags = someTags,
+            ),
         ),
-        listOf(),
+        SessionDetailState.Success(
+            SessionDetailUi(
+                id = "id",
+                name = "Session with no tags",
+                tags = noTags,
+            ),
+        ),
+        SessionDetailState.Success(
+            SessionDetailUi(
+                id = "id",
+                name = "Wed commute home",
+                tags = manyTags,
+            ),
+        ),
+        SessionDetailState.Loading,
+        SessionDetailState.Error,
+        SessionDetailState.Refreshing(
+            SessionDetailUi(
+                id = "id",
+                name = "Refreshing 10pm",
+                tags = someTags,
+            ),
+        ),
     ).asSequence()
 }
 
@@ -274,7 +320,17 @@ private val dummyCallbacks = object : SessionCallbacks {
     override fun addTag(now: OffsetDateTime) {}
     override fun deleteTag(id: String) {}
     override fun deleteAllTags() {}
+}
 
+@PreviewLightDark
+@Preview(widthDp = 720, heightDp = 360)
+@Composable
+private fun SessionDetailPreview(
+    @PreviewParameter(ViewStateProvider::class) viewState: SessionDetailState,
+) {
+    SpaceTimeTaggerTheme {
+        SessionDetailView(viewState, dummyCallbacks)
+    }
 }
 
 @PreviewLightDark
@@ -284,24 +340,6 @@ private fun TagPreview() {
         Tag(
             index = 2,
             tag = TagUi(dateTime = OffsetDateTime.now().minusSeconds(23)),
-            dummyCallbacks,
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
-        )
-    }
-}
-
-@PreviewLightDark
-@Preview(widthDp = 720, heightDp = 360)
-@Composable
-private fun SessionPreview(
-    @PreviewParameter(TagListProvider::class) tags: List<TagUi>,
-) {
-    SpaceTimeTaggerTheme {
-        Session(
-            "Preview Title",
-            tags,
             dummyCallbacks,
             Modifier
                 .background(MaterialTheme.colorScheme.background)

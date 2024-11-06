@@ -33,6 +33,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -89,6 +91,8 @@ private fun Header(
     val (editModeIsOn, setEditModeIsOn) = rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
+    val contentDescription = stringResource(R.string.name_input)
+
     // unfortunately, the cursor will go to the front of the input, not the end
     LaunchedEffect(editModeIsOn) {
         if (editModeIsOn) {
@@ -109,7 +113,9 @@ private fun Header(
                 setName(name?.trim())
                 setEditModeIsOn(false)
             }),
-            modifier = Modifier.focusRequester(focusRequester),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .semantics { this.contentDescription = contentDescription }
         )
     } else {
         Text(

@@ -44,14 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.formatShortDateLongTime
 import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
 import com.example.space_timetagger.sessions.presentation.models.TagUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
-import java.time.format.DateTimeFormatter
-
 
 @Composable
-fun Session(
+fun SessionDetail(
     name: String?,
     tags: List<TagUi>,
     callbacks: SessionCallbacks,
@@ -144,7 +143,7 @@ private fun Tag(
             modifier = Modifier.padding(horizontal = 8.dp)
         ) {
             Text(text = "#${index + 1}", fontWeight = FontWeight.W800)
-            Text(text = tag.dateTime.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm.ss")))
+            Text(text = tag.dateTime.formatShortDateLongTime())
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { setDialogIsOpen(true) }) {
                 Icon(

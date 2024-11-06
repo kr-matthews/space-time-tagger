@@ -48,7 +48,7 @@ fun SessionDetailView(
     ) {
         when (viewState) {
             is SessionDetailState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
-            is SessionDetailState.Success -> Session(
+            is SessionDetailState.Success -> SessionDetail(
                 viewState.session.name,
                 viewState.session.tags,
                 callbacks,
@@ -56,7 +56,7 @@ fun SessionDetailView(
             )
 
             is SessionDetailState.Refreshing -> {
-                Session(
+                SessionDetail(
                     viewState.session.name,
                     viewState.session.tags,
                     callbacks,

@@ -45,15 +45,15 @@ class SessionDetailScreenTest {
         name = "Test session name",
         tags = List(6) { i -> TagUi(dateTime = now.minusSeconds(i * i + 2L)) },
     )
-    private val successState = SessionDetailState.Success(session)
-    private val newSuccessState = SessionDetailState.Success(
+    private val successState = SessionDetailUiState.Success(session)
+    private val newSuccessState = SessionDetailUiState.Success(
         SessionDetailUi(name = null, tags = listOf()),
     )
-    private val loadingState = SessionDetailState.Loading
-    private val errorState = SessionDetailState.Error
-    private val refreshState = SessionDetailState.Refreshing(session)
+    private val loadingState = SessionDetailUiState.Loading
+    private val errorState = SessionDetailUiState.Error
+    private val refreshState = SessionDetailUiState.Refreshing(session)
 
-    private fun setup(viewState: SessionDetailState) {
+    private fun setup(viewState: SessionDetailUiState) {
         composeTestRule.setContent {
             SpaceTimeTaggerTheme {
                 SessionDetailView(viewState, mockCallbacks)

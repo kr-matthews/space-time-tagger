@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +16,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
@@ -30,7 +30,7 @@ fun SessionDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
-    val viewState by viewModel.viewState.collectAsState(SessionDetailUiState.Loading)
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionDetailUiState.Loading)
 
     SessionDetailView(viewState, viewModel.callbacks, modifier)
 }

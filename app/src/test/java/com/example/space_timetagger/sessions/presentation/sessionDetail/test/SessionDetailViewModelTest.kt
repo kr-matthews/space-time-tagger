@@ -5,7 +5,8 @@ import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
-import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailUiState
+import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailEvent
+import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailViewState
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -53,38 +54,39 @@ class SessionDetailViewModelTest {
     @Test
     fun nonExistentIdInitialState_producesErrorState() = runTest {
         val initialViewState = viewModelNonExistentSession.viewState.first()
-        assert(initialViewState is SessionDetailUiState.Error)
+        assert(initialViewState is SessionDetailViewState.Error)
     }
 
     @Test
     fun initialState_isSuccessState() = runTest {
+        advanceUntilIdle()
         val initialViewState = viewModel.viewState.first()
-        assert(initialViewState is SessionDetailUiState.Success)
+        assert(initialViewState is SessionDetailViewState.Success)
     }
 
     @Test
     fun initialSuccessState_hasNameFromRepository() = runTest {
-        val initialViewState = viewModel.viewState.first() as SessionDetailUiState.Success
+        val initialViewState = viewModel.viewState.first() as SessionDetailViewState.Success
         assertEquals(mockSession.name, initialViewState.session.name)
     }
 
     @Test
     fun initialSuccessState_hasTagsFromRepository() = runTest {
-        val initialViewState = viewModel.viewState.first() as SessionDetailUiState.Success
+        val initialViewState = viewModel.viewState.first() as SessionDetailViewState.Success
         assertEquals(mockSession.tags.map { it.id }, initialViewState.session.tags.map { it.id })
     }
 
     @Test
     fun setNameCallback_callsRepositoryFunc() = runTest {
         val newName = "Updated Name String"
-        viewModel.callbacks.setName(newName)
+        viewModel.handleEvent(SessionDetailEvent.ChangeName(newName))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).renameSession(validId, newName)
     }
 
     @Test
     fun addTagCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.addTag(mockDateTime)
+        viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
             eq(validId),
@@ -94,14 +96,14 @@ class SessionDetailViewModelTest {
 
     @Test
     fun deleteTagCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.deleteTag(mockTag.id)
+        viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteTag(mockTag.id))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeTagFromSession(validId, mockTag.id)
     }
 
     @Test
     fun deleteAllTagsCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.deleteAllTags()
+        viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteAllTags)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeAllTagsFromSession(validId)
     }

@@ -4,61 +4,78 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
-import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
+import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
-import com.example.space_timetagger.sessions.presentation.models.toDetailUiModel
+import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
+import com.example.space_timetagger.sessions.presentation.models.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
 
 class SessionViewModel(
-    sessionId: String,
+    private val sessionId: String,
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
     private val isLoading = MutableStateFlow(true)
 
-    private val session = sessionsRepository.session(sessionId).map { it?.toDetailUiModel() }
+    private val session = sessionsRepository.session(sessionId)
         .onEach { isLoading.update { false } }
 
-    val viewState = combine(session, isLoading) { session, isLoading ->
-        when {
-            session == null -> SessionDetailUiState.Error
-            isLoading -> SessionDetailUiState.Refreshing(session)
-            else -> SessionDetailUiState.Success(session)
+    private val nameIsBeingEdited = MutableStateFlow(false)
+
+    val viewState =
+        combine(isLoading, session, nameIsBeingEdited) { isLoading, session, nameIsBeingEdited ->
+            when {
+                session == null -> SessionDetailViewState.Error
+
+                isLoading -> SessionDetailViewState.Refreshing(
+                    buildSessionDetailUiModel(session, nameIsBeingEdited)
+                )
+
+                else -> SessionDetailViewState.Success(
+                    buildSessionDetailUiModel(session, nameIsBeingEdited)
+                )
+            }
+        }
+
+    fun handleEvent(event: SessionDetailEvent) {
+        when (event) {
+            SessionDetailEvent.TapName -> nameIsBeingEdited.update { true }
+            is SessionDetailEvent.ChangeName -> setName(event.newName)
+            SessionDetailEvent.TapNameDoneEditing -> nameIsBeingEdited.update { false }
+            is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
+            is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
+            SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
         }
     }
 
-    val callbacks = object : SessionCallbacks {
-        override fun setName(name: String?) {
-            viewModelScope.launch {
-                sessionsRepository.renameSession(sessionId, name)
-            }
+    private fun setName(name: String?) {
+        viewModelScope.launch {
+            sessionsRepository.renameSession(sessionId, name)
         }
+    }
 
-        override fun addTag(now: OffsetDateTime) {
-            val tag = Tag(dateTime = now)
-            viewModelScope.launch {
-                sessionsRepository.addTagToSession(sessionId, tag)
-            }
+    private fun addTag(now: OffsetDateTime) {
+        val tag = Tag(dateTime = now)
+        viewModelScope.launch {
+            sessionsRepository.addTagToSession(sessionId, tag)
         }
+    }
 
-        override fun deleteTag(id: String) {
-            viewModelScope.launch {
-                sessionsRepository.removeTagFromSession(sessionId, id)
-            }
+    private fun deleteTag(id: String) {
+        viewModelScope.launch {
+            sessionsRepository.removeTagFromSession(sessionId, id)
         }
+    }
 
-        override fun deleteAllTags() {
-            viewModelScope.launch {
-                sessionsRepository.removeAllTagsFromSession(sessionId)
-            }
+    private fun deleteAllTags() {
+        viewModelScope.launch {
+            sessionsRepository.removeAllTagsFromSession(sessionId)
         }
-
     }
 }
 
@@ -68,3 +85,12 @@ class SessionViewModelFactory(private val sessionId: String) : ViewModelProvider
         return SessionViewModel(sessionId, App.appModule.sessionsRepository) as T
     }
 }
+
+private fun buildSessionDetailUiModel(session: Session, nameIsBeingEdited: Boolean) =
+    SessionDetailUiModel(
+        id = session.id,
+        name = session.name,
+        nameIsBeingEdited = nameIsBeingEdited,
+        tags = session.tags.map(Tag::toUiModel),
+        deleteAllIsEnabled = session.tags.isNotEmpty(),
+    )

@@ -19,14 +19,13 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.formatShortDateLongTime
-import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
-import com.example.space_timetagger.sessions.presentation.models.SessionDetailUi
-import com.example.space_timetagger.sessions.presentation.models.TagUi
+import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
+import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.time.OffsetDateTime
@@ -39,24 +38,31 @@ class SessionDetailScreenTest {
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val mockCallbacks: SessionCallbacks = mock()
+    private val mockHandleEvent: (SessionDetailEvent) -> Unit = mock()
     private val now: OffsetDateTime = OffsetDateTime.of(2024, 7, 19, 8, 33, 6, 5, ZoneOffset.UTC)
-    private val session = SessionDetailUi(
+    private val session = SessionDetailUiModel(
         name = "Test session name",
-        tags = List(6) { i -> TagUi(dateTime = now.minusSeconds(i * i + 2L)) },
+        nameIsBeingEdited = false,
+        tags = List(6) { i -> TagUiModel(dateTime = now.minusSeconds(i * i + 2L)) },
+        deleteAllIsEnabled = true,
     )
-    private val successState = SessionDetailUiState.Success(session)
-    private val newSuccessState = SessionDetailUiState.Success(
-        SessionDetailUi(name = null, tags = listOf()),
+    private val successState = SessionDetailViewState.Success(session)
+    private val newSuccessState = SessionDetailViewState.Success(
+        SessionDetailUiModel(
+            name = null,
+            nameIsBeingEdited = false,
+            tags = listOf(),
+            deleteAllIsEnabled = false,
+        ),
     )
-    private val loadingState = SessionDetailUiState.Loading
-    private val errorState = SessionDetailUiState.Error
-    private val refreshState = SessionDetailUiState.Refreshing(session)
+    private val loadingState = SessionDetailViewState.Loading
+    private val errorState = SessionDetailViewState.Error
+    private val refreshState = SessionDetailViewState.Refreshing(session)
 
-    private fun setup(viewState: SessionDetailUiState) {
+    private fun setup(viewState: SessionDetailViewState) {
         composeTestRule.setContent {
             SpaceTimeTaggerTheme {
-                SessionDetailView(viewState, mockCallbacks)
+                SessionDetailView(viewState, mockHandleEvent)
             }
         }
     }
@@ -86,7 +92,7 @@ class SessionDetailScreenTest {
         setup(successState)
         val newName = "Banana"
         updateName(successState.session.name, newName)
-        verify(mockCallbacks, times(1)).setName(newName)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ChangeName(newName))
     }
 
     @Test
@@ -103,7 +109,10 @@ class SessionDetailScreenTest {
             it[index]
         }
         deleteTag(tagToDelete)
-        verify(mockCallbacks, times(1)).deleteTag(tagToDelete.id)
+        verify(
+            mockHandleEvent,
+            times(1)
+        ).invoke(SessionDetailEvent.TapConfirmDeleteTag(tagToDelete.id))
     }
 
     @Test
@@ -144,7 +153,7 @@ class SessionDetailScreenTest {
         setup(newSuccessState)
         val newName = "Cherry"
         updateName(null, newName)
-        verify(mockCallbacks, times(1)).setName(newName)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ChangeName(newName))
     }
 
     @Test
@@ -236,14 +245,14 @@ class SessionDetailScreenTest {
             }
     }
 
-    private fun assertShowsTags(tags: List<TagUi>) {
+    private fun assertShowsTags(tags: List<TagUiModel>) {
         tags.forEach {
             composeTestRule.onNodeWithText(it.dateTime.formatShortDateLongTime())
                 .assertIsDisplayed()
         }
     }
 
-    private fun deleteTag(tag: TagUi) {
+    private fun deleteTag(tag: TagUiModel) {
         composeTestRule.onNodeWithText(tag.dateTime.formatShortDateLongTime())
             .onParent()
             .onChildren()
@@ -260,7 +269,7 @@ class SessionDetailScreenTest {
             assertIsEnabled()
             performClick()
         }
-        verify(mockCallbacks, times(1)).addTag(any())
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapNewTagButton(any()))
     }
 
     private fun assertDeleteTagsButtonWorks() {
@@ -269,7 +278,7 @@ class SessionDetailScreenTest {
             performClick()
         }
         composeTestRule.onNodeWithText(appContext.getString(R.string.confirm)).performClick()
-        verify(mockCallbacks, times(1)).deleteAllTags()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapConfirmDeleteAllTags)
     }
 
     private fun assertDeleteTagsButtonDisabled() {
@@ -279,6 +288,6 @@ class SessionDetailScreenTest {
             performClick()
         }
         composeTestRule.onNodeWithText(appContext.getString(R.string.confirm)).assertDoesNotExist()
-        verify(mockCallbacks, times(0)).deleteAllTags()
+        verify(mockHandleEvent, times(0)).invoke(SessionDetailEvent.TapConfirmDeleteAllTags)
     }
 }

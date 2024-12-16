@@ -47,48 +47,66 @@ import androidx.compose.ui.unit.sp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.core.presentation.formatShortDateLongTime
-import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
-import com.example.space_timetagger.sessions.presentation.models.TagUi
+import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
+import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
+import java.time.OffsetDateTime
 
 @Composable
 fun SessionDetail(
-    name: String?,
-    tags: List<TagUi>,
-    callbacks: SessionCallbacks,
+    session: SessionDetailUiModel,
+    onEvent: (SessionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tags = session.tags
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        Header(name, callbacks::setName)
+        Header(
+            name = session.name,
+            editModeIsOn = session.nameIsBeingEdited,
+            onTapName = { onEvent(SessionDetailEvent.TapName) },
+            onTapNameDoneEditing = { onEvent(SessionDetailEvent.TapNameDoneEditing) },
+            onNameChange = { onEvent(SessionDetailEvent.ChangeName(it)) },
+        )
         if (tags.isNotEmpty()) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 itemsIndexed(tags, key = { _, item -> item.dateTime }) { index, tag ->
-                    Tag(index, tag, callbacks)
+                    Tag(
+                        index = index,
+                        tag = tag,
+                        onTapConfirmDelete = { onEvent(SessionDetailEvent.TapConfirmDeleteTag(tag.id)) },
+                    )
                 }
             }
         } else {
             NoTags(Modifier.weight(1f))
         }
-        SessionOptions(callbacks, tags.isNotEmpty())
+        SessionOptions(
+            deleteAllIsEnabled = session.deleteAllIsEnabled,
+            onTapAddNewTag = { onEvent(SessionDetailEvent.TapNewTagButton(it)) },
+            onTapConfirmDeleteAllTags = { onEvent(SessionDetailEvent.TapConfirmDeleteAllTags) },
+        )
     }
 }
 
 @Composable
 private fun Header(
     name: String?,
-    setName: (String?) -> Unit,
+    editModeIsOn: Boolean,
+    onTapName: () -> Unit,
+    onTapNameDoneEditing: () -> Unit,
+    onNameChange: (String?) -> Unit,
 ) {
     val title = if (name.isNullOrBlank()) stringResource(R.string.tap_to_add_title) else name
     val textStyle = if (name.isNullOrBlank()) FontStyle.Italic else null
 
-    val (editModeIsOn, setEditModeIsOn) = rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     val contentDescription = stringResource(R.string.name_input)
@@ -103,15 +121,15 @@ private fun Header(
     if (editModeIsOn) {
         TextField(
             value = name ?: "",
-            onValueChange = setName,
+            onValueChange = onNameChange,
             placeholder = { stringResource(R.string.untitled) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(onDone = {
-                setName(name?.trim())
-                setEditModeIsOn(false)
+                onNameChange(name?.trim())
+                onTapNameDoneEditing()
             }),
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -127,7 +145,7 @@ private fun Header(
             fontWeight = FontWeight.W800,
             fontStyle = textStyle,
             modifier = Modifier
-                .clickable { setEditModeIsOn(true) }
+                .clickable(onClick = onTapName)
                 .padding(8.dp)
         )
     }
@@ -136,8 +154,8 @@ private fun Header(
 @Composable
 private fun Tag(
     index: Int,
-    tag: TagUi,
-    callbacks: SessionCallbacks,
+    tag: TagUiModel,
+    onTapConfirmDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
@@ -162,16 +180,18 @@ private fun Tag(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }) {
-            callbacks.deleteTag(tag.id)
-        }
+        ConfirmationDialog(
+            onDismissRequest = { setDialogIsOpen(false) },
+            action = onTapConfirmDelete,
+        )
     }
 }
 
 @Composable
 private fun SessionOptions(
-    callbacks: SessionCallbacks,
-    deleteEnabled: Boolean,
+    deleteAllIsEnabled: Boolean,
+    onTapAddNewTag: (OffsetDateTime) -> Unit,
+    onTapConfirmDeleteAllTags: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
@@ -180,12 +200,12 @@ private fun SessionOptions(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
     ) {
-        Button(onClick = callbacks::addTag) {
+        Button(onClick = { onTapAddNewTag(OffsetDateTime.now()) }) {
             Text(stringResource(R.string.add_tag))
         }
         Button(
             onClick = { setDialogIsOpen(true) },
-            enabled = deleteEnabled,
+            enabled = deleteAllIsEnabled,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         ) {
             Text(stringResource(R.string.delete_all))
@@ -195,7 +215,7 @@ private fun SessionOptions(
     if (dialogIsOpen) {
         ConfirmationDialog(
             onDismissRequest = { setDialogIsOpen(false) },
-            action = callbacks::deleteAllTags,
+            action = onTapConfirmDeleteAllTags,
         )
     }
 }
@@ -221,7 +241,7 @@ private fun TagPreview() {
         Tag(
             index = 2,
             tag = tag,
-            dummySessionCallbacks,
+            {},
             Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)

@@ -20,8 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
-import com.example.space_timetagger.sessions.domain.models.SessionCallbacks
-import com.example.space_timetagger.sessions.presentation.models.SessionDetailUi
+import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -30,15 +29,19 @@ fun SessionDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
-    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionDetailUiState.Loading)
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionDetailViewState.Loading)
 
-    SessionDetailView(viewState, viewModel.callbacks, modifier)
+    SessionDetailView(
+        viewState = viewState,
+        onEvent = viewModel::handleEvent,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun SessionDetailView(
-    viewState: SessionDetailUiState,
-    callbacks: SessionCallbacks,
+    viewState: SessionDetailViewState,
+    onEvent: (SessionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -47,25 +50,24 @@ fun SessionDetailView(
             .background(MaterialTheme.colorScheme.background)
     ) {
         when (viewState) {
-            is SessionDetailUiState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
-            is SessionDetailUiState.Success -> SessionDetail(
-                viewState.session.name,
-                viewState.session.tags,
-                callbacks,
-                modifier.padding(8.dp)
+            is SessionDetailViewState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
+
+            is SessionDetailViewState.Success -> SessionDetail(
+                session = viewState.session,
+                onEvent = onEvent,
+                modifier = modifier.padding(8.dp)
             )
 
-            is SessionDetailUiState.Refreshing -> {
+            is SessionDetailViewState.Refreshing -> {
                 SessionDetail(
-                    viewState.session.name,
-                    viewState.session.tags,
-                    callbacks,
-                    modifier.padding(8.dp)
+                    session = viewState.session,
+                    onEvent = onEvent,
+                    modifier = modifier.padding(8.dp)
                 )
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            SessionDetailUiState.Error -> Error(
+            SessionDetailViewState.Error -> Error(
                 stringResource(R.string.error_session_detail),
                 modifier.align(Alignment.Center)
             )
@@ -73,36 +75,44 @@ fun SessionDetailView(
     }
 }
 
-class ViewStateProvider : PreviewParameterProvider<SessionDetailUiState> {
+class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
     override val values = sequenceOf(
-        SessionDetailUiState.Success(
-            SessionDetailUi(
+        SessionDetailViewState.Success(
+            SessionDetailUiModel(
                 id = "id",
                 name = "Shopping Trip",
+                nameIsBeingEdited = false,
                 tags = someTags,
+                deleteAllIsEnabled = true,
             ),
         ),
-        SessionDetailUiState.Success(
-            SessionDetailUi(
+        SessionDetailViewState.Success(
+            SessionDetailUiModel(
                 id = "id",
                 name = "Session with no tags",
+                nameIsBeingEdited = false,
                 tags = noTags,
+                deleteAllIsEnabled = false,
             ),
         ),
-        SessionDetailUiState.Success(
-            SessionDetailUi(
+        SessionDetailViewState.Success(
+            SessionDetailUiModel(
                 id = "id",
                 name = "Wed commute home",
+                nameIsBeingEdited = false,
                 tags = manyTags,
+                deleteAllIsEnabled = true,
             ),
         ),
-        SessionDetailUiState.Loading,
-        SessionDetailUiState.Error,
-        SessionDetailUiState.Refreshing(
-            SessionDetailUi(
+        SessionDetailViewState.Loading,
+        SessionDetailViewState.Error,
+        SessionDetailViewState.Refreshing(
+            SessionDetailUiModel(
                 id = "id",
                 name = "Refreshing 10pm",
+                nameIsBeingEdited = false,
                 tags = someTags,
+                deleteAllIsEnabled = true,
             ),
         ),
     )
@@ -112,9 +122,9 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailUiState> {
 @Preview(widthDp = 720, heightDp = 360)
 @Composable
 private fun SessionDetailPreview(
-    @PreviewParameter(ViewStateProvider::class) viewState: SessionDetailUiState,
+    @PreviewParameter(ViewStateProvider::class) viewState: SessionDetailViewState,
 ) {
     SpaceTimeTaggerTheme {
-        SessionDetailView(viewState, dummySessionCallbacks)
+        SessionDetailView(viewState, {})
     }
 }

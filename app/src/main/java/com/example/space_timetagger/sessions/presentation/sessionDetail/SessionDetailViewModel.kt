@@ -11,7 +11,6 @@ import com.example.space_timetagger.sessions.presentation.models.SessionDetailUi
 import com.example.space_timetagger.sessions.presentation.models.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
@@ -20,21 +19,18 @@ class SessionViewModel(
     private val sessionId: String,
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
-    private val isLoading = MutableStateFlow(true)
-
     private val session = sessionsRepository.session(sessionId)
-        .onEach { isLoading.update { false } }
 
     private val nameIsBeingEdited = MutableStateFlow(false)
 
     val viewState =
-        combine(isLoading, session, nameIsBeingEdited) { isLoading, session, nameIsBeingEdited ->
+        combine(session, nameIsBeingEdited) { session, nameIsBeingEdited ->
             when {
                 session == null -> SessionDetailViewState.Error
 
-                isLoading -> SessionDetailViewState.Refreshing(
-                    buildSessionDetailUiModel(session, nameIsBeingEdited)
-                )
+//                isLoading -> SessionDetailViewState.Refreshing(
+//                    buildSessionDetailUiModel(session, nameIsBeingEdited)
+//                )
 
                 else -> SessionDetailViewState.Success(
                     buildSessionDetailUiModel(session, nameIsBeingEdited)

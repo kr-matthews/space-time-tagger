@@ -51,33 +51,65 @@ class SessionDetailViewModelTest {
         viewModelNonExistentSession = SessionViewModel(nonExistentId, mockSessionsRepository)
     }
 
+    // session doesn't exist - view state
+
     @Test
     fun nonExistentIdInitialState_producesErrorState() = runTest {
         val initialViewState = viewModelNonExistentSession.viewState.first()
         assert(initialViewState is SessionDetailViewState.Error)
     }
 
+    // session exists - view state
+
     @Test
     fun initialState_isSuccessState() = runTest {
-        advanceUntilIdle()
         val initialViewState = viewModel.viewState.first()
         assert(initialViewState is SessionDetailViewState.Success)
     }
 
     @Test
     fun initialSuccessState_hasNameFromRepository() = runTest {
-        val initialViewState = viewModel.viewState.first() as SessionDetailViewState.Success
-        assertEquals(mockSession.name, initialViewState.session.name)
+        assertEquals(mockSession.name, getSuccessViewState().session.name)
+    }
+
+    @Test
+    fun initialSuccessState_hasEditModeOff() = runTest {
+        assert(!getSuccessViewState().session.nameIsBeingEdited)
     }
 
     @Test
     fun initialSuccessState_hasTagsFromRepository() = runTest {
-        val initialViewState = viewModel.viewState.first() as SessionDetailViewState.Success
-        assertEquals(mockSession.tags.map { it.id }, initialViewState.session.tags.map { it.id })
+        assertEquals(
+            mockSession.tags.map { it.id },
+            getSuccessViewState().session.tags.map { it.id })
     }
 
     @Test
-    fun setNameCallback_callsRepositoryFunc() = runTest {
+    fun initialSuccessState_hasDeleteAllButtonEnabled() = runTest {
+        // only true if the session has tags
+        assert(mockSession.tags.isNotEmpty())
+        assert(getSuccessViewState().session.deleteAllIsEnabled)
+    }
+
+    // TODO: updating repository flows -> view state updates
+
+    // session exists - handle events
+
+    @Test
+    fun eventTapName_turnsEditModeOn() = runTest {
+        viewModel.handleEvent(SessionDetailEvent.TapName)
+        assert(getSuccessViewState().session.nameIsBeingEdited)
+    }
+
+    @Test
+    fun eventTapNameDoneEditing_turnsEditModeOff() = runTest {
+        viewModel.handleEvent(SessionDetailEvent.TapName)
+        viewModel.handleEvent(SessionDetailEvent.TapNameDoneEditing)
+        assert(!getSuccessViewState().session.nameIsBeingEdited)
+    }
+
+    @Test
+    fun eventChangeName_callsRepositoryFunc() = runTest {
         val newName = "Updated Name String"
         viewModel.handleEvent(SessionDetailEvent.ChangeName(newName))
         advanceUntilIdle()
@@ -85,7 +117,7 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun addTagCallback_callsRepositoryFunc() = runTest {
+    fun eventTapNewTagButton_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
@@ -95,16 +127,21 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun deleteTagCallback_callsRepositoryFunc() = runTest {
+    fun eventTapConfirmDeleteTag_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteTag(mockTag.id))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeTagFromSession(validId, mockTag.id)
     }
 
     @Test
-    fun deleteAllTagsCallback_callsRepositoryFunc() = runTest {
+    fun eventTapConfirmDeleteAllTags_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteAllTags)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeAllTagsFromSession(validId)
     }
+
+    // helpers
+
+    private suspend fun getSuccessViewState() =
+        viewModel.viewState.first() as SessionDetailViewState.Success
 }

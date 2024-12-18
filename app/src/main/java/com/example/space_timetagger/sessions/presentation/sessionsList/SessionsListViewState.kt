@@ -6,7 +6,11 @@ import com.example.space_timetagger.sessions.presentation.models.SessionOverview
 @Immutable
 sealed interface SessionsListViewState {
     data object Loading : SessionsListViewState
-    data class Success(val sessions: List<SessionOverviewUi>) : SessionsListViewState
+    data class Success(
+        val sessions: List<SessionOverviewUi>,
+        val deleteAllIsEnabled: Boolean,
+    ) : SessionsListViewState
+
     data class Refreshing(val sessions: List<SessionOverviewUi>) : SessionsListViewState
     data object Error : SessionsListViewState
 }

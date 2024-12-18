@@ -3,6 +3,7 @@ package com.example.space_timetagger.sessions.presentation.sessionsList.test
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
+import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewState
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,15 +62,14 @@ class SessionsListViewModelTest {
 
     @Test
     fun newSessionCallback_callsRepositoryFunc() = runTest {
-        val newSessionName = "New test Session"
-        viewModel.callbacks.new(newSessionName)
+        viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).newSession(newSessionName)
+        verify(mockSessionsRepository, times(1)).newSession(null)
     }
 
     @Test
     fun newSessionCallback_setsIdToNavigateTo() = runTest {
-        viewModel.callbacks.new()
+        viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
         val sessionIdToNavigateTo = viewModel.sessionIdToNavigateTo.firstOrNull()
         assertNotNull(sessionIdToNavigateTo)
@@ -78,14 +78,14 @@ class SessionsListViewModelTest {
     @Test
     fun deleteSessionCallback_callsRepositoryFunc() = runTest {
         val fakeId = "fake-id"
-        viewModel.callbacks.delete(fakeId)
+        viewModel.handleEvent(SessionsListEvent.TapConfirmDeleteSession(fakeId))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).deleteSession(fakeId)
     }
 
     @Test
     fun deleteAllSessionsCallback_callsRepositoryFunc() = runTest {
-        viewModel.callbacks.deleteAll()
+        viewModel.handleEvent(SessionsListEvent.TapConfirmDeleteAllSessions)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).deleteAllSessions()
     }

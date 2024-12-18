@@ -20,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
-import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -33,14 +32,21 @@ fun SessionsListScreen(
 
     HandleNavigatingToNewSession(viewModel.sessionIdToNavigateTo, navigateToSession)
 
-    SessionsListView(viewState, viewModel.callbacks, navigateToSession, modifier)
+    fun onEvent(event: SessionsListEvent) {
+        viewModel.handleEvent(event)
+    }
+
+    SessionsListView(
+        viewState = viewState,
+        onEvent = ::onEvent,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun SessionsListView(
     viewState: SessionsListViewState,
-    callbacks: SessionsCallbacks,
-    navigateToSession: (String) -> Unit,
+    onEvent: (SessionsListEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -50,29 +56,29 @@ fun SessionsListView(
     ) {
         when (viewState) {
             is SessionsListViewState.Loading -> CircularProgressIndicator(
-                modifier.align(Alignment.Center)
+                modifier = modifier.align(Alignment.Center)
             )
 
             is SessionsListViewState.Success -> Sessions(
-                viewState.sessions,
-                callbacks,
-                navigateToSession,
-                Modifier.padding(8.dp)
+                sessions = viewState.sessions,
+                deleteAllIsEnabled = viewState.deleteAllIsEnabled,
+                onEvent = onEvent,
+                modifier = Modifier.padding(8.dp)
             )
 
             is SessionsListViewState.Refreshing -> {
                 Sessions(
-                    viewState.sessions,
-                    callbacks,
-                    navigateToSession,
-                    Modifier.padding(8.dp)
+                    sessions = viewState.sessions,
+                    deleteAllIsEnabled = false,
+                    onEvent = onEvent,
+                    modifier = Modifier.padding(8.dp)
                 )
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
             is SessionsListViewState.Error -> Error(
-                stringResource(R.string.error_sessions_list),
-                modifier.align(Alignment.Center)
+                text = stringResource(R.string.error_sessions_list),
+                modifier = modifier.align(Alignment.Center)
             )
         }
     }
@@ -80,8 +86,8 @@ fun SessionsListView(
 
 class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState> {
     override val values = sequenceOf(
-        SessionsListViewState.Success(someSessions),
-        SessionsListViewState.Success(noSessions),
+        SessionsListViewState.Success(someSessions, true),
+        SessionsListViewState.Success(noSessions, false),
         SessionsListViewState.Loading,
         SessionsListViewState.Error,
         SessionsListViewState.Refreshing(someSessions),
@@ -96,6 +102,6 @@ private fun SessionsPreview(
     @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListViewState,
 ) {
     SpaceTimeTaggerTheme {
-        SessionsListView(viewState, dummySessionsCallbacks, {})
+        SessionsListView(viewState, {})
     }
 }

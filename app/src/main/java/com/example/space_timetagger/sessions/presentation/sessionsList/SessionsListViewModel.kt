@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
 import com.example.space_timetagger.sessions.domain.models.Session
-import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toOverviewUiModel
 import kotlinx.coroutines.channels.Channel
@@ -20,29 +19,47 @@ class SessionsViewModel(
         sessions.map(Session::toOverviewUiModel)
     }
 
-    val viewState = sessions.map { sessions -> SessionsListViewState.Success(sessions) }
+    val viewState = sessions.map { sessions ->
+        SessionsListViewState.Success(
+            sessions = sessions,
+            deleteAllIsEnabled = sessions.isNotEmpty(),
+        )
+    }
 
     private val _sessionIdToNavigateTo = Channel<String>()
     val sessionIdToNavigateTo = _sessionIdToNavigateTo.receiveAsFlow()
 
-    val callbacks = object : SessionsCallbacks {
-        override fun new(name: String?) {
-            viewModelScope.launch {
-                val newSessionId = sessionsRepository.newSession(name)
-                _sessionIdToNavigateTo.send(newSessionId)
-            }
+    fun handleEvent(event: SessionsListEvent) {
+        when (event) {
+            SessionsListEvent.TapNewSessionButton -> createNewSessionAndNavigateToIt()
+            is SessionsListEvent.TapSession -> navigateToSession(event.sessionId)
+            is SessionsListEvent.TapConfirmDeleteSession -> deleteSession(event.sessionId)
+            SessionsListEvent.TapConfirmDeleteAllSessions -> deleteAllSessions()
         }
+    }
 
-        override fun delete(id: String) {
-            viewModelScope.launch {
-                sessionsRepository.deleteSession(id)
-            }
+    private fun createNewSessionAndNavigateToIt(name: String? = null) {
+        viewModelScope.launch {
+            val newSessionId = sessionsRepository.newSession(name)
+            navigateToSession(newSessionId)
         }
+    }
 
-        override fun deleteAll() {
-            viewModelScope.launch {
-                sessionsRepository.deleteAllSessions()
-            }
+    private fun navigateToSession(id: String) {
+        viewModelScope.launch {
+            _sessionIdToNavigateTo.send(id)
+        }
+    }
+
+    private fun deleteSession(id: String) {
+        viewModelScope.launch {
+            sessionsRepository.deleteSession(id)
+        }
+    }
+
+    private fun deleteAllSessions() {
+        viewModelScope.launch {
+            sessionsRepository.deleteAllSessions()
         }
     }
 }

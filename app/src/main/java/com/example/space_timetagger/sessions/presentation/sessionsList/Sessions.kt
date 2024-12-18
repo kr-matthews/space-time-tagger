@@ -33,15 +33,14 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
-import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun Sessions(
     sessions: List<SessionOverviewUi>,
-    callbacks: SessionsCallbacks,
-    navigateToSession: (String) -> Unit,
+    deleteAllIsEnabled: Boolean,
+    onEvent: (SessionsListEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -57,22 +56,32 @@ fun Sessions(
                 modifier = Modifier.weight(1f)
             ) {
                 items(sessions, key = { it.id }) { session ->
-                    SessionBox(session, callbacks) { navigateToSession(session.id) }
+                    SessionBox(
+                        session = session,
+                        onTap = { onEvent(SessionsListEvent.TapSession(session.id)) },
+                        onTapConfirmDelete = {
+                            onEvent(SessionsListEvent.TapConfirmDeleteSession(session.id))
+                        },
+                    )
                 }
             }
         } else {
             NoSessions(Modifier.weight(1f))
         }
-        SessionsOptions(callbacks, sessions.isNotEmpty())
+        SessionsOptions(
+            onNewSessionTap = { onEvent(SessionsListEvent.TapNewSessionButton) },
+            onConfirmDeleteAllSessions = { onEvent(SessionsListEvent.TapConfirmDeleteAllSessions) },
+            deleteAllIsEnabled = deleteAllIsEnabled,
+        )
     }
 }
 
 @Composable
 private fun SessionBox(
     session: SessionOverviewUi,
-    callbacks: SessionsCallbacks,
+    onTap: () -> Unit,
+    onTapConfirmDelete: () -> Unit,
     modifier: Modifier = Modifier,
-    navigateToSession: () -> Unit,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
 
@@ -80,7 +89,7 @@ private fun SessionBox(
     val title = if (isUnnamed) stringResource(R.string.untitled) else session.name!!
     val textStyle = if (isUnnamed) FontStyle.Italic else null
 
-    Card(modifier.clickable(onClick = navigateToSession)) {
+    Card(modifier.clickable(onClick = onTap)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -105,16 +114,18 @@ private fun SessionBox(
     }
 
     if (dialogIsOpen) {
-        ConfirmationDialog(onDismissRequest = { setDialogIsOpen(false) }) {
-            callbacks.delete(session.id)
-        }
+        ConfirmationDialog(
+            onDismissRequest = { setDialogIsOpen(false) },
+            action = onTapConfirmDelete,
+        )
     }
 }
 
 @Composable
 private fun SessionsOptions(
-    callbacks: SessionsCallbacks,
-    deleteEnabled: Boolean,
+    onNewSessionTap: () -> Unit,
+    onConfirmDeleteAllSessions: () -> Unit,
+    deleteAllIsEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
@@ -123,12 +134,12 @@ private fun SessionsOptions(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
     ) {
-        Button(onClick = callbacks::new) {
+        Button(onClick = onNewSessionTap) {
             Text(stringResource(R.string.new_session))
         }
         Button(
             onClick = { setDialogIsOpen(true) },
-            enabled = deleteEnabled,
+            enabled = deleteAllIsEnabled,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         ) {
             Text(stringResource(R.string.delete_all))
@@ -138,7 +149,7 @@ private fun SessionsOptions(
     if (dialogIsOpen) {
         ConfirmationDialog(
             onDismissRequest = { setDialogIsOpen(false) },
-            action = callbacks::deleteAll,
+            action = onConfirmDeleteAllSessions,
         )
     }
 }
@@ -164,10 +175,11 @@ private fun SessionBoxPreview() {
     SpaceTimeTaggerTheme {
         SessionBox(
             SessionOverviewUi(name = "Session Preview"),
-            dummySessionsCallbacks,
+            {},
+            {},
             Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(8.dp)
-        ) {}
+        )
     }
 }

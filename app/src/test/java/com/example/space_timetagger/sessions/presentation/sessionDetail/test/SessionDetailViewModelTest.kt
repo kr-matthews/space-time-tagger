@@ -1,10 +1,18 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail.test
 
+import assertk.assertThat
+import assertk.assertions.extracting
+import assertk.assertions.hasClass
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isNotEmpty
+import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
+import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailEvent
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailViewState
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionViewModel
@@ -13,7 +21,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,7 +63,7 @@ class SessionDetailViewModelTest {
     @Test
     fun nonExistentIdInitialState_producesErrorState() = runTest {
         val initialViewState = viewModelNonExistentSession.viewState.first()
-        assert(initialViewState is SessionDetailViewState.Error)
+        assertThat(initialViewState).hasClass<SessionDetailViewState.Error>()
     }
 
     // session exists - view state
@@ -64,48 +71,48 @@ class SessionDetailViewModelTest {
     @Test
     fun initialState_isSuccessState() = runTest {
         val initialViewState = viewModel.viewState.first()
-        assert(initialViewState is SessionDetailViewState.Success)
+        assertThat(initialViewState).hasClass<SessionDetailViewState.Success>()
     }
 
     @Test
     fun initialSuccessState_hasNameFromRepository() = runTest {
-        assertEquals(mockSession.name, getSuccessViewState().session.name)
+        assertThat(session()::name).isEqualTo(mockSession.name)
     }
 
     @Test
     fun initialSuccessState_hasEditModeOff() = runTest {
-        assert(!getSuccessViewState().session.nameIsBeingEdited)
+        assertThat(session()::nameIsBeingEdited).isFalse()
     }
 
     @Test
     fun initialSuccessState_hasTagsFromRepository() = runTest {
-        assertEquals(
-            mockSession.tags.map { it.id },
-            getSuccessViewState().session.tags.map { it.id })
+        assertThat(session()::tags)
+            .extracting(TagUiModel::id)
+            .isEqualTo(mockSession.tags.map { it.id })
     }
 
     @Test
     fun initialSuccessState_hasDeleteAllButtonEnabled() = runTest {
-        // only true if the session has tags
-        assert(mockSession.tags.isNotEmpty())
-        assert(getSuccessViewState().session.deleteAllIsEnabled)
+        // test only applies if the mock data has tags
+        assertThat(mockSession.tags).isNotEmpty()
+        assertThat(session()::deleteAllIsEnabled).isTrue()
     }
 
-    // TODO: updating repository flows -> view state updates
+    // FIXME: updating repository flows -> view state updates
 
     // session exists - handle events
 
     @Test
     fun eventTapName_turnsEditModeOn() = runTest {
         viewModel.handleEvent(SessionDetailEvent.TapName)
-        assert(getSuccessViewState().session.nameIsBeingEdited)
+        assertThat(session()::nameIsBeingEdited).isTrue()
     }
 
     @Test
     fun eventTapNameDoneEditing_turnsEditModeOff() = runTest {
         viewModel.handleEvent(SessionDetailEvent.TapName)
         viewModel.handleEvent(SessionDetailEvent.TapNameDoneEditing)
-        assert(!getSuccessViewState().session.nameIsBeingEdited)
+        assertThat(session()::nameIsBeingEdited).isFalse()
     }
 
     @Test
@@ -142,6 +149,6 @@ class SessionDetailViewModelTest {
 
     // helpers
 
-    private suspend fun getSuccessViewState() =
-        viewModel.viewState.first() as SessionDetailViewState.Success
+    private suspend fun session() =
+        (viewModel.viewState.first() as SessionDetailViewState.Success).session
 }

@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     testImplementation(libs.assertk)
+    lintChecks(libs.assertk.lint)
     testImplementation(libs.org.mockito.core)
     testImplementation(libs.org.mockito.kotlin)
     testImplementation(libs.org.jetbrains.kotlinx.coroutines.test)

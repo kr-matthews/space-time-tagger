@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
+    testImplementation(libs.assertk)
     testImplementation(libs.org.mockito.core)
     testImplementation(libs.org.mockito.kotlin)
     testImplementation(libs.org.jetbrains.kotlinx.coroutines.test)

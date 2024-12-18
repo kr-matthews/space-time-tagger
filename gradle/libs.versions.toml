@@ -3,6 +3,7 @@ agp = "8.5.2"
 kotlin = "1.9.24"
 coreKtx = "1.13.1"
 junit = "4.13.2"
+assertk = "0.28.1"
 mockito = "5.14.1"
 mockitoKotlin = "5.4.0"
 mockitoAndroid = "5.14.2"
@@ -20,6 +21,7 @@ kotlinPluginSerialization = "2.0.20"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+assertk = { group = "com.willowtreeapps.assertk", name = "assertk-jvm", version.ref = "assertk" }
 org-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 org-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 org-mockito-android = { group = "org.mockito", name = "mockito-android", version.ref = "mockitoAndroid" }

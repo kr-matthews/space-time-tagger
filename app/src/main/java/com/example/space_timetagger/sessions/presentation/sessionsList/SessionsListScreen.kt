@@ -29,7 +29,7 @@ fun SessionsListScreen(
     navigateToSession: (String) -> Unit,
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
-    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListUiState.Loading)
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListViewState.Loading)
 
     HandleNavigatingToNewSession(viewModel.sessionIdToNavigateTo, navigateToSession)
 
@@ -38,7 +38,7 @@ fun SessionsListScreen(
 
 @Composable
 fun SessionsListView(
-    viewState: SessionsListUiState,
+    viewState: SessionsListViewState,
     callbacks: SessionsCallbacks,
     navigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -49,15 +49,18 @@ fun SessionsListView(
             .background(MaterialTheme.colorScheme.background)
     ) {
         when (viewState) {
-            is SessionsListUiState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
-            is SessionsListUiState.Success -> Sessions(
+            is SessionsListViewState.Loading -> CircularProgressIndicator(
+                modifier.align(Alignment.Center)
+            )
+
+            is SessionsListViewState.Success -> Sessions(
                 viewState.sessions,
                 callbacks,
                 navigateToSession,
                 Modifier.padding(8.dp)
             )
 
-            is SessionsListUiState.Refreshing -> {
+            is SessionsListViewState.Refreshing -> {
                 Sessions(
                     viewState.sessions,
                     callbacks,
@@ -67,7 +70,7 @@ fun SessionsListView(
                 CircularProgressIndicator(modifier.align(Alignment.Center))
             }
 
-            is SessionsListUiState.Error -> Error(
+            is SessionsListViewState.Error -> Error(
                 stringResource(R.string.error_sessions_list),
                 modifier.align(Alignment.Center)
             )
@@ -75,13 +78,13 @@ fun SessionsListView(
     }
 }
 
-class SessionsListStateProvider : PreviewParameterProvider<SessionsListUiState> {
+class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState> {
     override val values = sequenceOf(
-        SessionsListUiState.Success(someSessions),
-        SessionsListUiState.Success(noSessions),
-        SessionsListUiState.Loading,
-        SessionsListUiState.Error,
-        SessionsListUiState.Refreshing(someSessions),
+        SessionsListViewState.Success(someSessions),
+        SessionsListViewState.Success(noSessions),
+        SessionsListViewState.Loading,
+        SessionsListViewState.Error,
+        SessionsListViewState.Refreshing(someSessions),
     )
 }
 
@@ -90,7 +93,7 @@ class SessionsListStateProvider : PreviewParameterProvider<SessionsListUiState> 
 @Preview(widthDp = 720, heightDp = 360)
 @Composable
 private fun SessionsPreview(
-    @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListUiState,
+    @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListViewState,
 ) {
     SpaceTimeTaggerTheme {
         SessionsListView(viewState, dummySessionsCallbacks, {})

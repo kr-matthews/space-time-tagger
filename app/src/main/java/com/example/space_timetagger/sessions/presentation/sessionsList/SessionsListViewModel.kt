@@ -4,33 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
+import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.SessionsCallbacks
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toOverviewUiModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SessionsViewModel(
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
-    private val isLoading = MutableStateFlow(true)
-
     private val sessions = sessionsRepository.sessions().map { sessions ->
-        sessions.map { session -> session.toOverviewUiModel() }
-    }.onEach { isLoading.update { false } }
-
-    val viewState = combine(sessions, isLoading) { sessions, isLoading ->
-        when {
-            isLoading -> SessionsListUiState.Refreshing(sessions)
-            else -> SessionsListUiState.Success(sessions)
-        }
+        sessions.map(Session::toOverviewUiModel)
     }
+
+    val viewState = sessions.map { sessions -> SessionsListViewState.Success(sessions) }
 
     private val _sessionIdToNavigateTo = Channel<String>()
     val sessionIdToNavigateTo = _sessionIdToNavigateTo.receiveAsFlow()

@@ -11,6 +11,7 @@ import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
+import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailEvent
@@ -88,7 +89,7 @@ class SessionDetailViewModelTest {
     fun initialSuccessState_hasTagsFromRepository() = runTest {
         assertThat(session()::tags)
             .extracting(TagUiModel::id)
-            .isEqualTo(mockSession.tags.map { it.id })
+            .isEqualTo(mockSession.tags.map(Tag::id))
     }
 
     @Test

@@ -1,19 +1,24 @@
 package com.example.space_timetagger.sessions.presentation.sessionsList.test
 
+import assertk.assertThat
+import assertk.assertions.extracting
+import assertk.assertions.hasClass
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
+import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
+import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewState
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,32 +56,51 @@ class SessionsListViewModelTest {
     @Test
     fun initialState_isSuccessState() = runTest {
         val initialViewState = viewModel.viewState.first()
-        assert(initialViewState is SessionsListViewState.Success)
+        assertThat(initialViewState).hasClass<SessionsListViewState.Success>()
     }
 
     @Test
     fun initially_passesAlongRepositorySessions() = runTest {
-        val initialViewState = viewModel.viewState.first() as SessionsListViewState.Success
-        assertEquals(mockSessions.map { it.id }, initialViewState.sessions.map { it.id })
+        val initialViewState = viewModel.viewState.first()
+        assertThat(initialViewState::sessions)
+            .extracting(SessionOverviewUi::id)
+            .isEqualTo(mockSessions.map(Session::id))
     }
 
+    // FIXME: test that if repository flow updates, view state will update
+
     @Test
-    fun newSessionCallback_callsRepositoryFunc() = runTest {
+    fun eventTapNewSessionButton_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).newSession(null)
     }
 
     @Test
-    fun newSessionCallback_setsIdToNavigateTo() = runTest {
+    fun eventTapNewSessionButton_setsIdToNavigateTo() = runTest {
+        val initialValue = viewModel.sessionIdToNavigateTo.first()
+        assertThat(initialValue).isNull()
+
         viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
-        val sessionIdToNavigateTo = viewModel.sessionIdToNavigateTo.firstOrNull()
-        assertNotNull(sessionIdToNavigateTo)
+        val updatedValue = viewModel.sessionIdToNavigateTo.first()
+        assertThat(updatedValue).isNotNull()
     }
 
     @Test
-    fun deleteSessionCallback_callsRepositoryFunc() = runTest {
+    fun eventTapSession_setsIdToNavigateTo() = runTest {
+        val initialValue = viewModel.sessionIdToNavigateTo.first()
+        assertThat(initialValue).isNull()
+
+        val sessionId = mockSessions[1].id
+        viewModel.handleEvent(SessionsListEvent.TapSession(sessionId))
+        advanceUntilIdle()
+        val updatedValue = viewModel.sessionIdToNavigateTo.first()
+        assertThat(updatedValue).isEqualTo(sessionId)
+    }
+
+    @Test
+    fun eventTapConfirmDeleteSession_callsRepositoryFunc() = runTest {
         val fakeId = "fake-id"
         viewModel.handleEvent(SessionsListEvent.TapConfirmDeleteSession(fakeId))
         advanceUntilIdle()
@@ -84,7 +108,7 @@ class SessionsListViewModelTest {
     }
 
     @Test
-    fun deleteAllSessionsCallback_callsRepositoryFunc() = runTest {
+    fun eventTapConfirmDeleteAllSessions_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionsListEvent.TapConfirmDeleteAllSessions)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).deleteAllSessions()

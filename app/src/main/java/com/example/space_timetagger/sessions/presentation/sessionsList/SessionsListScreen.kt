@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,8 +30,14 @@ fun SessionsListScreen(
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListViewState.Loading)
+    val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsStateWithLifecycle()
 
-    HandleNavigatingToNewSession(viewModel.sessionIdToNavigateTo, navigateToSession)
+    LaunchedEffect(key1 = sessionIdToNavigateTo) {
+        sessionIdToNavigateTo?.let { id ->
+            viewModel.clearSessionIdToNavigateTo()
+            navigateToSession(id)
+        }
+    }
 
     fun onEvent(event: SessionsListEvent) {
         viewModel.handleEvent(event)

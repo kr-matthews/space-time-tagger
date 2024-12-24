@@ -33,12 +33,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
-import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
+import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun Sessions(
-    sessions: List<SessionOverviewUi>,
+    sessions: List<SessionOverviewUiModel>,
     deleteAllIsEnabled: Boolean,
     onEvent: (SessionsListEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +78,7 @@ fun Sessions(
 
 @Composable
 private fun SessionBox(
-    session: SessionOverviewUi,
+    session: SessionOverviewUiModel,
     onTap: () -> Unit,
     onTapConfirmDelete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -174,7 +174,7 @@ private fun NoSessions(
 private fun SessionBoxPreview() {
     SpaceTimeTaggerTheme {
         SessionBox(
-            SessionOverviewUi(name = "Session Preview"),
+            SessionOverviewUiModel(name = "Session Preview"),
             {},
             {},
             Modifier

@@ -10,7 +10,7 @@ import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
-import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUi
+import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewState
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsViewModel
@@ -63,7 +63,7 @@ class SessionsListViewModelTest {
     fun initially_passesAlongRepositorySessions() = runTest {
         val initialViewState = viewModel.viewState.first()
         assertThat(initialViewState::sessions)
-            .extracting(SessionOverviewUi::id)
+            .extracting(SessionOverviewUiModel::id)
             .isEqualTo(mockSessions.map(Session::id))
     }
 

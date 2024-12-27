@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.assertk)
     lintChecks(libs.assertk.lint)

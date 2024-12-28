@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
+import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
@@ -18,6 +19,7 @@ import java.time.OffsetDateTime
 class SessionViewModel(
     private val sessionId: String,
     private val sessionsRepository: SessionsRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val session = sessionsRepository.session(sessionId)
 
@@ -76,9 +78,15 @@ class SessionViewModel(
 }
 
 @Suppress("UNCHECKED_CAST")
-class SessionViewModelFactory(private val sessionId: String) : ViewModelProvider.Factory {
+class SessionViewModelFactory(
+    private val sessionId: String,
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SessionViewModel(sessionId, App.appModule.sessionsRepository) as T
+        return SessionViewModel(
+            sessionId = sessionId,
+            sessionsRepository = App.appModule.sessionsRepository,
+            preferencesRepository = App.appModule.preferencesRepository,
+        ) as T
     }
 }
 

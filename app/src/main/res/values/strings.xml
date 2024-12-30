@@ -15,4 +15,5 @@
     <string name="error_session_detail">Could not find this session, something went wrong.</string>
     <string name="name_input">name input</string>
     <string name="back">Back</string>
+    <string name="settings">Settings</string>
 </resources>

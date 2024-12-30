@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.example.space_timetagger.R
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
@@ -42,6 +44,7 @@ fun MyTopBar(
 }
 
 @PreviewLightDark
+@Preview(device = Devices.TABLET)
 @Composable
 fun MyTopBarPreview() {
     SpaceTimeTaggerTheme {
@@ -49,12 +52,7 @@ fun MyTopBarPreview() {
             title = "Preview title",
             onBackTap = {},
         ) {
-            IconButton(onClick = {}) {
-                Icon(
-                    painter = painterResource(android.R.drawable.ic_menu_preferences),
-                    contentDescription = "",
-                )
-            }
+            TopBarSettingsIcon(onTap = {})
             IconButton(onClick = {}) {
                 Icon(
                     painter = painterResource(android.R.drawable.ic_menu_help),

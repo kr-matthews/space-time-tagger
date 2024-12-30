@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -21,26 +22,35 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
+import com.example.space_timetagger.core.presentation.MyScaffold
+import com.example.space_timetagger.core.presentation.MyTopBar
+import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun SessionsListScreen(
+    onSettingsTap: () -> Unit,
+    onNavigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
-    navigateToSession: (String) -> Unit,
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListViewState.Loading)
+    // move this into the view state? and make clearSessionIdToNavigateTo an event?
     val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = sessionIdToNavigateTo) {
         sessionIdToNavigateTo?.let { id ->
             viewModel.clearSessionIdToNavigateTo()
-            navigateToSession(id)
+            onNavigateToSession(id)
         }
     }
 
     fun onEvent(event: SessionsListEvent) {
         viewModel.handleEvent(event)
+        when (event) {
+            is SessionsListEvent.TapSettings -> onSettingsTap()
+            else -> Unit
+        }
     }
 
     SessionsListView(
@@ -56,38 +66,60 @@ fun SessionsListView(
     onEvent: (SessionsListEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    MyScaffold(
+        topBar = {
+            SessionsListTopBar(
+                title = stringResource(R.string.sessions),
+                onSettingsTap = { onEvent(SessionsListEvent.TapSettings) },
+            )
+        },
+        modifier = modifier,
     ) {
-        when (viewState) {
-            is SessionsListViewState.Loading -> CircularProgressIndicator(
-                modifier = modifier.align(Alignment.Center)
-            )
+        Box(
+            it
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            when (viewState) {
+                is SessionsListViewState.Loading -> CircularProgressIndicator(
+                    modifier = modifier.align(Alignment.Center)
+                )
 
-            is SessionsListViewState.Success -> Sessions(
-                sessions = viewState.sessions,
-                deleteAllIsEnabled = viewState.deleteAllIsEnabled,
-                onEvent = onEvent,
-                modifier = Modifier.padding(8.dp)
-            )
-
-            is SessionsListViewState.Refreshing -> {
-                Sessions(
+                is SessionsListViewState.Success -> Sessions(
                     sessions = viewState.sessions,
-                    deleteAllIsEnabled = false,
+                    deleteAllIsEnabled = viewState.deleteAllIsEnabled,
                     onEvent = onEvent,
                     modifier = Modifier.padding(8.dp)
                 )
-                CircularProgressIndicator(modifier.align(Alignment.Center))
-            }
 
-            is SessionsListViewState.Error -> Error(
-                text = stringResource(R.string.error_sessions_list),
-                modifier = modifier.align(Alignment.Center)
-            )
+                is SessionsListViewState.Refreshing -> {
+                    Sessions(
+                        sessions = viewState.sessions,
+                        deleteAllIsEnabled = false,
+                        onEvent = onEvent,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    CircularProgressIndicator(modifier.align(Alignment.Center))
+                }
+
+                is SessionsListViewState.Error -> Error(
+                    text = stringResource(R.string.error_sessions_list),
+                    modifier = modifier.align(Alignment.Center)
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun SessionsListTopBar(
+    title: String,
+    onSettingsTap: () -> Unit,
+) {
+    MyTopBar(
+        title = title,
+    ) {
+        TopBarSettingsIcon(onTap = onSettingsTap)
     }
 }
 
@@ -103,7 +135,7 @@ class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState
 
 @Suppress("EmptyFunctionBlock")
 @PreviewLightDark
-@Preview(widthDp = 720, heightDp = 360)
+@Preview(device = Devices.TABLET)
 @Composable
 private fun SessionsPreview(
     @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListViewState,

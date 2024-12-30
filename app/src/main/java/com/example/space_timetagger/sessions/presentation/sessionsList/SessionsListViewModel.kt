@@ -34,6 +34,7 @@ class SessionsViewModel(
 
     fun handleEvent(event: SessionsListEvent) {
         when (event) {
+            SessionsListEvent.TapSettings -> Unit // navigate, in compose
             SessionsListEvent.TapNewSessionButton -> createNewSessionAndNavigateToIt()
             is SessionsListEvent.TapSession -> navigateToSession(event.sessionId)
             is SessionsListEvent.TapConfirmDeleteSession -> deleteSession(event.sessionId)

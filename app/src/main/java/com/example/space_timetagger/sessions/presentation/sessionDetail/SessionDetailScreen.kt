@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -163,7 +164,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
 }
 
 @PreviewLightDark
-@Preview(widthDp = 720, heightDp = 360)
+@Preview(device = Devices.TABLET)
 @Composable
 private fun SessionDetailPreview(
     @PreviewParameter(ViewStateProvider::class) viewState: SessionDetailViewState,

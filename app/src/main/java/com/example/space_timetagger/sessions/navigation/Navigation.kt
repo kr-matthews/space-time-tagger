@@ -20,7 +20,13 @@ data class Session(val id: String)
 fun SttNavHost(navController: NavHostController, modifier: Modifier) {
     NavHost(navController = navController, startDestination = Sessions) {
         composable<Sessions> {
-            SessionsListScreen(modifier) { id -> navController.navigate(Session(id)) }
+            SessionsListScreen(
+                onNavigateToSession = { id -> navController.navigate(Session(id)) },
+                onSettingsTap = {
+                    // TODO, as below
+                },
+                modifier = modifier
+            )
         }
         composable<Session> { entry ->
             val session = entry.toRoute<Session>()

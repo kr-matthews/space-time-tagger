@@ -24,7 +24,14 @@ fun SttNavHost(navController: NavHostController, modifier: Modifier) {
         }
         composable<Session> { entry ->
             val session = entry.toRoute<Session>()
-            SessionDetailScreen(session.id, modifier)
+            SessionDetailScreen(
+                id = session.id,
+                onBackTap = navController::popBackStack,
+                onSettingsTap = {
+                    // TODO: add settings destination, navigate to it
+                },
+                modifier = modifier
+            )
         }
     }
 }

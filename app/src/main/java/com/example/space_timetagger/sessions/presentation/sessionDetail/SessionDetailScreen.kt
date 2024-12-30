@@ -20,20 +20,34 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
+import com.example.space_timetagger.core.presentation.MyScaffold
+import com.example.space_timetagger.core.presentation.MyTopBar
+import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun SessionDetailScreen(
     id: String,
+    onBackTap: () -> Unit,
+    onSettingsTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionDetailViewState.Loading)
 
+    fun onEvent(event: SessionDetailEvent) {
+        viewModel.handleEvent(event)
+        when (event) {
+            is SessionDetailEvent.TapBack -> onBackTap()
+            is SessionDetailEvent.TapSettings -> onSettingsTap()
+            else -> {}
+        }
+    }
+
     SessionDetailView(
         viewState = viewState,
-        onEvent = viewModel::handleEvent,
+        onEvent = ::onEvent,
         modifier = modifier
     )
 }
@@ -44,34 +58,64 @@ fun SessionDetailView(
     onEvent: (SessionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        when (viewState) {
-            is SessionDetailViewState.Loading -> CircularProgressIndicator(modifier.align(Alignment.Center))
-
-            is SessionDetailViewState.Success -> SessionDetail(
-                session = viewState.session,
-                onEvent = onEvent,
-                modifier = modifier.padding(8.dp)
+    MyScaffold(
+        topBar = {
+            SessionDetailTopBar(
+                // eventually use session name here, instead of below
+                title = stringResource(R.string.session_detail),
+                onBackTap = { onEvent(SessionDetailEvent.TapBack) },
+                onSettingsTap = { onEvent(SessionDetailEvent.TapSettings) },
             )
+        },
+        modifier = modifier,
+    ) {
+        Box(
+            it
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            when (viewState) {
+                is SessionDetailViewState.Loading -> CircularProgressIndicator(
+                    modifier.align(
+                        Alignment.Center
+                    )
+                )
 
-            is SessionDetailViewState.Refreshing -> {
-                SessionDetail(
+                is SessionDetailViewState.Success -> SessionDetail(
                     session = viewState.session,
                     onEvent = onEvent,
                     modifier = modifier.padding(8.dp)
                 )
-                CircularProgressIndicator(modifier.align(Alignment.Center))
-            }
 
-            SessionDetailViewState.Error -> Error(
-                stringResource(R.string.error_session_detail),
-                modifier.align(Alignment.Center)
-            )
+                is SessionDetailViewState.Refreshing -> {
+                    SessionDetail(
+                        session = viewState.session,
+                        onEvent = onEvent,
+                        modifier = modifier.padding(8.dp)
+                    )
+                    CircularProgressIndicator(modifier.align(Alignment.Center))
+                }
+
+                SessionDetailViewState.Error -> Error(
+                    stringResource(R.string.error_session_detail),
+                    modifier.align(Alignment.Center)
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun SessionDetailTopBar(
+    title: String,
+    onBackTap: () -> Unit,
+    onSettingsTap: () -> Unit,
+) {
+    MyTopBar(
+        title = title,
+        onBackTap = onBackTap,
+    ) {
+        TopBarSettingsIcon(onTap = onSettingsTap)
     }
 }
 

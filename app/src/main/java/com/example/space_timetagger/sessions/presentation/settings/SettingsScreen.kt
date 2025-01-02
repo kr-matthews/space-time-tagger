@@ -1,10 +1,15 @@
 package com.example.space_timetagger.sessions.presentation.settings
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -27,7 +32,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = viewModel<SettingsViewModel>(factory = SettingsViewModelFactory())
-    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SettingsViewState())
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SettingsViewState.Loading)
     fun onEvent(event: SettingsEvent) {
         viewModel.handleEvent(event)
         when (event) {
@@ -53,16 +58,32 @@ fun SettingsView(
         topBar = { SettingsTopBar(onBackTap = { onEvent(SettingsEvent.TapBack) }) },
         modifier = modifier
     ) {
-        Column(
-            modifier = it
-                .fillMaxSize()
-                .padding(8.dp)
-        ) {
-            LabelledSwitch(
-                name = stringResource(R.string.capture_location),
-                isChecked = viewState.taggingLocationIsEnabled,
-                onTap = { onEvent(SettingsEvent.TapLocationTaggingToggle) },
-            )
+        when (viewState) {
+            SettingsViewState.Loading -> {
+                Box(
+                    it
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    CircularProgressIndicator(
+                        Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+
+            is SettingsViewState.Success -> {
+                Column(
+                    modifier = it
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    LabelledSwitch(
+                        name = stringResource(R.string.capture_location),
+                        isChecked = viewState.taggingLocationIsEnabled,
+                        onTap = { onEvent(SettingsEvent.TapLocationTaggingToggle) },
+                    )
+                }
+            }
         }
     }
 }
@@ -81,8 +102,9 @@ private fun SettingsTopBar(
 
 class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
     override val values = sequenceOf(
-        SettingsViewState(false),
-        SettingsViewState(true),
+        SettingsViewState.Loading,
+        SettingsViewState.Success(false),
+        SettingsViewState.Success(true),
     )
 }
 

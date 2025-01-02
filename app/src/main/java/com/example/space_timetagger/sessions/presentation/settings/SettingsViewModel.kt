@@ -15,7 +15,7 @@ class SettingsViewModel(
     private val taggingLocationIsEnabled = preferencesRepository.taggingLocationIsEnabled
 
     val viewState = taggingLocationIsEnabled.map { taggingLocationIsEnabled ->
-        SettingsViewState(
+        SettingsViewState.Success(
             taggingLocationIsEnabled = taggingLocationIsEnabled,
         )
     }
@@ -27,6 +27,7 @@ class SettingsViewModel(
         }
     }
 
+    // TODO: handle requesting permission
     private fun onLocationTaggingToggleTap() {
         viewModelScope.launch {
             if (taggingLocationIsEnabled.firstOrNull() == true) {

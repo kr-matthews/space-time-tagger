@@ -1,5 +1,8 @@
 package com.example.space_timetagger.sessions.presentation.settings
 
-data class SettingsViewState(
-    val taggingLocationIsEnabled: Boolean = false,
-)
+sealed interface SettingsViewState {
+    data object Loading : SettingsViewState
+    data class Success(
+        val taggingLocationIsEnabled: Boolean,
+    ) : SettingsViewState
+}

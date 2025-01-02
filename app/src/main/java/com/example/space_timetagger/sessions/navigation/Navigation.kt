@@ -8,13 +8,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailScreen
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListScreen
+import com.example.space_timetagger.sessions.presentation.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-object Sessions
+data object Sessions
 
 @Serializable
 data class Session(val id: String)
+
+@Serializable
+data object Settings
 
 @Composable
 fun SttNavHost(navController: NavHostController, modifier: Modifier) {
@@ -22,20 +26,24 @@ fun SttNavHost(navController: NavHostController, modifier: Modifier) {
         composable<Sessions> {
             SessionsListScreen(
                 onNavigateToSession = { id -> navController.navigate(Session(id)) },
-                onSettingsTap = {
-                    // TODO, as below
-                },
+                onSettingsTap = { navController.navigate(Settings) },
                 modifier = modifier
             )
         }
+
         composable<Session> { entry ->
             val session = entry.toRoute<Session>()
             SessionDetailScreen(
                 id = session.id,
                 onBackTap = navController::popBackStack,
-                onSettingsTap = {
-                    // TODO: add settings destination, navigate to it
-                },
+                onSettingsTap = { navController.navigate(Settings) },
+                modifier = modifier
+            )
+        }
+
+        composable<Settings> {
+            SettingsScreen(
+                onBackTap = navController::popBackStack,
                 modifier = modifier
             )
         }

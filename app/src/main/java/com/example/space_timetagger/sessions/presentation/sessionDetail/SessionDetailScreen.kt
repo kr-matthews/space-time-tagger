@@ -77,29 +77,27 @@ fun SessionDetailView(
         ) {
             when (viewState) {
                 is SessionDetailViewState.Loading -> CircularProgressIndicator(
-                    modifier.align(
-                        Alignment.Center
-                    )
+                    Modifier.align(Alignment.Center)
                 )
 
                 is SessionDetailViewState.Success -> SessionDetail(
                     session = viewState.session,
                     onEvent = onEvent,
-                    modifier = modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp)
                 )
 
                 is SessionDetailViewState.Refreshing -> {
                     SessionDetail(
                         session = viewState.session,
                         onEvent = onEvent,
-                        modifier = modifier.padding(8.dp)
+                        modifier = Modifier.padding(8.dp)
                     )
                     CircularProgressIndicator(modifier.align(Alignment.Center))
                 }
 
                 SessionDetailViewState.Error -> Error(
                     stringResource(R.string.error_session_detail),
-                    modifier.align(Alignment.Center)
+                    Modifier.align(Alignment.Center)
                 )
             }
         }

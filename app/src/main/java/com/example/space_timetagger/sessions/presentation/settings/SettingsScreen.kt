@@ -1,15 +1,24 @@
 package com.example.space_timetagger.sessions.presentation.settings
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.space_timetagger.R
+import com.example.space_timetagger.core.presentation.LabelledSwitch
+import com.example.space_timetagger.core.presentation.MyScaffold
+import com.example.space_timetagger.core.presentation.MyTopBar
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -40,7 +49,34 @@ fun SettingsView(
     onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // TODO
+    MyScaffold(
+        topBar = { SettingsTopBar(onBackTap = { onEvent(SettingsEvent.TapBack) }) },
+        modifier = modifier
+    ) {
+        Column(
+            modifier = it
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            LabelledSwitch(
+                name = stringResource(R.string.capture_location),
+                isChecked = viewState.taggingLocationIsEnabled,
+                onTap = { onEvent(SettingsEvent.TapLocationTaggingToggle) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsTopBar(
+    onBackTap: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    MyTopBar(
+        title = stringResource(R.string.settings),
+        onBackTap = onBackTap,
+        modifier = modifier
+    )
 }
 
 class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {

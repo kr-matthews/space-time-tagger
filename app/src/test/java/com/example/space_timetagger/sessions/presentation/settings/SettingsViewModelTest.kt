@@ -61,17 +61,19 @@ class SettingsViewModelTest {
     // FIXME: test that if repository flow updates, view state will update
 
     @Test
-    fun eventEnableLocationTagging_callsRepositoryFunction() = runTest {
+    fun withLocationDisabledEventTapLocationTaggingToggle_callsRepositoryFunction() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
         initViewModel()
-        viewModel.handleEvent(SettingsEvent.EnableLocationTagging)
+        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle)
         advanceUntilIdle()
         verify(mockPreferencesRepository, times(1)).enableTaggingLocation()
     }
 
     @Test
-    fun eventDisableLocationTagging_callsRepositoryFunction() = runTest {
+    fun withLocationEnabledEventTapLocationTaggingToggle_callsRepositoryFunction() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         initViewModel()
-        viewModel.handleEvent(SettingsEvent.DisableLocationTagging)
+        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle)
         advanceUntilIdle()
         verify(mockPreferencesRepository, times(1)).disableTaggingLocation()
     }

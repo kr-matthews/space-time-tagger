@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -22,22 +23,23 @@ class SettingsViewModel(
     fun handleEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.TapBack -> Unit // handled in compose
-            SettingsEvent.EnableLocationTagging -> enableTaggingLocation()
-            SettingsEvent.DisableLocationTagging -> disableTaggingLocation()
+            SettingsEvent.TapLocationTaggingToggle -> onLocationTaggingToggleTap()
         }
     }
 
-    private fun enableTaggingLocation() {
+    private fun onLocationTaggingToggleTap() {
         viewModelScope.launch {
-            preferencesRepository.enableTaggingLocation()
+            if (taggingLocationIsEnabled.firstOrNull() == true) {
+                disableTaggingLocation()
+            } else {
+                enableTaggingLocation()
+            }
         }
     }
 
-    private fun disableTaggingLocation() {
-        viewModelScope.launch {
-            preferencesRepository.disableTaggingLocation()
-        }
-    }
+    private suspend fun enableTaggingLocation() = preferencesRepository.enableTaggingLocation()
+
+    private suspend fun disableTaggingLocation() = preferencesRepository.disableTaggingLocation()
 }
 
 @Suppress("UNCHECKED_CAST")

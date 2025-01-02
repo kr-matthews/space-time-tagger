@@ -35,7 +35,6 @@ import org.mockito.kotlin.whenever
 @RunWith(MockitoJUnitRunner::class)
 class SessionsListViewModelTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     var coroutineTestRule = CoroutineTestRule()
 

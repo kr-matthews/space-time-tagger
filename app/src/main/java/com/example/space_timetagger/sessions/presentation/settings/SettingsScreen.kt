@@ -1,12 +1,15 @@
 package com.example.space_timetagger.sessions.presentation.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -14,8 +17,10 @@ fun SettingsScreen(
     onBackTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewState = SettingsViewState()
+    val viewModel = viewModel<SettingsViewModel>(factory = SettingsViewModelFactory())
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle(SettingsViewState())
     fun onEvent(event: SettingsEvent) {
+        viewModel.handleEvent(event)
         when (event) {
             is SettingsEvent.TapBack -> onBackTap()
             else -> Unit

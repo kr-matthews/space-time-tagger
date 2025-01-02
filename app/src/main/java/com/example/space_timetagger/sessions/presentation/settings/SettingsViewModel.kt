@@ -11,11 +11,11 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
-    private val locationTaggingIsEnabled = preferencesRepository.taggingLocationIsEnabled
+    private val taggingLocationIsEnabled = preferencesRepository.taggingLocationIsEnabled
 
-    val viewState = locationTaggingIsEnabled.map { locationTaggingIsEnabled ->
+    val viewState = taggingLocationIsEnabled.map { taggingLocationIsEnabled ->
         SettingsViewState(
-            locationTaggingIsEnabled = locationTaggingIsEnabled,
+            taggingLocationIsEnabled = taggingLocationIsEnabled,
         )
     }
 

@@ -35,7 +35,7 @@ fun LabelledSwitch(
         Switch(
             checked = isChecked,
             // if it's null then ui tests won't recognize it as toggleable
-            onCheckedChange = {},
+            onCheckedChange = { onTap() },
         )
     }
 }

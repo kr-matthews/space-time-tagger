@@ -79,6 +79,20 @@ class SessionsListViewTest {
     }
 
     @Test
+    fun successState_doesNotHaveBackButton() {
+        setup(successState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.back)))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun successState_hasTitleText() {
+        setup(successState)
+        composeTestRule.onNodeWithText(appContext.getString(R.string.sessions)).assertIsDisplayed()
+    }
+
+    @Test
     fun successState_showsSessions() {
         setup(successState)
         assertShowsSessions(successState.sessions)
@@ -106,6 +120,15 @@ class SessionsListViewTest {
         assertDeleteAllSessionsButtonWorks()
     }
 
+    @Test
+    fun successState_tappingSettingsCallsEventTapSettings() {
+        setup(successState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionsListEvent.TapSettings)
+    }
+
     // success, no sessions
 
     @Test
@@ -121,6 +144,12 @@ class SessionsListViewTest {
     }
 
     @Test
+    fun emptySuccessState_hasTitleText() {
+        setup(emptySuccessState)
+        composeTestRule.onNodeWithText(appContext.getString(R.string.sessions)).assertIsDisplayed()
+    }
+
+    @Test
     fun emptySuccessState_tappingNewSessionCallsEventTapNewSession() {
         setup(emptySuccessState)
         assertNewSessionButtonWorks()
@@ -130,6 +159,15 @@ class SessionsListViewTest {
     fun emptySuccessState_deleteAllButtonIsDisabled() {
         setup(emptySuccessState)
         assertDeleteAllSessionsButtonIsDisabled()
+    }
+
+    @Test
+    fun emptySuccessState_tappingSettingsCallsEventTapSettings() {
+        setup(emptySuccessState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionsListEvent.TapSettings)
     }
 
     // loading
@@ -158,6 +196,21 @@ class SessionsListViewTest {
     fun errorState_hasErrorMessage() {
         setup(errorState)
         getErrorMessage().assertIsDisplayed()
+    }
+
+    @Test
+    fun errorState_hasTitleText() {
+        setup(errorState)
+        composeTestRule.onNodeWithText(appContext.getString(R.string.sessions)).assertIsDisplayed()
+    }
+
+    @Test
+    fun errorState_tappingSettingsCallsEventTapSettings() {
+        setup(errorState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionsListEvent.TapSettings)
     }
 
     // refreshing

@@ -89,6 +89,14 @@ class SessionDetailViewTest {
     }
 
     @Test
+    fun successState_hasTitleText() {
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.session_detail))
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun successState_showsName() {
         setup(successState)
         composeTestRule.onNodeWithText(successState.session.name!!).assertIsDisplayed()
@@ -142,6 +150,24 @@ class SessionDetailViewTest {
         assertDeleteTagsButtonWorks()
     }
 
+    @Test
+    fun successState_tappingBackCallsEventTapBack() {
+        setup(successState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.back)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapBack)
+    }
+
+    @Test
+    fun successState_tappingSettingsCallsEventTapSettings() {
+        setup(successState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapSettings)
+    }
+
     // new session success (no name, empty tags)
 
     @Test
@@ -154,6 +180,14 @@ class SessionDetailViewTest {
     fun newSuccessState_doesNotHaveErrorMessage() {
         setup(newSuccessState)
         getErrorMessage().assertDoesNotExist()
+    }
+
+    @Test
+    fun newSuccessState_hasTitleText() {
+        setup(newSuccessState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.session_detail))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -204,6 +238,24 @@ class SessionDetailViewTest {
         assertDeleteTagsButtonDisabled()
     }
 
+    @Test
+    fun newSuccessState_tappingBackCallsEventTapBack() {
+        setup(newSuccessState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.back)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapBack)
+    }
+
+    @Test
+    fun newSuccessState_tappingSettingsCallsEventTapSettings() {
+        setup(newSuccessState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapSettings)
+    }
+
     // loading
 
     @Test
@@ -224,6 +276,32 @@ class SessionDetailViewTest {
     fun errorState_hasErrorMessage() {
         setup(errorState)
         getErrorMessage().assertIsDisplayed()
+    }
+
+    @Test
+    fun errorState_hasTitleText() {
+        setup(errorState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.session_detail))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun errorState_tappingBackCallsEventTapBack() {
+        setup(errorState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.back)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapBack)
+    }
+
+    @Test
+    fun errorState_tappingSettingsCallsEventTapSettings() {
+        setup(errorState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapSettings)
     }
 
     // refreshing

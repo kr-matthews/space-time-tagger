@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
+import com.example.space_timetagger.core.presentation.InfoDialog
 import com.example.space_timetagger.core.presentation.LabelledSwitch
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
@@ -61,55 +62,24 @@ fun SettingsView(
     onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // TODO: extract into LocationPermissionRequesting()
-    val permissionRequestLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { isGranted ->
-            if (isGranted[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-                onEvent(SettingsEvent.LocationPermissionGranted)
-            } else {
-                onEvent(SettingsEvent.LocationPermissionDenied)
-            }
-        }
-    )
-
-    val isRequestingLocationPermission =
-        (viewState as? SettingsViewState.Success)?.locationPermissionMustBeRequested ?: false
-
-    LaunchedEffect(isRequestingLocationPermission) {
-        if (isRequestingLocationPermission) {
-            permissionRequestLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                )
-            )
-            onEvent(SettingsEvent.LocationPermissionRequestLaunched)
-        }
-    }
-
     MyScaffold(
         topBar = { SettingsTopBar(onBackTap = { onEvent(SettingsEvent.TapBack) }) },
         modifier = modifier
     ) {
         when (viewState) {
-            SettingsViewState.Loading -> {
-                Box(
-                    it
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
-                ) {
-                    CircularProgressIndicator(
-                        Modifier.align(Alignment.Center)
-                    )
-                }
-            }
+            SettingsViewState.Loading -> SettingsLoading(modifier = it)
 
-            is SettingsViewState.Success -> SettingsContent(
-                viewState = viewState,
-                onEvent = onEvent,
-                modifier = it
-            )
+            is SettingsViewState.Success -> {
+                SettingsContent(
+                    viewState = viewState,
+                    onEvent = onEvent,
+                    modifier = it
+                )
+                LocationPermissionHandling(
+                    viewState = viewState,
+                    onEvent = onEvent,
+                )
+            }
         }
     }
 }
@@ -151,11 +121,80 @@ fun SettingsContent(
     }
 }
 
+@Composable
+fun LocationPermissionHandling(
+    viewState: SettingsViewState.Success,
+    onEvent: (SettingsEvent) -> Unit,
+) {
+    val permissionRequestLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { isGranted ->
+            if (isGranted[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                onEvent(SettingsEvent.LocationPermissionGranted)
+            } else {
+                onEvent(SettingsEvent.LocationPermissionDenied)
+            }
+        }
+    )
+
+    val locationPermissionMustBeRequested = viewState.locationPermissionMustBeRequested
+
+    LaunchedEffect(locationPermissionMustBeRequested) {
+        if (locationPermissionMustBeRequested) {
+            permissionRequestLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                )
+            )
+            onEvent(SettingsEvent.LocationPermissionRequestLaunched)
+        }
+    }
+
+    if (viewState.locationPermissionExplanationIsVisible) {
+        InfoDialog(
+            text = stringResource(R.string.why_location_permission_is_required),
+            onDismiss = { onEvent(SettingsEvent.LocationPermissionDialogDismissed) },
+        )
+    }
+}
+
+@Composable
+fun SettingsLoading(modifier: Modifier = Modifier) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        CircularProgressIndicator(
+            Modifier.align(Alignment.Center)
+        )
+    }
+}
+
 class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
     override val values = sequenceOf(
         SettingsViewState.Loading,
-        SettingsViewState.Success(false),
-        SettingsViewState.Success(true),
+        SettingsViewState.Success(
+            taggingLocationIsEnabled = false,
+            locationPermissionMustBeRequested = false,
+            locationPermissionExplanationIsVisible = false,
+        ),
+        SettingsViewState.Success(
+            taggingLocationIsEnabled = false,
+            locationPermissionMustBeRequested = true,
+            locationPermissionExplanationIsVisible = false,
+        ),
+        SettingsViewState.Success(
+            taggingLocationIsEnabled = false,
+            locationPermissionMustBeRequested = false,
+            locationPermissionExplanationIsVisible = true,
+        ),
+        SettingsViewState.Success(
+            taggingLocationIsEnabled = true,
+            locationPermissionMustBeRequested = false,
+            locationPermissionExplanationIsVisible = false,
+        ),
     )
 }
 

@@ -5,38 +5,72 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val taggingLocationIsEnabled = preferencesRepository.taggingLocationIsEnabled
+    private val locationPermissionMustBeRequested = MutableStateFlow(false)
+    private val locationPermissionExplanationIsVisible = MutableStateFlow(false)
 
-    val viewState = taggingLocationIsEnabled.map { taggingLocationIsEnabled ->
+    val viewState = combine(
+        taggingLocationIsEnabled,
+        locationPermissionMustBeRequested,
+        locationPermissionExplanationIsVisible,
+    ) { taggingLocationIsEnabled, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
         SettingsViewState.Success(
             taggingLocationIsEnabled = taggingLocationIsEnabled,
+            locationPermissionMustBeRequested = locationPermissionMustBeRequested,
+            locationPermissionExplanationIsVisible = locationPermissionExplanationIsVisible,
         )
     }
 
     fun handleEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.TapBack -> Unit // handled in compose
-            SettingsEvent.TapLocationTaggingToggle -> onLocationTaggingToggleTap()
-        }
-    }
 
-    // TODO: handle requesting permission
-    private fun onLocationTaggingToggleTap() {
-        viewModelScope.launch {
-            if (taggingLocationIsEnabled.firstOrNull() == true) {
-                disableTaggingLocation()
-            } else {
-                enableTaggingLocation()
+            is SettingsEvent.TapLocationTaggingToggle -> onLocationTaggingToggleTap(
+                hasLocationPermission = event.hasLocationPermission,
+            )
+
+            SettingsEvent.LocationPermissionRequestLaunched -> {
+                locationPermissionMustBeRequested.update { false }
+            }
+
+            SettingsEvent.LocationPermissionGranted -> onLocationPermissionGranted()
+
+            SettingsEvent.LocationPermissionDenied -> {
+                locationPermissionExplanationIsVisible.update { true }
+            }
+
+            SettingsEvent.LocationPermissionDialogDismissed -> {
+                locationPermissionExplanationIsVisible.update { false }
             }
         }
     }
+
+    private fun onLocationTaggingToggleTap(hasLocationPermission: Boolean) {
+        viewModelScope.launch {
+            when {
+                taggingLocationIsEnabled.firstOrNull() == true -> disableTaggingLocation()
+                !hasLocationPermission -> requestLocationPermission()
+                else -> enableTaggingLocation()
+            }
+        }
+    }
+
+    private fun onLocationPermissionGranted() {
+        viewModelScope.launch {
+            enableTaggingLocation()
+        }
+    }
+
+    private fun requestLocationPermission() = locationPermissionMustBeRequested.update { true }
 
     private suspend fun enableTaggingLocation() = preferencesRepository.enableTaggingLocation()
 
@@ -46,6 +80,8 @@ class SettingsViewModel(
 @Suppress("UNCHECKED_CAST")
 class SettingsViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SettingsViewModel(App.appModule.preferencesRepository) as T
+        return SettingsViewModel(
+            preferencesRepository = App.appModule.preferencesRepository,
+        ) as T
     }
 }

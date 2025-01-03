@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,23 +23,18 @@ import com.example.space_timetagger.R
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
-fun ConfirmationDialog(
-    onDismissRequest: () -> Unit,
-    action: () -> Unit,
+fun InfoDialog(
+    text: String,
+    onDismiss: () -> Unit,
 ) {
-    val onConfirmation = {
-        action()
-        onDismissRequest()
-    }
-
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(onDismissRequest = {}) {
         Column(
             Modifier
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
             Text(
-                text = stringResource(R.string.are_you_sure),
+                text = text,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(8.dp))
@@ -49,14 +43,8 @@ fun ConfirmationDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Spacer(Modifier.weight(1f))
-                Button(onClick = onConfirmation) {
-                    Text(stringResource(R.string.confirm))
-                }
-                Button(
-                    onClick = onDismissRequest,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                ) {
-                    Text(stringResource(R.string.cancel))
+                Button(onClick = onDismiss) {
+                    Text(stringResource(R.string.ok))
                 }
             }
         }
@@ -66,8 +54,11 @@ fun ConfirmationDialog(
 @PreviewLightDark
 @Preview(device = Devices.TABLET)
 @Composable
-private fun ConfirmationDialogPreview() {
+private fun InfoDialogPreview() {
     SpaceTimeTaggerTheme {
-        ConfirmationDialog(onDismissRequest = {}, action = {})
+        InfoDialog(
+            text = "You can't do the thing you just tried to do. Because reasons. You must tap the button to dismiss this dialog.",
+            onDismiss = {},
+        )
     }
 }

@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -43,38 +44,132 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun initialState_whenRepositoryReturnsFalseStateIsFalse() = runTest {
+    fun initialState_taggingDisabledIsReflected() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
         initViewModel()
-        val initialViewState = viewModel.viewState.first()
-        assertThat(initialViewState::taggingLocationIsEnabled).isFalse()
+        assertThat(viewModel.viewState.first()::taggingLocationIsEnabled).isFalse()
     }
 
     @Test
-    fun initialState_whenRepositoryReturnsTrueStateIsTrue() = runTest {
+    fun initialState_taggingEnabledIsReflected() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         initViewModel()
-        val initialViewState = viewModel.viewState.first()
-        assertThat(initialViewState::taggingLocationIsEnabled).isTrue()
+        assertThat(viewModel.viewState.first()::taggingLocationIsEnabled).isTrue()
+    }
+
+    @Test
+    fun initialState_locationPermissionStatesAreFalse() = runTest {
+        initViewModel()
+        assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+        assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
     }
 
     // FIXME: test that if repository flow updates, view state will update
 
     @Test
-    fun withLocationDisabledEventTapLocationTaggingToggle_callsRepositoryFunction() = runTest {
+    fun withLocationDisabledEventTapLocationTaggingToggleWithoutPermission_promptsLocationPermissionRequest() =
+        runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
         initViewModel()
-        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle)
+            viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
         advanceUntilIdle()
-        verify(mockPreferencesRepository, times(1)).enableTaggingLocation()
+            verify(mockPreferencesRepository, never()).enableTaggingLocation()
+            assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isTrue()
+            assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
     }
 
     @Test
-    fun withLocationEnabledEventTapLocationTaggingToggle_callsRepositoryFunction() = runTest {
+    fun withLocationDisabledEventTapLocationTaggingToggleWithPermission_callsRepositoryFunction() =
+        runTest {
+            whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+            initViewModel()
+            viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(true))
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).enableTaggingLocation()
+            assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+            assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+        }
+
+    @Test
+    fun withLocationEnabledEventTapLocationTaggingToggleWithoutPermission_callsRepositoryFunction() =
+        runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         initViewModel()
-        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle)
+            viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
         advanceUntilIdle()
         verify(mockPreferencesRepository, times(1)).disableTaggingLocation()
+            assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+            assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+    }
+
+    @Test
+    fun withLocationEnabledEventTapLocationTaggingToggleWithPermission_callsRepositoryFunction() =
+        runTest {
+            whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+            initViewModel()
+            viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(true))
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).disableTaggingLocation()
+            assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+            assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+        }
+
+    @Test
+    fun eventLocationPermissionRequestLaunched_resetsRequestState() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionRequestLaunched)
+        advanceUntilIdle()
+        assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+        assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+    }
+
+    @Test
+    fun eventLocationPermissionGranted_callsRepositoryFunction() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionRequestLaunched)
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionGranted)
+        advanceUntilIdle()
+        verify(mockPreferencesRepository, times(1)).enableTaggingLocation()
+        assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+        assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+    }
+
+    @Test
+    fun eventLocationPermissionDenied_showsExplanation() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionRequestLaunched)
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionDenied)
+        advanceUntilIdle()
+        verify(mockPreferencesRepository, never()).enableTaggingLocation()
+        assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+        assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isTrue()
+    }
+
+    @Test
+    fun eventLocationPermissionDialogDismissed_clearsExplanation() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionRequestLaunched)
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionDenied)
+        advanceUntilIdle()
+        viewModel.handleEvent(SettingsEvent.LocationPermissionDialogDismissed)
+        advanceUntilIdle()
+        verify(mockPreferencesRepository, never()).enableTaggingLocation()
+        assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
+        assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
     }
 }

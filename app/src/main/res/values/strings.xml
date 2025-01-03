@@ -19,6 +19,6 @@
     <string name="settings">Settings</string>
     <string name="sessions">Sessions</string>
     <string name="capture_location">Capture Location in Tags</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="why_location_permission_is_required">If you don\'t grant precise location permission, then this app will not be able to add your current location to tags.</string>
 </resources>

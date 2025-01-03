@@ -34,7 +34,8 @@ fun LabelledSwitch(
         Spacer(Modifier.weight(1f))
         Switch(
             checked = isChecked,
-            onCheckedChange = null,
+            // if it's null then ui tests won't recognize it as toggleable
+            onCheckedChange = {},
         )
     }
 }

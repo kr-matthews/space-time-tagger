@@ -18,6 +18,8 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
@@ -30,9 +32,17 @@ class SettingsViewTest {
 
     private val mockHandleEvent: (SettingsEvent) -> Unit = mock()
 
-    private val successStateLocationEnabled = SettingsViewState.Success(true)
-    private val successStateLocationDisabled = SettingsViewState.Success(false)
-    private val successState = successStateLocationDisabled
+    private val enabledState = SettingsViewState.Success(true)
+    private val disabledState = SettingsViewState.Success(false)
+    private val successState = disabledState
+    private val requestLaunchState = SettingsViewState.Success(
+        taggingLocationIsEnabled = false,
+        locationPermissionMustBeRequested = true,
+    )
+    private val permissionDeniedState = SettingsViewState.Success(
+        taggingLocationIsEnabled = false,
+        locationPermissionExplanationIsVisible = true,
+    )
     private val loadingState = SettingsViewState.Loading
 
     private fun setup(viewState: SettingsViewState) {
@@ -58,38 +68,25 @@ class SettingsViewTest {
     }
 
     @Test
+    fun successState_doesNotHavePermissionExplanation() {
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.why_location_permission_is_required))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun successState_doesNotCallEventLocationPermissionRequestLaunched() {
+        setup(successState)
+        verify(mockHandleEvent, never()).invoke(SettingsEvent.LocationPermissionRequestLaunched)
+    }
+
+    @Test
     fun successState_doesNotHaveSettingsButton() {
         setup(successState)
         composeTestRule
             .onNode(hasContentDescription(appContext.getString(R.string.settings)))
             .assertDoesNotExist()
-    }
-
-    @Test
-    fun successStateLocationEnabled_hasLocationSwitchOn() {
-        setup(successStateLocationEnabled)
-        getSwitch(appContext.getString(R.string.capture_location)).apply {
-            assertIsDisplayed()
-            isOn()
-        }
-    }
-
-    @Test
-    fun successStateLocationEnabled_hasLocationSwitchOff() {
-        setup(successStateLocationDisabled)
-        getSwitch(appContext.getString(R.string.capture_location)).apply {
-            assertIsDisplayed()
-            isOff()
-        }
-    }
-
-    @Test
-    fun successState_tappingSwitchCallsEventTapLocationTaggingToggle() {
-        setup(successState)
-        composeTestRule
-            .onNodeWithText(appContext.getString(R.string.capture_location))
-            .performClick()
-        verify(mockHandleEvent, times(1)).invoke(SettingsEvent.TapLocationTaggingToggle)
     }
 
     @Test
@@ -101,12 +98,93 @@ class SettingsViewTest {
         verify(mockHandleEvent, times(1)).invoke(SettingsEvent.TapBack)
     }
 
+    // not sure how to mock/check hasLocationPermission is passed correctly
+    @Test
+    fun successState_tappingSwitchCallsEventTapLocationTaggingToggle() {
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.capture_location))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(
+            argThat { this is SettingsEvent.TapLocationTaggingToggle }
+//            SettingsEvent.TapLocationTaggingToggle(hasLocationPermission = any())
+        )
+    }
+
+    // switch states
+
+    @Test
+    fun enabledState_hasLocationSwitchOn() {
+        setup(enabledState)
+        getSwitch(appContext.getString(R.string.capture_location)).apply {
+            assertIsDisplayed()
+            isOn()
+        }
+    }
+
+    @Test
+    fun disabledState_hasLocationSwitchOff() {
+        setup(disabledState)
+        getSwitch(appContext.getString(R.string.capture_location)).apply {
+            assertIsDisplayed()
+            isOff()
+        }
+    }
+
+    // request launch
+
+    // not sure how to check request was actually launched
+    @Test
+    fun requestLaunchState_callsEventLocationPermissionRequestLaunched() {
+        setup(requestLaunchState)
+        verify(mockHandleEvent, times(1)).invoke(SettingsEvent.LocationPermissionRequestLaunched)
+    }
+
+    // permission denied
+
+    @Test
+    fun permissionDeniedState_hasExplanationDialog() {
+        setup(permissionDeniedState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.why_location_permission_is_required))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun dismissingExplanationDialog_callsEventLocationPermissionDialogDismissed() {
+        setup(permissionDeniedState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.ok))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SettingsEvent.LocationPermissionDialogDismissed)
+    }
+
     // loading
 
     @Test
     fun loadingState_hasProgressIndicator() {
         setup(loadingState)
         getProgressIndicator().assertIsDisplayed()
+    }
+
+    @Test
+    fun loadingState_hasTitleText() {
+        setup(loadingState)
+        composeTestRule.onNodeWithText(appContext.getString(R.string.settings)).assertIsDisplayed()
+    }
+
+    @Test
+    fun loadingState_doesNotHavePermissionExplanation() {
+        setup(loadingState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.why_location_permission_is_required))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun loadingState_doesNotCallEventLocationPermissionRequestLaunched() {
+        setup(loadingState)
+        verify(mockHandleEvent, never()).invoke(SettingsEvent.LocationPermissionRequestLaunched)
     }
 
     // helpers

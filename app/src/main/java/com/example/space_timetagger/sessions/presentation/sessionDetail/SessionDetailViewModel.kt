@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.location.domain.repository.LocationRepository
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
@@ -12,6 +13,7 @@ import com.example.space_timetagger.sessions.presentation.models.SessionDetailUi
 import com.example.space_timetagger.sessions.presentation.models.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.OffsetDateTime
@@ -20,6 +22,7 @@ class SessionViewModel(
     private val sessionId: String,
     private val sessionsRepository: SessionsRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val locationRepository: LocationRepository,
 ) : ViewModel() {
     private val session = sessionsRepository.session(sessionId)
 
@@ -60,9 +63,18 @@ class SessionViewModel(
     }
 
     private fun addTag(now: OffsetDateTime) {
-        val tag = Tag(dateTime = now)
         viewModelScope.launch {
-            sessionsRepository.addTagToSession(sessionId, tag)
+            if (preferencesRepository.taggingLocationIsEnabled.firstOrNull() == true) {
+                locationRepository.findCurrentLocation {
+                    val tag = Tag(dateTime = now, latLng = it)
+                    viewModelScope.launch {
+                        sessionsRepository.addTagToSession(sessionId, tag)
+                    }
+                }
+            } else {
+                val tag = Tag(dateTime = now)
+                sessionsRepository.addTagToSession(sessionId, tag)
+            }
         }
     }
 
@@ -88,6 +100,7 @@ class SessionViewModelFactory(
             sessionId = sessionId,
             sessionsRepository = App.appModule.sessionsRepository,
             preferencesRepository = App.appModule.preferencesRepository,
+            locationRepository = App.appModule.locationRepository,
         ) as T
     }
 }

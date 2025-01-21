@@ -9,6 +9,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.location.domain.repository.LocationRepository
 import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
@@ -52,6 +53,9 @@ class SessionDetailViewModelTest {
     @Mock
     private val mockPreferencesRepository = mock<PreferencesRepository>()
 
+    @Mock
+    private val mockLocationRepository = mock<LocationRepository>()
+
     private lateinit var viewModel: SessionViewModel
     private lateinit var viewModelNonExistentSession: SessionViewModel
 
@@ -59,9 +63,19 @@ class SessionDetailViewModelTest {
     fun setup() = runTest {
         whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession))
         whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
-        viewModel = SessionViewModel(validId, mockSessionsRepository, mockPreferencesRepository)
+        viewModel = SessionViewModel(
+            validId,
+            mockSessionsRepository,
+            mockPreferencesRepository,
+            mockLocationRepository,
+        )
         viewModelNonExistentSession =
-            SessionViewModel(nonExistentId, mockSessionsRepository, mockPreferencesRepository)
+            SessionViewModel(
+                nonExistentId,
+                mockSessionsRepository,
+                mockPreferencesRepository,
+                mockLocationRepository,
+            )
     }
 
     // session doesn't exist - view state

@@ -23,8 +23,7 @@ install it on an android phone with developer mode enabled.
 - Settings screen to toggle whether current location is stored in tags (requesting permission if
   necessary).
 
-Note: No data is persisted after the app closes, and the current location settings is ignored (
-location is never captured). This will change eventually.
+Note: No data is persisted after the app closes. This will change soon.
 
 ### Potential Future
 
@@ -33,7 +32,6 @@ on GitHub.
 
 - Persist session data.
 - Integration tests.
-- Add location to tags (when the settings is enabled).
 - Map view of tags.
 - Improve styling and colours.
 - Ability to create tags from phone's lock screen (and/or a mode to prevent screen from locking).

@@ -9,6 +9,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.location.domain.models.LatLng
 import com.example.space_timetagger.location.domain.repository.LocationRepository
 import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
@@ -30,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -42,6 +44,7 @@ import org.mockito.kotlin.whenever
 class SessionDetailViewModelTest {
     private val validId = "existing-id"
     private val nonExistentId = "not-found-id"
+    private val latLng = LatLng(49.00504, -123.00678)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
@@ -59,10 +62,16 @@ class SessionDetailViewModelTest {
     private lateinit var viewModel: SessionViewModel
     private lateinit var viewModelNonExistentSession: SessionViewModel
 
+    @Suppress("UNCHECKED_CAST")
     @Before
     fun setup() = runTest {
         whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession))
         whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+        whenever(mockLocationRepository.findCurrentLocation(any())).thenAnswer { invocation ->
+            (invocation.arguments[0] as (LatLng?) -> Unit)(latLng)
+        }
+
         viewModel = SessionViewModel(
             validId,
             mockSessionsRepository,
@@ -144,12 +153,24 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun eventTapNewTagButton_callsRepositoryFunc() = runTest {
+    fun eventTapNewTagButtonWithLocationEnabled_callsRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
             eq(validId),
-            argThat { tag -> tag.dateTime == mockDateTime },
+            argThat { tag -> tag.dateTime == mockDateTime && tag.latLng == latLng },
+        )
+    }
+
+    @Test
+    fun eventTapNewTagButtonWithLocationDisabled_callsRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+        viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).addTagToSession(
+            eq(validId),
+            argThat { tag -> tag.dateTime == mockDateTime && tag.latLng == null },
         )
     }
 

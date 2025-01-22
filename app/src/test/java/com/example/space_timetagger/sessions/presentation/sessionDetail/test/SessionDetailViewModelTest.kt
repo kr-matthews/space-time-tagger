@@ -31,7 +31,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -62,15 +61,12 @@ class SessionDetailViewModelTest {
     private lateinit var viewModel: SessionViewModel
     private lateinit var viewModelNonExistentSession: SessionViewModel
 
-    @Suppress("UNCHECKED_CAST")
     @Before
     fun setup() = runTest {
         whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession))
         whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
-        whenever(mockLocationRepository.findCurrentLocation(any())).thenAnswer { invocation ->
-            (invocation.arguments[0] as (LatLng?) -> Unit)(latLng)
-        }
+        whenever(mockLocationRepository.findCurrentLocation()).thenReturn(latLng)
 
         viewModel = SessionViewModel(
             validId,
@@ -153,24 +149,36 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun eventTapNewTagButtonWithLocationEnabled_callsRepositoryFunc() = runTest {
-        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
-        viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
-        advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).addTagToSession(
-            eq(validId),
-            argThat { tag -> tag.dateTime == mockDateTime && tag.latLng == latLng },
-        )
-    }
-
-    @Test
     fun eventTapNewTagButtonWithLocationDisabled_callsRepositoryFunc() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
         viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
             eq(validId),
-            argThat { tag -> tag.dateTime == mockDateTime && tag.latLng == null },
+            argThat { tag -> tag.dateTime == mockDateTime && tag.location == null },
+        )
+    }
+
+    @Test
+    fun eventTapNewTagButtonWithLocationEnabled_callsRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+        viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).addTagToSession(
+            eq(validId),
+            argThat { tag -> tag.dateTime == mockDateTime && tag.location == latLng },
+        )
+    }
+
+    @Test
+    fun eventTapNewTagButtonWithLocationEnabledButFailedLocation_callsRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+        whenever(mockLocationRepository.findCurrentLocation()).thenReturn(null)
+        viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).addTagToSession(
+            eq(validId),
+            argThat { tag -> tag.dateTime == mockDateTime && tag.location == null },
         )
     }
 

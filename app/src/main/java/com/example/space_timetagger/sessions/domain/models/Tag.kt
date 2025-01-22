@@ -7,5 +7,5 @@ import java.util.UUID
 data class Tag(
     val id: String = UUID.randomUUID().toString(),
     val dateTime: OffsetDateTime,
-    val latLng: LatLng? = null,
+    val location: LatLng? = null,
 )

@@ -64,17 +64,15 @@ class SessionViewModel(
 
     private fun addTag(now: OffsetDateTime) {
         viewModelScope.launch {
-            if (preferencesRepository.taggingLocationIsEnabled.firstOrNull() == true) {
-                locationRepository.findCurrentLocation {
-                    val tag = Tag(dateTime = now, latLng = it)
-                    viewModelScope.launch {
-                        sessionsRepository.addTagToSession(sessionId, tag)
-                    }
-                }
+            val taggingLocationIsEnabled =
+                preferencesRepository.taggingLocationIsEnabled.firstOrNull() == true
+            val currentLocation = if (taggingLocationIsEnabled) {
+                locationRepository.findCurrentLocation()
             } else {
-                val tag = Tag(dateTime = now)
-                sessionsRepository.addTagToSession(sessionId, tag)
+                null
             }
+            val tag = Tag(dateTime = now, location = currentLocation)
+            sessionsRepository.addTagToSession(sessionId, tag)
         }
     }
 

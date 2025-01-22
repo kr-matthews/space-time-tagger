@@ -21,4 +21,5 @@
     <string name="capture_location">Capture Location in Tags</string>
     <string name="ok">OK</string>
     <string name="why_location_permission_is_required">If you don\'t grant precise location permission, then this app will not be able to add your current location to tags.</string>
+    <string name="tag_being_added">Tag Being Added</string>
 </resources>

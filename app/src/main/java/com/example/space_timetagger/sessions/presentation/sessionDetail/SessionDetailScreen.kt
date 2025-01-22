@@ -1,5 +1,6 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +36,7 @@ fun SessionDetailScreen(
     onSettingsTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionDetailViewState.Loading)
 
@@ -42,6 +45,10 @@ fun SessionDetailScreen(
         when (event) {
             is SessionDetailEvent.TapBack -> onBackTap()
             is SessionDetailEvent.TapSettings -> onSettingsTap()
+            is SessionDetailEvent.TapNewTagButton -> {
+                Toast.makeText(context, R.string.tag_being_added, Toast.LENGTH_SHORT).show()
+            }
+
             else -> {}
         }
     }

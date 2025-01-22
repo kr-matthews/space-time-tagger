@@ -14,6 +14,7 @@ import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Ignore
 import org.junit.Rule
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -37,10 +39,16 @@ class PreferencesRepositoryImplTest {
 
     private lateinit var preferencesRepository: PreferencesRepository
 
-    private fun initializeRepository(mockPreferences: Preferences?) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun initializeRepository(
+        mockPreferences: Preferences?,
+        initiallyHasFineLocationPermission: Boolean = true,
+    ) {
         mockPreferences?.let { whenever(preferencesDataStore.data).thenReturn(flowOf(it)) }
         preferencesRepository = PreferencesRepositoryImpl(
             preferencesDataStore = preferencesDataStore,
+            initiallyHasFineLocationPermission = initiallyHasFineLocationPermission,
+            ioDispatcher = coroutineTestRule.testDispatcher,
         )
     }
 
@@ -51,9 +59,19 @@ class PreferencesRepositoryImplTest {
     }
 
     @Test
-    fun initiallyWithEnabledLocationPreferences_taggingLocationIsEnabledProducesTrue() = runTest {
-        initializeRepository(mockEnabledLocationPreferences)
+    fun initiallyWithEnabledLocationPreferencesAndPermission_taggingLocationIsEnabledProducesTrue() =
+        runTest {
+            initializeRepository(mockEnabledLocationPreferences, true)
         assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isTrue()
+            verify(preferencesDataStore, never()).edit(any())
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun initiallyWithEnabledLocationPreferencesButNoPermission_callsDataStoreEdit() = runTest {
+        initializeRepository(mockEnabledLocationPreferences, false)
+        advanceUntilIdle()
+        verify(preferencesDataStore).edit(any())
     }
 
     @Test

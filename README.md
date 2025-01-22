@@ -61,4 +61,5 @@ on GitHub.
 See the [issues](https://github.com/kr-matthews/space-time-tagger/issues) on GitHub, in addition to
 the following:
 
-- (currently too early to list flaws, but I'm sure there will be many soon enough)
+- Not sure whether dependency injection into repositories is done correctly - (application) context
+  is passed in sometimes.

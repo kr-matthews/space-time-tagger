@@ -22,6 +22,8 @@ install it on an android phone with developer mode enabled.
 - Session Detail screen to see/add/delete tags within a session.
 - Settings screen to toggle whether current location is stored in tags (requesting permission if
   necessary).
+- Allow app to run over the lock screen.
+- Optionally allow app to keep the screen on.
 
 Note: No data is persisted after the app closes. This will change soon.
 
@@ -34,7 +36,7 @@ on GitHub.
 - Integration tests.
 - Map view of tags.
 - Improve styling and colours.
-- Ability to create tags from phone's lock screen (and/or a mode to prevent screen from locking).
+- Ability to create tags from a notification on the phone's lock screen.
 - Settings for default session names.
 - Ability to 'start' a session (introducing a relative timestamp, in addition to the absolute
   timestamp).
@@ -50,7 +52,7 @@ on GitHub.
 ## Focus
 
 - Android architecture.
-- Clean code.
+- Good code.
 - Tests.
 - Clean git history, with a functional app at all points.
 - Android permissions - location in particular.
@@ -61,5 +63,6 @@ on GitHub.
 See the [issues](https://github.com/kr-matthews/space-time-tagger/issues) on GitHub, in addition to
 the following:
 
+- Toasts won't show when the phone is locked and the app is being used on the lock screen.
 - Not sure whether dependency injection into repositories is done correctly - (application) context
   is passed in sometimes.

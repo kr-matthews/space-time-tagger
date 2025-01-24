@@ -45,6 +45,20 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun initialState_keepScreenOnDisabledIsReflected() = runTest {
+        whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        assertThat(viewModel.viewState.first()::keepScreenOnIsEnabled).isFalse()
+    }
+
+    @Test
+    fun initialState_keepScreenOnEnabledIsReflected() = runTest {
+        whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(true))
+        initViewModel()
+        assertThat(viewModel.viewState.first()::keepScreenOnIsEnabled).isTrue()
+    }
+
+    @Test
     fun initialState_taggingDisabledIsReflected() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
         initViewModel()
@@ -66,6 +80,26 @@ class SettingsViewModelTest {
     }
 
     // FIXME: test that if repository flow updates, view state will update
+
+    @Test
+    fun withKeepScreenOnDisabled_eventTapKeepScreenOnToggle_callsRepositoryFunction() =
+        runTest {
+            whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(false))
+            initViewModel()
+            viewModel.handleEvent(SettingsEvent.TapKeepScreenOnToggle)
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).enableKeepScreenOn()
+        }
+
+    @Test
+    fun withKeepScreenOnEnabled_eventTapKeepScreenOnToggle_callsRepositoryFunction() =
+        runTest {
+            whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(true))
+            initViewModel()
+            viewModel.handleEvent(SettingsEvent.TapKeepScreenOnToggle)
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).disableKeepScreenOn()
+        }
 
     @Test
     fun withLocationDisabledEventTapLocationTaggingToggleWithoutPermission_promptsLocationPermissionRequest() =

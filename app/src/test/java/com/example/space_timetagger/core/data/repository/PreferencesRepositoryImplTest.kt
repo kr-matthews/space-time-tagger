@@ -53,16 +53,44 @@ class PreferencesRepositoryImplTest {
     }
 
     @Test
+    fun initiallyWithEmptyPreferences_keepScreenOnIsEnabledProducesFalse() = runTest {
+        initializeRepository(mockEmptyPreferences)
+        assertThat(preferencesRepository.keepScreenOnIsEnabled.first()).isFalse()
+    }
+
+    @Test
     fun initiallyWithEmptyPreferences_taggingLocationIsEnabledProducesFalse() = runTest {
         initializeRepository(mockEmptyPreferences)
         assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isFalse()
     }
 
     @Test
+    fun initiallyWithEnabledKeepScreenOnPreferences_taggingLocationIsEnabledProducesTrue() =
+        runTest {
+            initializeRepository(mockEnabledKeepScreenOnPreferences)
+            assertThat(preferencesRepository.keepScreenOnIsEnabled.first()).isTrue()
+        }
+
+    @Test
+    fun initiallyWithDisabledKeepScreenOnPreferences_taggingLocationIsEnabledProducesFalse() =
+        runTest {
+            initializeRepository(mockDisabledKeepScreenOnPreferences)
+            assertThat(preferencesRepository.keepScreenOnIsEnabled.first()).isFalse()
+        }
+
+    @Test
+    fun initiallyWithAllPreferencesEnabled_allPreferenceFlowsProduceTrue() =
+        runTest {
+            initializeRepository(mockAllPreferencesOn)
+            assertThat(preferencesRepository.keepScreenOnIsEnabled.first()).isTrue()
+            assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isTrue()
+        }
+
+    @Test
     fun initiallyWithEnabledLocationPreferencesAndPermission_taggingLocationIsEnabledProducesTrue() =
         runTest {
             initializeRepository(mockEnabledLocationPreferences, true)
-        assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isTrue()
+            assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isTrue()
             verify(preferencesDataStore, never()).edit(any())
         }
 
@@ -82,10 +110,34 @@ class PreferencesRepositoryImplTest {
 
     @Ignore("Says checked exception is invalid for this method, not sure why")
     @Test
+    fun whenDataStoreThrowsIOException_keepScreenOnIsEnabledProducesFalse() = runTest {
+        whenever(preferencesDataStore.data).thenThrow(IOException())
+        initializeRepository(null)
+        assertThat(preferencesRepository.keepScreenOnIsEnabled.first()).isFalse()
+    }
+
+    @Ignore("Says checked exception is invalid for this method, not sure why")
+    @Test
     fun whenDataStoreThrowsIOException_taggingLocationIsEnabledProducesFalse() = runTest {
         whenever(preferencesDataStore.data).thenThrow(IOException())
         initializeRepository(null)
         assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isFalse()
+    }
+
+    // unsure how best to write test
+    @Test
+    fun enableKeepScreenOn_callsDataStoreEdit() = runTest {
+        initializeRepository(mockDisabledKeepScreenOnPreferences)
+        preferencesRepository.enableKeepScreenOn()
+        verify(preferencesDataStore).edit(any())
+    }
+
+    // unsure how best to write test
+    @Test
+    fun disableKeepScreenOn_callsDataStoreEdit() = runTest {
+        initializeRepository(mockEnabledKeepScreenOnPreferences)
+        preferencesRepository.disableKeepScreenOn()
+        verify(preferencesDataStore).edit(any())
     }
 
     // unsure how best to write test
@@ -107,4 +159,10 @@ class PreferencesRepositoryImplTest {
     private val mockEmptyPreferences = emptyPreferences()
     private val mockEnabledLocationPreferences = preferencesOf(TAGGING_LOCATION to true)
     private val mockDisabledLocationPreferences = preferencesOf(TAGGING_LOCATION to false)
+    private val mockEnabledKeepScreenOnPreferences = preferencesOf(KEEP_SCREEN_ON to true)
+    private val mockDisabledKeepScreenOnPreferences = preferencesOf(KEEP_SCREEN_ON to false)
+    private val mockAllPreferencesOn = preferencesOf(
+        TAGGING_LOCATION to true,
+        KEEP_SCREEN_ON to true,
+    )
 }

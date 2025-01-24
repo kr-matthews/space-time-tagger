@@ -41,6 +41,7 @@ class SettingsViewModelTest {
     @Before
     fun setup() {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+        whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(true))
     }
 
     @Test
@@ -69,14 +70,14 @@ class SettingsViewModelTest {
     @Test
     fun withLocationDisabledEventTapLocationTaggingToggleWithoutPermission_promptsLocationPermissionRequest() =
         runTest {
-        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
-        initViewModel()
+            whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+            initViewModel()
             viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
-        advanceUntilIdle()
+            advanceUntilIdle()
             verify(mockPreferencesRepository, never()).enableTaggingLocation()
             assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isTrue()
             assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
-    }
+        }
 
     @Test
     fun withLocationDisabledEventTapLocationTaggingToggleWithPermission_callsRepositoryFunction() =
@@ -93,14 +94,14 @@ class SettingsViewModelTest {
     @Test
     fun withLocationEnabledEventTapLocationTaggingToggleWithoutPermission_callsRepositoryFunction() =
         runTest {
-        whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
-        initViewModel()
+            whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+            initViewModel()
             viewModel.handleEvent(SettingsEvent.TapLocationTaggingToggle(false))
-        advanceUntilIdle()
-        verify(mockPreferencesRepository, times(1)).disableTaggingLocation()
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).disableTaggingLocation()
             assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
             assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
-    }
+        }
 
     @Test
     fun withLocationEnabledEventTapLocationTaggingToggleWithPermission_callsRepositoryFunction() =

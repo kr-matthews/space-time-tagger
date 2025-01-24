@@ -114,6 +114,11 @@ fun SettingsContent(
             .padding(8.dp)
     ) {
         LabelledSwitch(
+            name = stringResource(R.string.keep_screen_on),
+            isChecked = viewState.keepScreenOnIsEnabled,
+            onTap = { onEvent(SettingsEvent.TapKeepScreenOnToggle) },
+        )
+        LabelledSwitch(
             name = stringResource(R.string.capture_location),
             isChecked = viewState.taggingLocationIsEnabled,
             onTap = { onEvent(SettingsEvent.TapLocationTaggingToggle(hasLocationPermission)) },
@@ -176,21 +181,25 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
     override val values = sequenceOf(
         SettingsViewState.Loading,
         SettingsViewState.Success(
+            keepScreenOnIsEnabled = false,
             taggingLocationIsEnabled = false,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = false,
         ),
         SettingsViewState.Success(
+            keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = false,
             locationPermissionMustBeRequested = true,
             locationPermissionExplanationIsVisible = false,
         ),
         SettingsViewState.Success(
+            keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = false,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = true,
         ),
         SettingsViewState.Success(
+            keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = true,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = false,

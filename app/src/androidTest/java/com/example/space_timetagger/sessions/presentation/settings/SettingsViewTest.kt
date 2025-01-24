@@ -32,14 +32,26 @@ class SettingsViewTest {
 
     private val mockHandleEvent: (SettingsEvent) -> Unit = mock()
 
-    private val enabledState = SettingsViewState.Success(true)
-    private val disabledState = SettingsViewState.Success(false)
-    private val successState = disabledState
+    private val enabledState = SettingsViewState.Success(
+        keepScreenOnIsEnabled = true,
+        taggingLocationIsEnabled = true,
+    )
+    private val disabledState = SettingsViewState.Success(
+        keepScreenOnIsEnabled = false,
+        taggingLocationIsEnabled = false,
+    )
+    private val mixedState = SettingsViewState.Success(
+        keepScreenOnIsEnabled = true,
+        taggingLocationIsEnabled = false,
+    )
+    private val successState = mixedState
     private val requestLaunchState = SettingsViewState.Success(
+        keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = false,
         locationPermissionMustBeRequested = true,
     )
     private val permissionDeniedState = SettingsViewState.Success(
+        keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = false,
         locationPermissionExplanationIsVisible = true,
     )

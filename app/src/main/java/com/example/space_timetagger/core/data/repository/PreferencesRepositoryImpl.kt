@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 val TAGGING_LOCATION = booleanPreferencesKey("tagging_location")
+val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
 
 class PreferencesRepositoryImpl(
     private val preferencesDataStore: DataStore<Preferences>,
@@ -24,6 +25,27 @@ class PreferencesRepositoryImpl(
 ) : PreferencesRepository {
 
     private val scope = CoroutineScope(ioDispatcher)
+
+    override val keepScreenOnIsEnabled: Flow<Boolean> =
+        preferencesDataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[KEEP_SCREEN_ON] ?: false
+        }
+
+    override suspend fun enableKeepScreenOn() = toggleKeepScreenOn(true)
+
+    override suspend fun disableKeepScreenOn() = toggleKeepScreenOn(false)
+
+    private suspend fun toggleKeepScreenOn(isEnabled: Boolean) {
+        preferencesDataStore.edit { preferences ->
+            preferences[KEEP_SCREEN_ON] = isEnabled
+        }
+    }
 
     override val taggingLocationIsEnabled: Flow<Boolean> =
         preferencesDataStore.data.catch { exception ->

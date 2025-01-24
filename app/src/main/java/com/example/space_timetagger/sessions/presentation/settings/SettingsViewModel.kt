@@ -14,16 +14,19 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
+    private val keepScreenOnIsEnabled = preferencesRepository.keepScreenOnIsEnabled
     private val taggingLocationIsEnabled = preferencesRepository.taggingLocationIsEnabled
     private val locationPermissionMustBeRequested = MutableStateFlow(false)
     private val locationPermissionExplanationIsVisible = MutableStateFlow(false)
 
     val viewState = combine(
+        keepScreenOnIsEnabled,
         taggingLocationIsEnabled,
         locationPermissionMustBeRequested,
         locationPermissionExplanationIsVisible,
-    ) { taggingLocationIsEnabled, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
+    ) { keepScreenOnIsEnabled, taggingLocationIsEnabled, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
         SettingsViewState.Success(
+            keepScreenOnIsEnabled = keepScreenOnIsEnabled,
             taggingLocationIsEnabled = taggingLocationIsEnabled,
             locationPermissionMustBeRequested = locationPermissionMustBeRequested,
             locationPermissionExplanationIsVisible = locationPermissionExplanationIsVisible,
@@ -33,6 +36,8 @@ class SettingsViewModel(
     fun handleEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.TapBack -> Unit // handled in compose
+
+            SettingsEvent.TapKeepScreenOnToggle -> onKeepScreenOnToggled()
 
             is SettingsEvent.TapLocationTaggingToggle -> onLocationTaggingToggleTap(
                 hasLocationPermission = event.hasLocationPermission,
@@ -53,6 +58,20 @@ class SettingsViewModel(
             }
         }
     }
+
+    private fun onKeepScreenOnToggled() {
+        viewModelScope.launch {
+            if (keepScreenOnIsEnabled.firstOrNull() == true) {
+                disableKeepScreenOn()
+            } else {
+                enableKeepScreenOn()
+            }
+        }
+    }
+
+    private suspend fun enableKeepScreenOn() = preferencesRepository.enableKeepScreenOn()
+
+    private suspend fun disableKeepScreenOn() = preferencesRepository.disableKeepScreenOn()
 
     private fun onLocationTaggingToggleTap(hasLocationPermission: Boolean) {
         viewModelScope.launch {

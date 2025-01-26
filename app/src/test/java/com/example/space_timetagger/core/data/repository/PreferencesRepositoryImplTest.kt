@@ -65,6 +65,12 @@ class PreferencesRepositoryImplTest {
     }
 
     @Test
+    fun initiallyWithEmptyPreferences_tapAnywhereIsEnabledProducesFalse() = runTest {
+        initializeRepository(mockEmptyPreferences)
+        assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isFalse()
+    }
+
+    @Test
     fun initiallyWithEnabledKeepScreenOnPreferences_taggingLocationIsEnabledProducesTrue() =
         runTest {
             initializeRepository(mockEnabledKeepScreenOnPreferences)
@@ -79,11 +85,26 @@ class PreferencesRepositoryImplTest {
         }
 
     @Test
+    fun initiallyWithEnabledTapAnywherePreferences_tapAnywhereIsEnabledProducesTrue() =
+        runTest {
+            initializeRepository(mockEnabledTapAnywherePreferences)
+            assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isTrue()
+        }
+
+    @Test
+    fun initiallyWithDisabledTapAnywherePreferences_tapAnywhereIsEnabledProducesFalse() =
+        runTest {
+            initializeRepository(mockDisabledTapAnywherePreferences)
+            assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isFalse()
+        }
+
+    @Test
     fun initiallyWithAllPreferencesEnabled_allPreferenceFlowsProduceTrue() =
         runTest {
             initializeRepository(mockAllPreferencesOn)
             assertThat(preferencesRepository.keepScreenOnIsEnabled.first()).isTrue()
             assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isTrue()
+            assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isTrue()
         }
 
     @Test
@@ -124,6 +145,14 @@ class PreferencesRepositoryImplTest {
         assertThat(preferencesRepository.taggingLocationIsEnabled.first()).isFalse()
     }
 
+    @Ignore("Says checked exception is invalid for this method, not sure why")
+    @Test
+    fun whenDataStoreThrowsIOException_tapAnywhereIsEnabledProducesFalse() = runTest {
+        whenever(preferencesDataStore.data).thenThrow(IOException())
+        initializeRepository(null)
+        assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isFalse()
+    }
+
     // unsure how best to write test
     @Test
     fun enableKeepScreenOn_callsDataStoreEdit() = runTest {
@@ -156,13 +185,32 @@ class PreferencesRepositoryImplTest {
         verify(preferencesDataStore).edit(any())
     }
 
+    // unsure how best to write test
+    @Test
+    fun enableTapAnywhere_callsDataStoreEdit() = runTest {
+        initializeRepository(mockDisabledTapAnywherePreferences)
+        preferencesRepository.enableTapAnywhere()
+        verify(preferencesDataStore).edit(any())
+    }
+
+    // unsure how best to write test
+    @Test
+    fun disableTapAnywhere_callsDataStoreEdit() = runTest {
+        initializeRepository(mockEnabledTapAnywherePreferences)
+        preferencesRepository.disableTapAnywhere()
+        verify(preferencesDataStore).edit(any())
+    }
+
     private val mockEmptyPreferences = emptyPreferences()
     private val mockEnabledLocationPreferences = preferencesOf(TAGGING_LOCATION to true)
     private val mockDisabledLocationPreferences = preferencesOf(TAGGING_LOCATION to false)
     private val mockEnabledKeepScreenOnPreferences = preferencesOf(KEEP_SCREEN_ON to true)
     private val mockDisabledKeepScreenOnPreferences = preferencesOf(KEEP_SCREEN_ON to false)
+    private val mockEnabledTapAnywherePreferences = preferencesOf(TAP_ANYWHERE to true)
+    private val mockDisabledTapAnywherePreferences = preferencesOf(TAP_ANYWHERE to false)
     private val mockAllPreferencesOn = preferencesOf(
         TAGGING_LOCATION to true,
         KEEP_SCREEN_ON to true,
+        TAP_ANYWHERE to true,
     )
 }

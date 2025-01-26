@@ -8,4 +8,5 @@ data class SessionDetailUiModel(
     val nameIsBeingEdited: Boolean,
     val tags: List<TagUiModel>,
     val deleteAllIsEnabled: Boolean,
+    val tapAnywhereIsEnabled: Boolean,
 )

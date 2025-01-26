@@ -26,10 +26,16 @@ class SessionViewModel(
 ) : ViewModel() {
     private val session = sessionsRepository.session(sessionId)
 
+    private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
+
     private val nameIsBeingEdited = MutableStateFlow(false)
 
     val viewState =
-        combine(session, nameIsBeingEdited) { session, nameIsBeingEdited ->
+        combine(
+            session,
+            tapAnywhereIsEnabled,
+            nameIsBeingEdited,
+        ) { session, tapAnywhereIsEnabled, nameIsBeingEdited ->
             when {
                 session == null -> SessionDetailViewState.Error
 
@@ -38,7 +44,7 @@ class SessionViewModel(
 //                )
 
                 else -> SessionDetailViewState.Success(
-                    buildSessionDetailUiModel(session, nameIsBeingEdited)
+                    buildSessionDetailUiModel(session, tapAnywhereIsEnabled, nameIsBeingEdited)
                 )
             }
         }
@@ -53,6 +59,7 @@ class SessionViewModel(
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
+            is SessionDetailEvent.TapAnywhere -> addTag(event.time)
         }
     }
 
@@ -103,11 +110,16 @@ class SessionViewModelFactory(
     }
 }
 
-private fun buildSessionDetailUiModel(session: Session, nameIsBeingEdited: Boolean) =
+private fun buildSessionDetailUiModel(
+    session: Session,
+    tapAnywhereIsEnabled: Boolean,
+    nameIsBeingEdited: Boolean,
+) =
     SessionDetailUiModel(
         id = session.id,
         name = session.name,
         nameIsBeingEdited = nameIsBeingEdited,
         tags = session.tags.map(Tag::toUiModel),
         deleteAllIsEnabled = session.tags.isNotEmpty(),
+        tapAnywhereIsEnabled = tapAnywhereIsEnabled,
     )

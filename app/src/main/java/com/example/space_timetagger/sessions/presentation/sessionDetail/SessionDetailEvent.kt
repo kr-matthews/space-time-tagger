@@ -11,4 +11,5 @@ sealed interface SessionDetailEvent {
     data class TapNewTagButton(val time: OffsetDateTime) : SessionDetailEvent
     data class TapConfirmDeleteTag(val tagId: String) : SessionDetailEvent
     data object TapConfirmDeleteAllTags : SessionDetailEvent
+    data class TapAnywhere(val time: OffsetDateTime) : SessionDetailEvent
 }

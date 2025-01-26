@@ -134,6 +134,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 nameIsBeingEdited = false,
                 tags = someTags,
                 deleteAllIsEnabled = true,
+                tapAnywhereIsEnabled = false,
             ),
         ),
         SessionDetailViewState.Success(
@@ -143,6 +144,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 nameIsBeingEdited = false,
                 tags = noTags,
                 deleteAllIsEnabled = false,
+                tapAnywhereIsEnabled = false,
             ),
         ),
         SessionDetailViewState.Success(
@@ -152,6 +154,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 nameIsBeingEdited = false,
                 tags = manyTags,
                 deleteAllIsEnabled = true,
+                tapAnywhereIsEnabled = true,
             ),
         ),
         SessionDetailViewState.Loading,
@@ -163,6 +166,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 nameIsBeingEdited = false,
                 tags = someTags,
                 deleteAllIsEnabled = true,
+                tapAnywhereIsEnabled = true,
             ),
         ),
     )

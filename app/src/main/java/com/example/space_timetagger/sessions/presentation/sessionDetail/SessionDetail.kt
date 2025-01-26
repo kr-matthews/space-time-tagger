@@ -96,7 +96,10 @@ fun SessionDetail(
                 }
             }
         } else {
-            NoTags(Modifier.weight(1f))
+            NoTags(
+                tapAnywhereIsEnabled = session.tapAnywhereIsEnabled,
+                modifier = Modifier.weight(1f),
+            )
         }
         SessionOptions(
             deleteAllIsEnabled = session.deleteAllIsEnabled,
@@ -232,10 +235,14 @@ private fun SessionOptions(
 
 @Composable
 private fun NoTags(
+    tapAnywhereIsEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val textRes =
+        if (tapAnywhereIsEnabled) R.string.no_tags_tap_anywhere else R.string.no_tags_tap_below
+
     Text(
-        text = stringResource(R.string.no_tags),
+        text = stringResource(textRes),
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier

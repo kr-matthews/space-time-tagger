@@ -48,12 +48,14 @@ class SessionDetailViewTest {
         nameIsBeingEdited = false,
         tags = List(6) { i -> TagUiModel(dateTime = now.minusSeconds(i * i + 2L)) },
         deleteAllIsEnabled = true,
+        tapAnywhereIsEnabled = false,
     )
     private val newSession = SessionDetailUiModel(
         name = null,
         nameIsBeingEdited = false,
         tags = listOf(),
         deleteAllIsEnabled = false,
+        tapAnywhereIsEnabled = false,
     )
     private val aTag = session.tags.let {
         val index = 2.coerceAtMost(it.size - 1)
@@ -222,7 +224,8 @@ class SessionDetailViewTest {
     @Test
     fun newSuccessState_showsNoTagMessage() {
         setup(newSuccessState)
-        composeTestRule.onNodeWithText(appContext.getString(R.string.no_tags)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(appContext.getString(R.string.no_tags_tap_below))
+            .assertIsDisplayed()
     }
 
     @Ignore("OffsetDateTime.now() seems to be returning null in the test")

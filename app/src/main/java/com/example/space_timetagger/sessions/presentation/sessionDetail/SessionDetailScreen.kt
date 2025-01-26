@@ -40,13 +40,20 @@ fun SessionDetailScreen(
     val viewModel = viewModel<SessionViewModel>(key = id, factory = SessionViewModelFactory(id))
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionDetailViewState.Loading)
 
+    val tagBeingAddedToast = Toast.makeText(context, R.string.tag_being_added, Toast.LENGTH_SHORT)
+
     fun onEvent(event: SessionDetailEvent) {
         viewModel.handleEvent(event)
         when (event) {
             is SessionDetailEvent.TapBack -> onBackTap()
             is SessionDetailEvent.TapSettings -> onSettingsTap()
+            // TODO: move into SessionDetailView and add UI tests?
             is SessionDetailEvent.TapNewTagButton -> {
-                Toast.makeText(context, R.string.tag_being_added, Toast.LENGTH_SHORT).show()
+                tagBeingAddedToast.show()
+            }
+
+            is SessionDetailEvent.TapAnywhere -> {
+                tagBeingAddedToast.show()
             }
 
             else -> {}

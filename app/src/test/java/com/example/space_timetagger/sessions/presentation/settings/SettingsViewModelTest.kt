@@ -42,6 +42,7 @@ class SettingsViewModelTest {
     fun setup() {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(true))
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(true))
     }
 
     @Test
@@ -70,6 +71,20 @@ class SettingsViewModelTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         initViewModel()
         assertThat(viewModel.viewState.first()::taggingLocationIsEnabled).isTrue()
+    }
+
+    @Test
+    fun initialState_tapAnywhereDisabledIsReflected() = runTest {
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        assertThat(viewModel.viewState.first()::tapAnywhereIsEnabled).isFalse()
+    }
+
+    @Test
+    fun initialState_tapAnywhereEnabledIsReflected() = runTest {
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(true))
+        initViewModel()
+        assertThat(viewModel.viewState.first()::tapAnywhereIsEnabled).isTrue()
     }
 
     @Test
@@ -207,4 +222,24 @@ class SettingsViewModelTest {
         assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
         assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
     }
+
+    @Test
+    fun withTapAnywhereDisabled_eventTapTapAnywhereToggle_callsRepositoryFunction() =
+        runTest {
+            whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
+            initViewModel()
+            viewModel.handleEvent(SettingsEvent.TapTapAnywhereToggle)
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).enableTapAnywhere()
+        }
+
+    @Test
+    fun withTapAnywhereEnabled_eventTapTapAnywhereToggle_callsRepositoryFunction() =
+        runTest {
+            whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(true))
+            initViewModel()
+            viewModel.handleEvent(SettingsEvent.TapTapAnywhereToggle)
+            advanceUntilIdle()
+            verify(mockPreferencesRepository, times(1)).disableTapAnywhere()
+        }
 }

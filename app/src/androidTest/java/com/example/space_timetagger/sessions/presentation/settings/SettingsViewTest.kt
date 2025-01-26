@@ -35,24 +35,29 @@ class SettingsViewTest {
     private val enabledState = SettingsViewState.Success(
         keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = true,
+        tapAnywhereIsEnabled = true,
     )
     private val disabledState = SettingsViewState.Success(
         keepScreenOnIsEnabled = false,
         taggingLocationIsEnabled = false,
+        tapAnywhereIsEnabled = false
     )
     private val mixedState = SettingsViewState.Success(
         keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = false,
+        tapAnywhereIsEnabled = true,
     )
     private val successState = mixedState
     private val requestLaunchState = SettingsViewState.Success(
         keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = false,
+        tapAnywhereIsEnabled = false,
         locationPermissionMustBeRequested = true,
     )
     private val permissionDeniedState = SettingsViewState.Success(
-        keepScreenOnIsEnabled = true,
+        keepScreenOnIsEnabled = false,
         taggingLocationIsEnabled = false,
+        tapAnywhereIsEnabled = true,
         locationPermissionExplanationIsVisible = true,
     )
     private val loadingState = SettingsViewState.Loading

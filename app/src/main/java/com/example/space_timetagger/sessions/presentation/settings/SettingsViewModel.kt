@@ -16,18 +16,21 @@ class SettingsViewModel(
 ) : ViewModel() {
     private val keepScreenOnIsEnabled = preferencesRepository.keepScreenOnIsEnabled
     private val taggingLocationIsEnabled = preferencesRepository.taggingLocationIsEnabled
+    private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
     private val locationPermissionMustBeRequested = MutableStateFlow(false)
     private val locationPermissionExplanationIsVisible = MutableStateFlow(false)
 
     val viewState = combine(
         keepScreenOnIsEnabled,
         taggingLocationIsEnabled,
+        tapAnywhereIsEnabled,
         locationPermissionMustBeRequested,
         locationPermissionExplanationIsVisible,
-    ) { keepScreenOnIsEnabled, taggingLocationIsEnabled, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
+    ) { keepScreenOnIsEnabled, taggingLocationIsEnabled, tapAnywhereIsEnabled, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
         SettingsViewState.Success(
             keepScreenOnIsEnabled = keepScreenOnIsEnabled,
             taggingLocationIsEnabled = taggingLocationIsEnabled,
+            tapAnywhereIsEnabled = tapAnywhereIsEnabled,
             locationPermissionMustBeRequested = locationPermissionMustBeRequested,
             locationPermissionExplanationIsVisible = locationPermissionExplanationIsVisible,
         )
@@ -42,6 +45,8 @@ class SettingsViewModel(
             is SettingsEvent.TapLocationTaggingToggle -> onLocationTaggingToggleTap(
                 hasLocationPermission = event.hasLocationPermission,
             )
+
+            SettingsEvent.TapTapAnywhereToggle -> onTapAnywhereToggled()
 
             SettingsEvent.LocationPermissionRequestLaunched -> {
                 locationPermissionMustBeRequested.update { false }
@@ -82,6 +87,20 @@ class SettingsViewModel(
             }
         }
     }
+
+    private fun onTapAnywhereToggled() {
+        viewModelScope.launch {
+            if (tapAnywhereIsEnabled.firstOrNull() == true) {
+                disableTapAnywhere()
+            } else {
+                enableTapAnywhere()
+            }
+        }
+    }
+
+    private suspend fun enableTapAnywhere() = preferencesRepository.enableTapAnywhere()
+
+    private suspend fun disableTapAnywhere() = preferencesRepository.disableTapAnywhere()
 
     private fun onLocationPermissionGranted() {
         viewModelScope.launch {

@@ -15,8 +15,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-val TAGGING_LOCATION = booleanPreferencesKey("tagging_location")
 val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
+val TAGGING_LOCATION = booleanPreferencesKey("tagging_location")
+val TAP_ANYWHERE = booleanPreferencesKey("tap_anywhere")
 
 class PreferencesRepositoryImpl(
     private val preferencesDataStore: DataStore<Preferences>,
@@ -73,6 +74,27 @@ class PreferencesRepositoryImpl(
             scope.launch {
                 disableTaggingLocation()
             }
+        }
+    }
+
+    override val tapAnywhereIsEnabled: Flow<Boolean> =
+        preferencesDataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[TAP_ANYWHERE] ?: false
+        }
+
+    override suspend fun enableTapAnywhere() = toggleTapAnywhere(true)
+
+    override suspend fun disableTapAnywhere() = toggleTapAnywhere(false)
+
+    private suspend fun toggleTapAnywhere(isEnabled: Boolean) {
+        preferencesDataStore.edit { preferences ->
+            preferences[TAP_ANYWHERE] = isEnabled
         }
     }
 }

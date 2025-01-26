@@ -5,6 +5,7 @@ sealed interface SettingsViewState {
     data class Success(
         val keepScreenOnIsEnabled: Boolean,
         val taggingLocationIsEnabled: Boolean,
+        val tapAnywhereIsEnabled: Boolean,
         val locationPermissionMustBeRequested: Boolean = false,
         val locationPermissionExplanationIsVisible: Boolean = false,
     ) : SettingsViewState

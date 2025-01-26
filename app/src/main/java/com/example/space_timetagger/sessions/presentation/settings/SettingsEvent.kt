@@ -7,6 +7,7 @@ sealed interface SettingsEvent {
         val hasLocationPermission: Boolean,
     ) : SettingsEvent
 
+    data object TapTapAnywhereToggle : SettingsEvent
     data object LocationPermissionRequestLaunched : SettingsEvent
     data object LocationPermissionGranted : SettingsEvent
     data object LocationPermissionDenied : SettingsEvent

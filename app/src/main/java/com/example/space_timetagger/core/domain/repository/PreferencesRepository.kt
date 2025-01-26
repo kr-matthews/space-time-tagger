@@ -9,4 +9,7 @@ interface PreferencesRepository {
     val taggingLocationIsEnabled: Flow<Boolean>
     suspend fun enableTaggingLocation()
     suspend fun disableTaggingLocation()
+    val tapAnywhereIsEnabled: Flow<Boolean>
+    suspend fun enableTapAnywhere()
+    suspend fun disableTapAnywhere()
 }

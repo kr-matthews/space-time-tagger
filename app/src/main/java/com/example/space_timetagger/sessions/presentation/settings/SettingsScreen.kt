@@ -123,6 +123,11 @@ fun SettingsContent(
             isChecked = viewState.taggingLocationIsEnabled,
             onTap = { onEvent(SettingsEvent.TapLocationTaggingToggle(hasLocationPermission)) },
         )
+        LabelledSwitch(
+            name = stringResource(R.string.tap_anywhere),
+            isChecked = viewState.tapAnywhereIsEnabled,
+            onTap = { onEvent(SettingsEvent.TapTapAnywhereToggle) },
+        )
     }
 }
 
@@ -183,24 +188,28 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
         SettingsViewState.Success(
             keepScreenOnIsEnabled = false,
             taggingLocationIsEnabled = false,
+            tapAnywhereIsEnabled = false,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = false,
         ),
         SettingsViewState.Success(
             keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = false,
+            tapAnywhereIsEnabled = false,
             locationPermissionMustBeRequested = true,
             locationPermissionExplanationIsVisible = false,
         ),
         SettingsViewState.Success(
             keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = false,
+            tapAnywhereIsEnabled = true,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = true,
         ),
         SettingsViewState.Success(
             keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = true,
+            tapAnywhereIsEnabled = true,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = false,
         ),

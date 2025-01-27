@@ -66,6 +66,8 @@ fun SessionDetail(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .fillMaxWidth()
+            // always adding .clickable, but with enabled = session.tapAnywhereIsEnabled,
+            // will make the delete-a-tag test fail for unknown reasons
             .thenIf(
                 condition = session.tapAnywhereIsEnabled,
                 ifTrue = {

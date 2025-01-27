@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.core.presentation.formatShortDateLongTime
+import com.example.space_timetagger.core.presentation.thenIf
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
@@ -65,9 +66,13 @@ fun SessionDetail(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .fillMaxWidth()
-            .clickable(
-                onClick = { onEvent(SessionDetailEvent.TapAnywhere(OffsetDateTime.now())) },
-                enabled = session.tapAnywhereIsEnabled
+            .thenIf(
+                condition = session.tapAnywhereIsEnabled,
+                ifTrue = {
+                    clickable(
+                        onClick = { onEvent(SessionDetailEvent.TapAnywhere(OffsetDateTime.now())) },
+                    )
+                },
             )
     ) {
         Header(

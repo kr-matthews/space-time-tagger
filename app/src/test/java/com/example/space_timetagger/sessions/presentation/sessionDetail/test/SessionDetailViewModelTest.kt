@@ -31,9 +31,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -59,35 +61,31 @@ class SessionDetailViewModelTest {
     private val mockLocationRepository = mock<LocationRepository>()
 
     private lateinit var viewModel: SessionViewModel
-    private lateinit var viewModelNonExistentSession: SessionViewModel
 
     @Before
     fun setup() = runTest {
         whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession))
         whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
         whenever(mockLocationRepository.findCurrentLocation()).thenReturn(latLng)
+    }
 
+    private fun initViewModel(sessionId: String = validId) {
         viewModel = SessionViewModel(
-            validId,
+            sessionId,
             mockSessionsRepository,
             mockPreferencesRepository,
             mockLocationRepository,
         )
-        viewModelNonExistentSession =
-            SessionViewModel(
-                nonExistentId,
-                mockSessionsRepository,
-                mockPreferencesRepository,
-                mockLocationRepository,
-            )
     }
 
     // session doesn't exist - view state
 
     @Test
     fun nonExistentIdInitialState_producesErrorState() = runTest {
-        val initialViewState = viewModelNonExistentSession.viewState.first()
+        initViewModel(nonExistentId)
+        val initialViewState = viewModel.viewState.first()
         assertThat(initialViewState).hasClass<SessionDetailViewState.Error>()
     }
 
@@ -95,22 +93,26 @@ class SessionDetailViewModelTest {
 
     @Test
     fun initialState_isSuccessState() = runTest {
+        initViewModel()
         val initialViewState = viewModel.viewState.first()
         assertThat(initialViewState).hasClass<SessionDetailViewState.Success>()
     }
 
     @Test
     fun initialSuccessState_hasNameFromRepository() = runTest {
+        initViewModel()
         assertThat(session()::name).isEqualTo(mockSession.name)
     }
 
     @Test
     fun initialSuccessState_hasEditModeOff() = runTest {
+        initViewModel()
         assertThat(session()::nameIsBeingEdited).isFalse()
     }
 
     @Test
     fun initialSuccessState_hasTagsFromRepository() = runTest {
+        initViewModel()
         assertThat(session()::tags)
             .extracting(TagUiModel::id)
             .isEqualTo(mockSession.tags.map(Tag::id))
@@ -120,7 +122,23 @@ class SessionDetailViewModelTest {
     fun initialSuccessState_hasDeleteAllButtonEnabled() = runTest {
         // test only applies if the mock data has tags
         assertThat(mockSession.tags).isNotEmpty()
+
+        initViewModel()
         assertThat(session()::deleteAllIsEnabled).isTrue()
+    }
+
+    @Test
+    fun initialSuccessState_tapAnywhereIsEnabledReflectsFalseFromRepository() = runTest {
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        assertThat(session()::tapAnywhereIsEnabled).isFalse()
+    }
+
+    @Test
+    fun initialSuccessState_tapAnywhereIsEnabledReflectsTrueFromRepository() = runTest {
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(true))
+        initViewModel()
+        assertThat(session()::tapAnywhereIsEnabled).isTrue()
     }
 
     // FIXME: updating repository flows -> view state updates
@@ -129,12 +147,14 @@ class SessionDetailViewModelTest {
 
     @Test
     fun eventTapName_turnsEditModeOn() = runTest {
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapName)
         assertThat(session()::nameIsBeingEdited).isTrue()
     }
 
     @Test
     fun eventTapNameDoneEditing_turnsEditModeOff() = runTest {
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapName)
         viewModel.handleEvent(SessionDetailEvent.TapNameDoneEditing)
         assertThat(session()::nameIsBeingEdited).isFalse()
@@ -142,6 +162,7 @@ class SessionDetailViewModelTest {
 
     @Test
     fun eventChangeName_callsRepositoryFunc() = runTest {
+        initViewModel()
         val newName = "Updated Name String"
         viewModel.handleEvent(SessionDetailEvent.ChangeName(newName))
         advanceUntilIdle()
@@ -151,6 +172,7 @@ class SessionDetailViewModelTest {
     @Test
     fun eventTapNewTagButtonWithLocationDisabled_callsRepositoryFunc() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
@@ -162,6 +184,7 @@ class SessionDetailViewModelTest {
     @Test
     fun eventTapNewTagButtonWithLocationEnabled_callsRepositoryFunc() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
@@ -174,6 +197,7 @@ class SessionDetailViewModelTest {
     fun eventTapNewTagButtonWithLocationEnabledButFailedLocation_callsRepositoryFunc() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         whenever(mockLocationRepository.findCurrentLocation()).thenReturn(null)
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapNewTagButton(mockDateTime))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).addTagToSession(
@@ -184,6 +208,7 @@ class SessionDetailViewModelTest {
 
     @Test
     fun eventTapConfirmDeleteTag_callsRepositoryFunc() = runTest {
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteTag(mockTag.id))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeTagFromSession(validId, mockTag.id)
@@ -191,9 +216,34 @@ class SessionDetailViewModelTest {
 
     @Test
     fun eventTapConfirmDeleteAllTags_callsRepositoryFunc() = runTest {
+        initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteAllTags)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).removeAllTagsFromSession(validId)
+    }
+
+    @Test
+    fun eventTapAnywhereWithTapAnywhereEnabled_callsRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(true))
+        initViewModel()
+        viewModel.handleEvent(SessionDetailEvent.TapAnywhere(mockDateTime))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).addTagToSession(
+            eq(validId),
+            any(),
+        )
+    }
+
+    @Test
+    fun eventTapAnywhereWithTapAnywhereDisabled_doesNotCallRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
+        initViewModel()
+        viewModel.handleEvent(SessionDetailEvent.TapAnywhere(mockDateTime))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, never()).addTagToSession(
+            any(),
+            any(),
+        )
     }
 
     // helpers

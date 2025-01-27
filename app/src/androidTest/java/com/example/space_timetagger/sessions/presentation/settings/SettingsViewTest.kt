@@ -3,10 +3,10 @@ package com.example.space_timetagger.sessions.presentation.settings
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.isOff
-import androidx.compose.ui.test.isOn
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithText
@@ -135,7 +135,7 @@ class SettingsViewTest {
         setup(enabledState)
         getSwitch(appContext.getString(R.string.capture_location)).apply {
             assertIsDisplayed()
-            isOn()
+            assertIsOn()
         }
     }
 
@@ -144,7 +144,7 @@ class SettingsViewTest {
         setup(disabledState)
         getSwitch(appContext.getString(R.string.capture_location)).apply {
             assertIsDisplayed()
-            isOff()
+            assertIsOff()
         }
     }
 

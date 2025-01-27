@@ -59,7 +59,7 @@ class SessionViewModel(
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
-            is SessionDetailEvent.TapAnywhere -> addTag(event.time)
+            is SessionDetailEvent.TapAnywhere -> onTapAnywhere(event.time)
         }
     }
 
@@ -92,6 +92,14 @@ class SessionViewModel(
     private fun deleteAllTags() {
         viewModelScope.launch {
             sessionsRepository.removeAllTagsFromSession(sessionId)
+        }
+    }
+
+    private fun onTapAnywhere(time: OffsetDateTime) {
+        viewModelScope.launch {
+            if (tapAnywhereIsEnabled.firstOrNull() == true) {
+                addTag(time)
+            }
         }
     }
 }

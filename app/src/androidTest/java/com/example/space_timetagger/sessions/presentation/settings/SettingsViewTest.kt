@@ -32,12 +32,12 @@ class SettingsViewTest {
 
     private val mockHandleEvent: (SettingsEvent) -> Unit = mock()
 
-    private val enabledState = SettingsViewState.Success(
+    private val allEnabledState = SettingsViewState.Success(
         keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = true,
         tapAnywhereIsEnabled = true,
     )
-    private val disabledState = SettingsViewState.Success(
+    private val allDisabledState = SettingsViewState.Success(
         keepScreenOnIsEnabled = false,
         taggingLocationIsEnabled = false,
         tapAnywhereIsEnabled = false
@@ -115,6 +115,15 @@ class SettingsViewTest {
         verify(mockHandleEvent, times(1)).invoke(SettingsEvent.TapBack)
     }
 
+    @Test
+    fun tapKeepScreenOnToggle_callsEventTapKeepScreenOnToggle() {
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.keep_screen_on))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SettingsEvent.TapKeepScreenOnToggle)
+    }
+
     // not sure how to mock/check hasLocationPermission is passed correctly
     @Test
     fun successState_tappingSwitchCallsEventTapLocationTaggingToggle() {
@@ -128,21 +137,46 @@ class SettingsViewTest {
         )
     }
 
+    @Test
+    fun tapTapAnywhereToggle_callsEventTapTapAnywhereToggle() {
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.tap_anywhere))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SettingsEvent.TapTapAnywhereToggle)
+    }
+
     // switch states
 
     @Test
-    fun enabledState_hasLocationSwitchOn() {
-        setup(enabledState)
+    fun allEnabledState_hasAllSwitchesOn() {
+        setup(allEnabledState)
+        getSwitch(appContext.getString(R.string.keep_screen_on)).apply {
+            assertIsDisplayed()
+            assertIsOn()
+        }
         getSwitch(appContext.getString(R.string.capture_location)).apply {
+            assertIsDisplayed()
+            assertIsOn()
+        }
+        getSwitch(appContext.getString(R.string.tap_anywhere)).apply {
             assertIsDisplayed()
             assertIsOn()
         }
     }
 
     @Test
-    fun disabledState_hasLocationSwitchOff() {
-        setup(disabledState)
+    fun allDisabledState_hasAllSwitchesOff() {
+        setup(allDisabledState)
+        getSwitch(appContext.getString(R.string.keep_screen_on)).apply {
+            assertIsDisplayed()
+            assertIsOff()
+        }
         getSwitch(appContext.getString(R.string.capture_location)).apply {
+            assertIsDisplayed()
+            assertIsOff()
+        }
+        getSwitch(appContext.getString(R.string.tap_anywhere)).apply {
             assertIsDisplayed()
             assertIsOff()
         }

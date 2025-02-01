@@ -26,7 +26,6 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -57,6 +56,9 @@ class SessionDetailViewTest {
         deleteAllIsEnabled = false,
         tapAnywhereIsEnabled = false,
     )
+    private val tapAnywhereSession = session.copy(tapAnywhereIsEnabled = true)
+    private val tapAnywhereNewSession = newSession.copy(tapAnywhereIsEnabled = true)
+
     private val aTag = session.tags.let {
         val index = 2.coerceAtMost(it.size - 1)
         it[index]
@@ -64,6 +66,8 @@ class SessionDetailViewTest {
 
     private val successState = SessionDetailViewState.Success(session)
     private val newSuccessState = SessionDetailViewState.Success(newSession)
+    private val tapAnywhereState = SessionDetailViewState.Success(tapAnywhereSession)
+    private val tapAnywhereNewState = SessionDetailViewState.Success(tapAnywhereNewSession)
     private val loadingState = SessionDetailViewState.Loading
     private val errorState = SessionDetailViewState.Error
     private val refreshState = SessionDetailViewState.Refreshing(session)
@@ -139,7 +143,7 @@ class SessionDetailViewTest {
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapConfirmDeleteTag(aTag.id))
     }
 
-    @Ignore("OffsetDateTime.now() seems to be returning null in the test")
+    @Ignore("something weird going on when TapNewTagButton event is initialized, even in a verify")
     @Test
     fun successState_tappingAddButtonCallsEventTapNewTagButton() {
         setup(successState)
@@ -228,7 +232,7 @@ class SessionDetailViewTest {
             .assertIsDisplayed()
     }
 
-    @Ignore("OffsetDateTime.now() seems to be returning null in the test")
+    @Ignore("something weird going on when TapNewTagButton event is initialized, even in a verify")
     @Test
     fun newSuccessState_tappingAddButtonCallsEventTapNewTagButton() {
         setup(newSuccessState)
@@ -257,6 +261,90 @@ class SessionDetailViewTest {
             .onNode(hasContentDescription(appContext.getString(R.string.settings)))
             .performClick()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapSettings)
+    }
+
+    // tap anywhere state
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_tappingNameDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        tapName(tapAnywhereState.session.name)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapName)
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_deletingATagDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        deleteTag(aTag)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapConfirmDeleteTag(aTag.id))
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_tappingAddButtonDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        assertAddTagButtonWorks()
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_tappingDeleteAllTagsButtonDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        assertDeleteTagsButtonWorks()
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_tappingBackDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.back)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapBack)
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_tappingSettingsDoesNotCallEventTapAnywhere() {
+        setup(successState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.settings)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapSettings)
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereState_tappingExistingTagCallsEventTapAnywhere() {
+        setup(tapAnywhereState)
+        composeTestRule.onNodeWithText(aTag.dateTime.formatShortDateLongTime()).performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapAnywhere(any()))
+    }
+
+    @Ignore("Unsure how to click _below_ a node")
+    @Test
+    fun tapAnywhereState_tappingOnBackgroundCallsEventTapAnywhere() {
+        setup(tapAnywhereState)
+        val lastTag = tapAnywhereSession.tags.last()
+        composeTestRule.onNodeWithText(lastTag.dateTime.formatShortDateLongTime()).performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapAnywhere(any()))
+    }
+
+    @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
+    @Test
+    fun tapAnywhereNewState_tappingOnTextCallsEventTapAnywhere() {
+        setup(tapAnywhereNewState)
+        composeTestRule.onNodeWithText(appContext.getString(R.string.no_tags_tap_anywhere))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapAnywhere(any()))
     }
 
     // loading
@@ -420,7 +508,7 @@ class SessionDetailViewTest {
             assertIsNotEnabled()
             performClick()
         }
-        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapNewTagButton(anyOrNull()))
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapNewTagButton(any()))
     }
 
     private fun assertDeleteTagsButtonWorks() {
@@ -440,6 +528,10 @@ class SessionDetailViewTest {
         }
         composeTestRule.onNodeWithText(appContext.getString(R.string.confirm)).assertDoesNotExist()
         verify(mockHandleEvent, times(0)).invoke(SessionDetailEvent.TapConfirmDeleteAllTags)
+    }
+
+    private fun verifyTapAnywhereIsNotCalled() {
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapAnywhere(any()))
     }
 }
 

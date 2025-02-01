@@ -6,6 +6,7 @@ import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
@@ -14,6 +15,7 @@ import com.example.space_timetagger.location.domain.repository.LocationRepositor
 import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
+import com.example.space_timetagger.sessions.domain.models.SessionChange
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.TagUiModel
@@ -46,6 +48,7 @@ class SessionDetailViewModelTest {
     private val validId = "existing-id"
     private val nonExistentId = "not-found-id"
     private val latLng = LatLng(49.00504, -123.00678)
+    private val lastChange = SessionChange.AddTag(mockSession.tags.last().id)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
@@ -64,8 +67,10 @@ class SessionDetailViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession))
-        whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
+        whenever(mockSessionsRepository.sessionAndLastChange(validId)).thenReturn(
+            flowOf(Pair(mockSession, lastChange))
+        )
+        whenever(mockSessionsRepository.sessionAndLastChange(nonExistentId)).thenReturn(flowOf(null))
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
         whenever(mockLocationRepository.findCurrentLocation()).thenReturn(latLng)
@@ -116,6 +121,12 @@ class SessionDetailViewModelTest {
         assertThat(session()::tags)
             .extracting(TagUiModel::id)
             .isEqualTo(mockSession.tags.map(Tag::id))
+    }
+
+    @Test
+    fun initialSuccessState_hasTagIdToScrollToBasedOnRepository() = runTest {
+        initViewModel()
+        assertThat(session()::tagIdToScrollTo).isEqualTo(lastChange.id)
     }
 
     @Test
@@ -244,6 +255,16 @@ class SessionDetailViewModelTest {
             any(),
             any(),
         )
+    }
+
+    @Test
+    fun eventAutoScrollToTag_ClearsTagIdToScrollTo() = runTest {
+        initViewModel()
+        assertThat(session()::tagIdToScrollTo).isEqualTo(lastChange.id)
+
+        viewModel.handleEvent(SessionDetailEvent.AutoScrollToTag(lastChange.id))
+        advanceUntilIdle()
+        assertThat(session()::tagIdToScrollTo).isNull()
     }
 
     // helpers

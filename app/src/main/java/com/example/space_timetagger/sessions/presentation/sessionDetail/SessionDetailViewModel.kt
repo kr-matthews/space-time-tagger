@@ -31,12 +31,15 @@ class SessionViewModel(
 
     private val nameIsBeingEdited = MutableStateFlow(false)
 
+    private val scrolledToTagId = MutableStateFlow<String?>(null)
+
     val viewState =
         combine(
             sessionAndLastChange,
             tapAnywhereIsEnabled,
             nameIsBeingEdited,
-        ) { sessionAndLastChange, tapAnywhereIsEnabled, nameIsBeingEdited ->
+            scrolledToTagId
+        ) { sessionAndLastChange, tapAnywhereIsEnabled, nameIsBeingEdited, scrolledToTagId ->
             when {
                 sessionAndLastChange == null -> SessionDetailViewState.Error
 
@@ -47,6 +50,7 @@ class SessionViewModel(
                 else -> SessionDetailViewState.Success(
                     buildSessionDetailUiModel(
                         sessionAndLastChange,
+                        scrolledToTagId,
                         tapAnywhereIsEnabled,
                         nameIsBeingEdited,
                     )
@@ -65,6 +69,7 @@ class SessionViewModel(
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
             is SessionDetailEvent.TapAnywhere -> onTapAnywhere(event.time)
+            is SessionDetailEvent.AutoScrollToTag -> onScrollToTag(event.id)
         }
     }
 
@@ -107,6 +112,12 @@ class SessionViewModel(
             }
         }
     }
+
+    private fun onScrollToTag(id: String) {
+        viewModelScope.launch {
+            scrolledToTagId.update { id }
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -125,17 +136,22 @@ class SessionViewModelFactory(
 
 private fun buildSessionDetailUiModel(
     sessionAndLastChange: Pair<Session, SessionChange>,
+    scrolledToTagId: String?,
     tapAnywhereIsEnabled: Boolean,
     nameIsBeingEdited: Boolean,
-) = sessionAndLastChange.let { (session, lastChange) ->
-    SessionDetailUiModel(
+): SessionDetailUiModel {
+    val (session, lastChange) = sessionAndLastChange
+    val justAddedTagId = (lastChange as? SessionChange.AddTag)?.id
+    val needToScrollToJustAddedTag = justAddedTagId != null && justAddedTagId != scrolledToTagId
+    val tagIdToScrollTo = if (needToScrollToJustAddedTag) justAddedTagId else null
+
+    return SessionDetailUiModel(
         id = session.id,
         name = session.name,
         nameIsBeingEdited = nameIsBeingEdited,
         tags = session.tags.map(Tag::toUiModel),
-        justAddedTagId = (lastChange as? SessionChange.AddTag)?.id,
+        tagIdToScrollTo = tagIdToScrollTo,
         deleteAllIsEnabled = session.tags.isNotEmpty(),
         tapAnywhereIsEnabled = tapAnywhereIsEnabled,
     )
-
 }

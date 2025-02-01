@@ -5,6 +5,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasContentDescription
@@ -42,10 +43,14 @@ class SessionDetailViewTest {
 
     private val mockHandleEvent: (SessionDetailEvent) -> Unit = mock()
     private val now: OffsetDateTime = OffsetDateTime.of(2024, 7, 19, 8, 33, 6, 5, ZoneOffset.UTC)
+    private val lotsOfTags =
+        List(333) { i -> TagUiModel(dateTime = now.minusSeconds((i + 1) * (i + 1) - i + 5L)) }
+
     private val session = SessionDetailUiModel(
         name = "Test session name",
         nameIsBeingEdited = false,
         tags = List(6) { i -> TagUiModel(dateTime = now.minusSeconds(i * i + 2L)) },
+        tagIdToScrollTo = null,
         deleteAllIsEnabled = true,
         tapAnywhereIsEnabled = false,
     )
@@ -53,9 +58,12 @@ class SessionDetailViewTest {
         name = null,
         nameIsBeingEdited = false,
         tags = listOf(),
+        tagIdToScrollTo = null,
         deleteAllIsEnabled = false,
         tapAnywhereIsEnabled = false,
     )
+    private val sessionWithScroll =
+        session.copy(tags = lotsOfTags, tagIdToScrollTo = lotsOfTags.last().id)
     private val tapAnywhereSession = session.copy(tapAnywhereIsEnabled = true)
     private val tapAnywhereNewSession = newSession.copy(tapAnywhereIsEnabled = true)
 
@@ -68,6 +76,7 @@ class SessionDetailViewTest {
     private val newSuccessState = SessionDetailViewState.Success(newSession)
     private val tapAnywhereState = SessionDetailViewState.Success(tapAnywhereSession)
     private val tapAnywhereNewState = SessionDetailViewState.Success(tapAnywhereNewSession)
+    private val sessionWithScrollState = SessionDetailViewState.Success(sessionWithScroll)
     private val loadingState = SessionDetailViewState.Loading
     private val errorState = SessionDetailViewState.Error
     private val refreshState = SessionDetailViewState.Refreshing(session)
@@ -345,6 +354,23 @@ class SessionDetailViewTest {
         composeTestRule.onNodeWithText(appContext.getString(R.string.no_tags_tap_anywhere))
             .performClick()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapAnywhere(any()))
+    }
+
+    // scroll to tag
+
+    @Test
+    fun sessionWithScrollState_scrollsToTag() {
+        setup(sessionWithScrollState)
+        val firstTag = sessionWithScroll.tags.first()
+        val tagToScrollTo =
+            sessionWithScroll.tags.find { it.id == sessionWithScroll.tagIdToScrollTo }!!
+
+        composeTestRule
+            .onNodeWithText(tagToScrollTo.dateTime.formatShortDateLongTime())
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(firstTag.dateTime.formatShortDateLongTime())
+            .assertIsNotDisplayed()
     }
 
     // loading

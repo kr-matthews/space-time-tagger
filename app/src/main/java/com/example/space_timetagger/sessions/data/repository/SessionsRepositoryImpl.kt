@@ -1,6 +1,7 @@
 package com.example.space_timetagger.sessions.data.repository
 
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.SessionChange
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import kotlinx.coroutines.flow.Flow
@@ -10,74 +11,88 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 class SessionsRepositoryImpl : SessionsRepository {
-    private val _sessions = MutableStateFlow(listOf<Session>())
+    private val _sessionsWithChanges = MutableStateFlow(listOf<Pair<Session, SessionChange>>())
 
-    override fun sessions() = _sessions.asStateFlow()
+    override fun sessions() = _sessionsWithChanges.asStateFlow().map { sessions ->
+        sessions.map { (session, _) -> session }
+    }
 
     override fun session(id: String): Flow<Session?> =
-        _sessions.map { list -> list.find { session -> session.id == id } }
+        _sessionsWithChanges.map { list -> list.find { (session, _) -> session.id == id }?.first }
+
+    override fun sessionAndLastChange(id: String): Flow<Pair<Session, SessionChange>?> =
+        _sessionsWithChanges.map { list -> list.find { (session, _) -> session.id == id } }
 
     override suspend fun newSession(name: String?): String {
         val newSession = Session(name = name)
-        _sessions.update { it.toMutableList().apply { add(newSession) } }
+        _sessionsWithChanges.update {
+            it.toMutableList().apply { add(Pair(newSession, SessionChange.Create)) }
+        }
+        // TODO: remove return value
         return newSession.id
     }
 
     override suspend fun renameSession(id: String, newName: String?) {
-        _sessions.update { list ->
+        _sessionsWithChanges.update { list ->
             list.toMutableList().apply {
-                val index = list.indexOfFirst { it.id == id }
+                val index = list.indexOfFirst { it.first.id == id }
                 if (index > -1) {
-                    set(index, get(index).copy(name = newName))
+                    val (session, _) = get(index)
+                    val renamedSession = session.copy(name = newName)
+                    set(index, Pair(renamedSession, SessionChange.Rename))
                 }
             }.toList()
         }
     }
 
     override suspend fun addTagToSession(id: String, tag: Tag) {
-        _sessions.update { list ->
+        _sessionsWithChanges.update { list ->
             list.toMutableList().apply {
-                val index = list.indexOfFirst { it.id == id }
+                val index = list.indexOfFirst { it.first.id == id }
                 if (index > -1) {
-                    val session = get(index)
+                    val (session, _) = get(index)
                     val newTags = session.tags.toMutableList().apply { add(tag) }
-                    set(index, session.copy(tags = newTags))
+                    val updatedSession = session.copy(tags = newTags)
+                    set(index, Pair(updatedSession, SessionChange.AddTag(tag.id)))
                 }
             }.toList()
         }
     }
 
     override suspend fun removeTagFromSession(id: String, tagId: String) {
-        _sessions.update { list ->
+        _sessionsWithChanges.update { list ->
             list.toMutableList().apply {
-                val index = list.indexOfFirst { it.id == id }
+                val index = list.indexOfFirst { it.first.id == id }
                 if (index > -1) {
-                    val session = get(index)
+                    val (session, _) = get(index)
                     val newTags = session.tags.toMutableList().filterNot { it.id == tagId }
-                    set(index, session.copy(tags = newTags))
+                    val updatedSession = session.copy(tags = newTags)
+                    set(index, Pair(updatedSession, SessionChange.DeleteTag(tagId)))
                 }
             }.toList()
         }
     }
 
     override suspend fun removeAllTagsFromSession(id: String) {
-        _sessions.update { list ->
+        _sessionsWithChanges.update { list ->
             list.toMutableList().apply {
-                val index = list.indexOfFirst { it.id == id }
+                val index = list.indexOfFirst { it.first.id == id }
                 if (index > -1) {
-                    set(index, get(index).copy(tags = listOf()))
+                    val (session, _) = get(index)
+                    val updatedSession = session.copy(tags = emptyList())
+                    set(index, Pair(updatedSession, SessionChange.Clear))
                 }
             }.toList()
         }
     }
 
     override suspend fun deleteSession(id: String) {
-        _sessions.update { list ->
-            list.toMutableList().apply { removeIf { it.id == id } }.toList()
+        _sessionsWithChanges.update { list ->
+            list.toMutableList().apply { removeIf { it.first.id == id } }.toList()
         }
     }
 
     override suspend fun deleteAllSessions() {
-        _sessions.update { listOf() }
+        _sessionsWithChanges.update { listOf() }
     }
 }

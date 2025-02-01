@@ -27,16 +27,7 @@ class PreferencesRepositoryImpl(
 
     private val scope = CoroutineScope(ioDispatcher)
 
-    override val keepScreenOnIsEnabled: Flow<Boolean> =
-        preferencesDataStore.data.catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
-            preferences[KEEP_SCREEN_ON] ?: false
-        }
+    override val keepScreenOnIsEnabled: Flow<Boolean> = getPreference(KEEP_SCREEN_ON, false)
 
     override suspend fun enableKeepScreenOn() = toggleKeepScreenOn(true)
 
@@ -48,16 +39,7 @@ class PreferencesRepositoryImpl(
         }
     }
 
-    override val taggingLocationIsEnabled: Flow<Boolean> =
-        preferencesDataStore.data.catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
-            preferences[TAGGING_LOCATION] ?: false
-        }
+    override val taggingLocationIsEnabled: Flow<Boolean> = getPreference(TAGGING_LOCATION, false)
 
     override suspend fun enableTaggingLocation() = toggleTaggingLocation(true)
 
@@ -77,16 +59,7 @@ class PreferencesRepositoryImpl(
         }
     }
 
-    override val tapAnywhereIsEnabled: Flow<Boolean> =
-        preferencesDataStore.data.catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
-            preferences[TAP_ANYWHERE] ?: false
-        }
+    override val tapAnywhereIsEnabled: Flow<Boolean> = getPreference(TAP_ANYWHERE, false)
 
     override suspend fun enableTapAnywhere() = toggleTapAnywhere(true)
 
@@ -97,4 +70,15 @@ class PreferencesRepositoryImpl(
             preferences[TAP_ANYWHERE] = isEnabled
         }
     }
+
+    private fun <T> getPreference(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
+        preferencesDataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[key] ?: defaultValue
+        }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -59,7 +60,16 @@ fun SessionDetail(
     onEvent: (SessionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val tags = session.tags
+    val lazyColumnState = rememberLazyListState()
+
+    LaunchedEffect(key1 = session.justAddedTagId) {
+        session.justAddedTagId?.let { addedTagId ->
+            val addedTagIndex = session.tags.indexOfFirst { it.id === addedTagId }
+            if (addedTagIndex != -1) {
+                lazyColumnState.animateScrollToItem(addedTagIndex)
+            }
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,12 +94,13 @@ fun SessionDetail(
             onTapNameDoneEditing = { onEvent(SessionDetailEvent.TapNameDoneEditing) },
             onNameChange = { onEvent(SessionDetailEvent.ChangeName(it)) },
         )
-        if (tags.isNotEmpty()) {
+        if (session.tags.isNotEmpty()) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
+                state = lazyColumnState,
                 modifier = Modifier.weight(1f)
             ) {
-                itemsIndexed(tags, key = { _, item -> item.dateTime }) { index, tag ->
+                itemsIndexed(session.tags, key = { _, item -> item.dateTime }) { index, tag ->
                     Tag(
                         index = index,
                         tag = tag,

@@ -7,6 +7,7 @@ import com.example.space_timetagger.App
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.location.domain.repository.LocationRepository
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.SessionChange
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
@@ -24,7 +25,7 @@ class SessionViewModel(
     private val preferencesRepository: PreferencesRepository,
     private val locationRepository: LocationRepository,
 ) : ViewModel() {
-    private val session = sessionsRepository.session(sessionId)
+    private val sessionAndLastChange = sessionsRepository.sessionAndLastChange(sessionId)
 
     private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
 
@@ -32,19 +33,23 @@ class SessionViewModel(
 
     val viewState =
         combine(
-            session,
+            sessionAndLastChange,
             tapAnywhereIsEnabled,
             nameIsBeingEdited,
-        ) { session, tapAnywhereIsEnabled, nameIsBeingEdited ->
+        ) { sessionAndLastChange, tapAnywhereIsEnabled, nameIsBeingEdited ->
             when {
-                session == null -> SessionDetailViewState.Error
+                sessionAndLastChange == null -> SessionDetailViewState.Error
 
 //                isLoading -> SessionDetailViewState.Refreshing(
 //                    buildSessionDetailUiModel(session, nameIsBeingEdited)
 //                )
 
                 else -> SessionDetailViewState.Success(
-                    buildSessionDetailUiModel(session, tapAnywhereIsEnabled, nameIsBeingEdited)
+                    buildSessionDetailUiModel(
+                        sessionAndLastChange,
+                        tapAnywhereIsEnabled,
+                        nameIsBeingEdited,
+                    )
                 )
             }
         }
@@ -119,15 +124,18 @@ class SessionViewModelFactory(
 }
 
 private fun buildSessionDetailUiModel(
-    session: Session,
+    sessionAndLastChange: Pair<Session, SessionChange>,
     tapAnywhereIsEnabled: Boolean,
     nameIsBeingEdited: Boolean,
-) =
+) = sessionAndLastChange.let { (session, lastChange) ->
     SessionDetailUiModel(
         id = session.id,
         name = session.name,
         nameIsBeingEdited = nameIsBeingEdited,
         tags = session.tags.map(Tag::toUiModel),
+        justAddedTagId = (lastChange as? SessionChange.AddTag)?.id,
         deleteAllIsEnabled = session.tags.isNotEmpty(),
         tapAnywhereIsEnabled = tapAnywhereIsEnabled,
     )
+
+}

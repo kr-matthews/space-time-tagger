@@ -4,8 +4,6 @@ import assertk.assertThat
 import assertk.assertions.extracting
 import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
-import assertk.assertions.isNull
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
@@ -75,29 +73,6 @@ class SessionsListViewModelTest {
         viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).newSession(null)
-    }
-
-    @Test
-    fun eventTapNewSessionButton_setsIdToNavigateTo() = runTest {
-        val initialValue = viewModel.sessionIdToNavigateTo.first()
-        assertThat(initialValue).isNull()
-
-        viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
-        advanceUntilIdle()
-        val updatedValue = viewModel.sessionIdToNavigateTo.first()
-        assertThat(updatedValue).isNotNull()
-    }
-
-    @Test
-    fun eventTapSession_setsIdToNavigateTo() = runTest {
-        val initialValue = viewModel.sessionIdToNavigateTo.first()
-        assertThat(initialValue).isNull()
-
-        val sessionId = mockSessions[1].id
-        viewModel.handleEvent(SessionsListEvent.TapSession(sessionId))
-        advanceUntilIdle()
-        val updatedValue = viewModel.sessionIdToNavigateTo.first()
-        assertThat(updatedValue).isEqualTo(sessionId)
     }
 
     @Test

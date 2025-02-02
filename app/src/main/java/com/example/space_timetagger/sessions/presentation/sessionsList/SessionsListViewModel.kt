@@ -9,8 +9,7 @@ import com.example.space_timetagger.sessions.domain.models.SessionsChange
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toOverviewUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -19,39 +18,35 @@ class SessionsViewModel(
 ) : ViewModel() {
     private val sessionsAndLastChange = sessionsRepository.sessionsAndLastChange()
 
-    val viewState = sessionsAndLastChange.map { (sessions, lastChange) ->
-        SessionsListViewState.Success(
-            sessions = sessions.map(Session::toOverviewUiModel),
-            idToNavigateTo = (lastChange as? SessionsChange.Create)?.id,
-            deleteAllIsEnabled = sessions.isNotEmpty(),
-        )
-    }
+    private val idNavigatedTo = MutableStateFlow<String?>(null)
 
-    private val _sessionIdToNavigateTo = MutableStateFlow<String?>(null)
-    val sessionIdToNavigateTo = _sessionIdToNavigateTo.asStateFlow()
+    val viewState =
+        combine(sessionsAndLastChange, idNavigatedTo) { (sessions, lastChange), idNavigatedTo ->
+            val justCreatedId = (lastChange as? SessionsChange.Create)?.id
+            val needsToNavigate = justCreatedId != null && justCreatedId != idNavigatedTo
+            val idToNavigateTo = if (needsToNavigate) justCreatedId else null
 
-    fun clearSessionIdToNavigateTo() = _sessionIdToNavigateTo.update { null }
+            SessionsListViewState.Success(
+                sessions = sessions.map(Session::toOverviewUiModel),
+                idToNavigateTo = idToNavigateTo,
+                deleteAllIsEnabled = sessions.isNotEmpty(),
+            )
+        }
 
     fun handleEvent(event: SessionsListEvent) {
         when (event) {
             SessionsListEvent.TapSettings -> Unit // navigate, in compose
-            SessionsListEvent.TapNewSessionButton -> createNewSessionAndNavigateToIt()
-            is SessionsListEvent.TapSession -> navigateToSession(event.sessionId)
+            SessionsListEvent.TapNewSessionButton -> createNewSession()
+            is SessionsListEvent.TapSession -> Unit // navigate, in compose
             is SessionsListEvent.TapConfirmDeleteSession -> deleteSession(event.sessionId)
             SessionsListEvent.TapConfirmDeleteAllSessions -> deleteAllSessions()
+            is SessionsListEvent.AutoNavigateToSession -> onNavigateToSession(event.sessionId)
         }
     }
 
-    private fun createNewSessionAndNavigateToIt(name: String? = null) {
+    private fun createNewSession(name: String? = null) {
         viewModelScope.launch {
-            val newSessionId = sessionsRepository.newSession(name)
-            navigateToSession(newSessionId)
-        }
-    }
-
-    private fun navigateToSession(id: String) {
-        viewModelScope.launch {
-            _sessionIdToNavigateTo.update { id }
+            sessionsRepository.newSession(name)
         }
     }
 
@@ -64,6 +59,12 @@ class SessionsViewModel(
     private fun deleteAllSessions() {
         viewModelScope.launch {
             sessionsRepository.deleteAllSessions()
+        }
+    }
+
+    private fun onNavigateToSession(id: String) {
+        viewModelScope.launch {
+            idNavigatedTo.update { id }
         }
     }
 }

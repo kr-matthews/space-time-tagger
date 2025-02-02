@@ -35,21 +35,22 @@ fun SessionsListScreen(
 ) {
     val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListViewState.Loading)
-    // move this into the view state? and make clearSessionIdToNavigateTo an event?
-    val sessionIdToNavigateTo by viewModel.sessionIdToNavigateTo.collectAsStateWithLifecycle()
-
-    LaunchedEffect(key1 = sessionIdToNavigateTo) {
-        sessionIdToNavigateTo?.let { id ->
-            viewModel.clearSessionIdToNavigateTo()
-            onNavigateToSession(id)
-        }
-    }
 
     fun onEvent(event: SessionsListEvent) {
         viewModel.handleEvent(event)
         when (event) {
             is SessionsListEvent.TapSettings -> onSettingsTap()
+            is SessionsListEvent.TapSession -> onNavigateToSession(event.sessionId)
             else -> Unit
+        }
+    }
+
+    val idToNavigateTo = (viewState as? SessionsListViewState.Success)?.idToNavigateTo
+
+    LaunchedEffect(key1 = idToNavigateTo) {
+        idToNavigateTo?.let { id ->
+            onNavigateToSession(id)
+            onEvent(SessionsListEvent.AutoNavigateToSession(id))
         }
     }
 

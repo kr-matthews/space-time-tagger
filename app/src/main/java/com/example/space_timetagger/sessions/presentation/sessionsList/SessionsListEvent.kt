@@ -6,4 +6,5 @@ sealed interface SessionsListEvent {
     data object TapNewSessionButton : SessionsListEvent
     data class TapConfirmDeleteSession(val sessionId: String) : SessionsListEvent
     data object TapConfirmDeleteAllSessions : SessionsListEvent
+    data class AutoNavigateToSession(val sessionId: String) : SessionsListEvent
 }

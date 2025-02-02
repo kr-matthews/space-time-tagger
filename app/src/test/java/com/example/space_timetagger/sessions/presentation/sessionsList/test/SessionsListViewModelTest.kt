@@ -4,9 +4,11 @@ import assertk.assertThat
 import assertk.assertions.extracting
 import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.SessionsChange
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
@@ -32,6 +34,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class SessionsListViewModelTest {
+    private val lastChange = SessionsChange.Create(mockSessions.last().id)
 
     @get:Rule
     var coroutineTestRule = CoroutineTestRule()
@@ -44,7 +47,7 @@ class SessionsListViewModelTest {
     @Before
     fun setup() = runTest {
         whenever(mockSessionsRepository.sessionsAndLastChange()).thenReturn(
-            flowOf(Pair(mockSessions, null))
+            flowOf(Pair(mockSessions, lastChange))
         )
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
@@ -64,6 +67,12 @@ class SessionsListViewModelTest {
         assertThat(initialViewState::sessions)
             .extracting(SessionOverviewUiModel::id)
             .isEqualTo(mockSessions.map(Session::id))
+    }
+
+    @Test
+    fun initially_hasIdToNavigateToBasedOnRepository() = runTest {
+        val initialViewState = viewModel.viewState.first()
+        assertThat(initialViewState::idToNavigateTo).isEqualTo(lastChange.id)
     }
 
     // FIXME: test that if repository flow updates, view state will update
@@ -88,5 +97,14 @@ class SessionsListViewModelTest {
         viewModel.handleEvent(SessionsListEvent.TapConfirmDeleteAllSessions)
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).deleteAllSessions()
+    }
+
+    @Test
+    fun eventAutoNavigateToSession_callsRepositoryFunc() = runTest {
+        assertThat(viewModel.viewState.first()::idToNavigateTo).isEqualTo(lastChange.id)
+
+        viewModel.handleEvent(SessionsListEvent.AutoNavigateToSession(mockSessions.last().id))
+        advanceUntilIdle()
+        assertThat(viewModel.viewState.first()::idToNavigateTo).isNull()
     }
 }

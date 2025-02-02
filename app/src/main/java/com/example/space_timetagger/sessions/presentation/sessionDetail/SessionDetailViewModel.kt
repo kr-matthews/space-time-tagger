@@ -42,11 +42,6 @@ class SessionViewModel(
         ) { sessionAndLastChange, tapAnywhereIsEnabled, nameIsBeingEdited, scrolledToTagId ->
             when {
                 sessionAndLastChange == null -> SessionDetailViewState.Error
-
-//                isLoading -> SessionDetailViewState.Refreshing(
-//                    buildSessionDetailUiModel(session, nameIsBeingEdited)
-//                )
-
                 else -> SessionDetailViewState.Success(
                     buildSessionDetailUiModel(
                         sessionAndLastChange,
@@ -69,7 +64,7 @@ class SessionViewModel(
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
             is SessionDetailEvent.TapAnywhere -> onTapAnywhere(event.time)
-            is SessionDetailEvent.AutoScrollToTag -> onScrollToTag(event.id)
+            is SessionDetailEvent.AutoScrollToTag -> scrolledToTagId.update { event.id }
         }
     }
 
@@ -110,12 +105,6 @@ class SessionViewModel(
             if (tapAnywhereIsEnabled.firstOrNull() == true) {
                 addTag(time)
             }
-        }
-    }
-
-    private fun onScrollToTag(id: String) {
-        viewModelScope.launch {
-            scrolledToTagId.update { id }
         }
     }
 }

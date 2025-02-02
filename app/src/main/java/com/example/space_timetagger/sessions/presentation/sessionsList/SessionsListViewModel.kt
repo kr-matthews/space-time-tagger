@@ -40,7 +40,7 @@ class SessionsViewModel(
             is SessionsListEvent.TapSession -> Unit // navigate, in compose
             is SessionsListEvent.TapConfirmDeleteSession -> deleteSession(event.sessionId)
             SessionsListEvent.TapConfirmDeleteAllSessions -> deleteAllSessions()
-            is SessionsListEvent.AutoNavigateToSession -> onNavigateToSession(event.sessionId)
+            is SessionsListEvent.AutoNavigateToSession -> idNavigatedTo.update { event.sessionId }
         }
     }
 
@@ -59,12 +59,6 @@ class SessionsViewModel(
     private fun deleteAllSessions() {
         viewModelScope.launch {
             sessionsRepository.deleteAllSessions()
-        }
-    }
-
-    private fun onNavigateToSession(id: String) {
-        viewModelScope.launch {
-            idNavigatedTo.update { id }
         }
     }
 }

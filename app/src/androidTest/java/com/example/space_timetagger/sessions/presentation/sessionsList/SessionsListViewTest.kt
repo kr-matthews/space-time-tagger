@@ -50,8 +50,10 @@ class SessionsListViewTest {
         it[index]
     }
 
-    private val successState = SessionsListViewState.Success(sessions, true)
-    private val emptySuccessState = SessionsListViewState.Success(emptyList(), false)
+    private val successState = SessionsListViewState.Success(sessions, null, true)
+    private val emptySuccessState = SessionsListViewState.Success(emptyList(), null, false)
+
+    // TODO: scrollToState, new tests
     private val loadingState = SessionsListViewState.Loading
     private val errorState = SessionsListViewState.Error
     // refreshing state also exists, but not currently produced by view model

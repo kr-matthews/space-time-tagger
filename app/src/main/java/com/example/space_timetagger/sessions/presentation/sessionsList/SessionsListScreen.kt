@@ -125,8 +125,8 @@ private fun SessionsListTopBar(
 
 class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState> {
     override val values = sequenceOf(
-        SessionsListViewState.Success(someSessions, true),
-        SessionsListViewState.Success(noSessions, false),
+        SessionsListViewState.Success(someSessions, null, true),
+        SessionsListViewState.Success(noSessions, null, false),
         SessionsListViewState.Loading,
         SessionsListViewState.Error,
         SessionsListViewState.Refreshing(someSessions),

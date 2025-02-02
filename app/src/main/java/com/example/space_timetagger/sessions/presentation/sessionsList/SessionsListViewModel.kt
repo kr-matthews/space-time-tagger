@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.SessionsChange
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toOverviewUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +17,12 @@ import kotlinx.coroutines.launch
 class SessionsViewModel(
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
-    private val sessions = sessionsRepository.sessions().map { sessions ->
-        sessions.map(Session::toOverviewUiModel)
-    }
+    private val sessionsAndLastChange = sessionsRepository.sessionsAndLastChange()
 
-    val viewState = sessions.map { sessions ->
+    val viewState = sessionsAndLastChange.map { (sessions, lastChange) ->
         SessionsListViewState.Success(
-            sessions = sessions,
+            sessions = sessions.map(Session::toOverviewUiModel),
+            idToNavigateTo = (lastChange as? SessionsChange.Create)?.id,
             deleteAllIsEnabled = sessions.isNotEmpty(),
         )
     }

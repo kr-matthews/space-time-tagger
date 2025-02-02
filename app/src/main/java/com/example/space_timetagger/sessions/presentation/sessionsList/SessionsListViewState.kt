@@ -8,6 +8,7 @@ sealed interface SessionsListViewState {
     data object Loading : SessionsListViewState
     data class Success(
         val sessions: List<SessionOverviewUiModel>,
+        val idToNavigateTo: String?,
         val deleteAllIsEnabled: Boolean,
     ) : SessionsListViewState
 

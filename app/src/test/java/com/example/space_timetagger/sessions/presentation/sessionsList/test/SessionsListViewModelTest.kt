@@ -45,7 +45,9 @@ class SessionsListViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(mockSessionsRepository.sessions()).thenReturn(flowOf(mockSessions))
+        whenever(mockSessionsRepository.sessionsAndLastChange()).thenReturn(
+            flowOf(Pair(mockSessions, null))
+        )
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
         )

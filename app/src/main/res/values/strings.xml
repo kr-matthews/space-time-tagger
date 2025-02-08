@@ -25,4 +25,5 @@
     <string name="tag_being_added">Tag Being Added</string>
     <string name="keep_screen_on">Keep Screen On</string>
     <string name="tap_anywhere">Tap Anywhere to Add a Tag</string>
+    <string name="edit">Edit</string>
 </resources>

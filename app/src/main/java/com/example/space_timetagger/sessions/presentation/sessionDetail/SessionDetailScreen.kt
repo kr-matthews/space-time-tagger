@@ -25,6 +25,7 @@ import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
+import com.example.space_timetagger.core.presentation.TopBarEditIcon
 import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
@@ -73,12 +74,22 @@ fun SessionDetailView(
     onEvent: (SessionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val title = when (viewState) {
+        is SessionDetailViewState.Success -> {
+            viewState.session.name ?: stringResource(R.string.untitled)
+        }
+
+        else -> ""
+    }
+
     MyScaffold(
         topBar = {
             SessionDetailTopBar(
-                // eventually use session name here, instead of below
-                title = stringResource(R.string.session_detail),
+                title = title,
                 onBackTap = { onEvent(SessionDetailEvent.TapBack) },
+                onEditTap = (viewState as? SessionDetailViewState.Success)?.let {
+                    { onEvent(SessionDetailEvent.TapEdit) }
+                },
                 onSettingsTap = { onEvent(SessionDetailEvent.TapSettings) },
             )
         },
@@ -122,12 +133,14 @@ fun SessionDetailView(
 private fun SessionDetailTopBar(
     title: String,
     onBackTap: () -> Unit,
+    onEditTap: (() -> Unit)?,
     onSettingsTap: () -> Unit,
 ) {
     MyTopBar(
         title = title,
         onBackTap = onBackTap,
     ) {
+        onEditTap?.let { TopBarEditIcon(onTap = it) }
         TopBarSettingsIcon(onTap = onSettingsTap)
     }
 }
@@ -159,7 +172,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
         SessionDetailViewState.Success(
             SessionDetailUiModel(
                 id = "id",
-                name = "Wed commute home",
+                name = null,
                 nameIsBeingEdited = false,
                 tags = manyTags,
                 tagIdToScrollTo = manyTags.last().id,

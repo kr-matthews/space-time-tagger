@@ -57,6 +57,7 @@ class SessionViewModel(
         when (event) {
             SessionDetailEvent.TapBack -> Unit // navigate, in compose
             SessionDetailEvent.TapSettings -> Unit // navigate, in compose
+            SessionDetailEvent.TapEdit -> nameIsBeingEdited.update { true }
             SessionDetailEvent.TapName -> nameIsBeingEdited.update { true }
             is SessionDetailEvent.ChangeName -> setName(event.newName)
             SessionDetailEvent.TapNameDoneEditing -> nameIsBeingEdited.update { false }

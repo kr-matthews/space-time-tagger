@@ -58,8 +58,8 @@ class SessionViewModel(
             SessionDetailEvent.TapBack -> Unit // navigate, in compose
             SessionDetailEvent.TapSettings -> Unit // navigate, in compose
             SessionDetailEvent.TapEdit -> nameIsBeingEdited.update { true }
-            is SessionDetailEvent.TapDoneEditing -> onDoneEditingName(event.newName)
-            SessionDetailEvent.TapCancelEditing -> nameIsBeingEdited.update { false }
+            is SessionDetailEvent.ConfirmNameEdit -> onDoneEditingName(event.newName)
+            SessionDetailEvent.CancelNameEdit -> nameIsBeingEdited.update { false }
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()

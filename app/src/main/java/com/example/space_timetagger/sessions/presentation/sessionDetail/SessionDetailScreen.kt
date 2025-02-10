@@ -79,8 +79,8 @@ fun SessionDetailView(
     if (session?.nameIsBeingEdited == true) {
         EditTextDialog(
             initialText = session.name,
-            onConfirmClick = { onEvent(SessionDetailEvent.TapDoneEditing(it)) },
-            onCancelClick = { onEvent(SessionDetailEvent.TapCancelEditing) },
+            onConfirmClick = { onEvent(SessionDetailEvent.ConfirmNameEdit(it)) },
+            onCancelClick = { onEvent(SessionDetailEvent.CancelNameEdit) },
         )
     }
 

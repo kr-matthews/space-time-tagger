@@ -9,6 +9,8 @@ sealed interface SessionDetailEvent {
     data object TapEdit : SessionDetailEvent
     data object TapNameDoneEditing : SessionDetailEvent
     data class ChangeName(val newName: String?) : SessionDetailEvent
+    data class TapDoneEditing(val newName: String) : SessionDetailEvent
+    data object TapCancelEditing : SessionDetailEvent
     data class TapNewTagButton(val time: OffsetDateTime) : SessionDetailEvent
     data class TapConfirmDeleteTag(val tagId: String) : SessionDetailEvent
     data object TapConfirmDeleteAllTags : SessionDetailEvent

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
+import com.example.space_timetagger.core.presentation.EditTextDialog
 import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
@@ -74,6 +75,15 @@ fun SessionDetailView(
     onEvent: (SessionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val session = (viewState as? SessionDetailViewState.Success)?.session
+    if (session?.nameIsBeingEdited == true) {
+        EditTextDialog(
+            initialText = session.name,
+            onConfirmClick = { onEvent(SessionDetailEvent.TapDoneEditing(it)) },
+            onCancelClick = { onEvent(SessionDetailEvent.TapCancelEditing) },
+        )
+    }
+
     val title = when (viewState) {
         is SessionDetailViewState.Success -> {
             viewState.session.name ?: stringResource(R.string.untitled)

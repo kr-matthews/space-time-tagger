@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.window.Dialog
 import com.example.space_timetagger.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun EditTextDialog(
@@ -31,6 +32,8 @@ fun EditTextDialog(
 
     // unfortunately, the cursor will go to the front of the input, not the end
     LaunchedEffect(Unit) {
+        // without a delay, ui tests complain that the focus requester hasn't been initialized
+        delay(10)
         focusRequester.requestFocus()
     }
 

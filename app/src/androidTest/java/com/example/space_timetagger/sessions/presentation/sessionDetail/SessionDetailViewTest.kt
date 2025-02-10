@@ -104,39 +104,33 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun successState_hasTitleText() {
-        setup(successState)
-        composeTestRule
-            .onNodeWithText(appContext.getString(R.string.session_detail))
-            .assertIsDisplayed()
-    }
-
-    @Test
     fun successState_showsName() {
         setup(successState)
         composeTestRule.onNodeWithText(successState.session.name!!).assertIsDisplayed()
     }
 
     @Test
-    fun successState_tappingNameCallsEventTapName() {
+    fun successState_tappingEditCallsEventTapEdit() {
         setup(successState)
-        tapName(successState.session.name)
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapName)
+        tapEdit()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapEdit)
     }
 
     @Test
-    fun successState_typingNewNameCallsEventChangeName() {
+    fun successState_typingNewNameDoesNotCallEventConfirmNameEdit() {
         setup(successState.editingName())
         val newName = "Banana"
         typeNewName(newName)
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ChangeName(newName))
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
     }
 
     @Test
-    fun successState_tappingNameFinishCallsEventTapNameDoneEditing() {
+    fun successState_tappingEditFinishCallsEventConfirmNameEdit() {
         setup(successState.editingName())
+        val newName = "Croissant"
+        typeNewName(newName)
         tapDoneEditingName()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapNameDoneEditing)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
     }
 
     @Test
@@ -198,40 +192,34 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun newSuccessState_hasTitleText() {
+    fun newSuccessState_showsUntitled() {
         setup(newSuccessState)
-        composeTestRule
-            .onNodeWithText(appContext.getString(R.string.session_detail))
+        composeTestRule.onNodeWithText(appContext.getString(R.string.untitled))
             .assertIsDisplayed()
     }
 
     @Test
-    fun newSuccessState_showsName() {
+    fun newSuccessState_tappingEditCallsEventTapEdit() {
         setup(newSuccessState)
-        composeTestRule.onNodeWithText(appContext.getString(R.string.tap_to_add_title))
-            .assertIsDisplayed()
+        tapEdit()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapEdit)
     }
 
     @Test
-    fun newSuccessState_tappingNameCallsEventTapName() {
-        setup(newSuccessState)
-        tapName(newSuccessState.session.name)
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapName)
-    }
-
-    @Test
-    fun newSuccessState_typingNewNameCallsEventChangeName() {
+    fun newSuccessState_typingNewNameDoesNotCallEventConfirmNameEdit() {
         setup(newSuccessState.editingName())
-        val newName = "Cherry"
+        val newName = "Donut"
         typeNewName(newName)
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ChangeName(newName))
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
     }
 
     @Test
-    fun newSuccessState_tappingNameFinishCallsEventTapNameDoneEditing() {
+    fun newSuccessState_tappingEditFinishCallsEventConfirmNameEdit() {
         setup(newSuccessState.editingName())
+        val newName = "Eclair"
+        typeNewName(newName)
         tapDoneEditingName()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapNameDoneEditing)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
     }
 
     @Test
@@ -276,10 +264,10 @@ class SessionDetailViewTest {
 
     @Ignore("something weird going on when TapAnywhere event is initialized, even in a verify")
     @Test
-    fun tapAnywhereState_tappingNameDoesNotCallEventTapAnywhere() {
+    fun tapAnywhereState_tappingEditDoesNotCallEventTapAnywhere() {
         setup(tapAnywhereState)
-        tapName(tapAnywhereState.session.name)
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapName)
+        tapEdit()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapEdit)
         verifyTapAnywhereIsNotCalled()
     }
 
@@ -381,6 +369,23 @@ class SessionDetailViewTest {
         getProgressIndicator().assertIsDisplayed()
     }
 
+    @Test
+    fun loadingState_hasTitleText() {
+        setup(loadingState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.session_detail))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun loadingState_tappingBackCallsEventTapBack() {
+        setup(loadingState)
+        composeTestRule
+            .onNode(hasContentDescription(appContext.getString(R.string.back)))
+            .performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapBack)
+    }
+
     // error
 
     @Test
@@ -449,10 +454,10 @@ class SessionDetailViewTest {
 
     @Ignore("Refresh state never produced by view model, and action would trigger event")
     @Test
-    fun refreshState_tappingNameDoesNotCallEventTapName() {
+    fun refreshState_tappingEditDoesNotCallEventTapEdit() {
         setup(refreshState)
-        tapName(refreshState.session.name)
-        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapName)
+        tapEdit()
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapEdit)
     }
 
     @Test
@@ -483,12 +488,9 @@ class SessionDetailViewTest {
     private fun getErrorMessage() =
         composeTestRule.onNodeWithText(appContext.getString(R.string.error_session_detail))
 
-    private fun tapName(currentName: String?) {
-        val text = currentName ?: appContext.getString(R.string.tap_to_add_title)
-        composeTestRule.onNodeWithText(text).apply {
-            assertHasClickAction()
-            performClick()
-        }
+    private fun tapEdit() {
+        composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.edit)))
+            .performClick()
     }
 
     private fun typeNewName(newName: String) {

@@ -89,7 +89,12 @@ fun SessionDetailView(
             viewState.session.name ?: stringResource(R.string.untitled)
         }
 
-        else -> ""
+        is SessionDetailViewState.Refreshing -> {
+            viewState.session.name ?: stringResource(R.string.untitled)
+        }
+
+        is SessionDetailViewState.Error,
+        is SessionDetailViewState.Loading -> stringResource(R.string.session_detail)
     }
 
     MyScaffold(

@@ -78,6 +78,7 @@ fun SessionDetailView(
     val session = (viewState as? SessionDetailViewState.Success)?.session
     if (session?.nameIsBeingEdited == true) {
         EditTextDialog(
+            title = stringResource(R.string.session_name),
             initialText = session.name,
             onConfirmClick = { onEvent(SessionDetailEvent.ConfirmNameEdit(it)) },
             onCancelClick = { onEvent(SessionDetailEvent.CancelNameEdit) },

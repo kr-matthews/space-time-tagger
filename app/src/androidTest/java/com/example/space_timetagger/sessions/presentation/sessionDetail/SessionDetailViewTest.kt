@@ -125,12 +125,42 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun successState_tappingEditFinishCallsEventConfirmNameEdit() {
+    fun successState_tappingKeyboardDoneCallsEventConfirmNameEdit() {
         setup(successState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
-        tapDoneEditingName()
+        tapKeyboardDone()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+    }
+
+    @Test
+    fun successState_tappingDialogConfirmCallsEventConfirmNameEdit() {
+        setup(successState.editingName())
+        val newName = "Croissant"
+        typeNewName(newName)
+        tapDialogConfirm()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+    }
+
+    @Test
+    fun successState_tappingDialogCancelCallsEventCancelNameEdit() {
+        setup(successState.editingName())
+        val newName = "Croissant"
+        typeNewName(newName)
+        tapDialogCancel()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+    }
+
+    @Ignore("not clear how to tap outside dialog")
+    @Test
+    fun successState_tappingOutsideDialogCallsEventCancelNameEdit() {
+        setup(successState.editingName())
+        val newName = "Spinach"
+        typeNewName(newName)
+        composeTestRule.onNodeWithText(successState.session.name!!).performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
     }
 
     @Test
@@ -214,12 +244,42 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun newSuccessState_tappingEditFinishCallsEventConfirmNameEdit() {
+    fun newSuccessState_tappingKeyboardDoneCallsEventConfirmNameEdit() {
         setup(newSuccessState.editingName())
         val newName = "Eclair"
         typeNewName(newName)
-        tapDoneEditingName()
+        tapKeyboardDone()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+    }
+
+    @Test
+    fun newSuccessState_tappingDialogConfirmCallsEventConfirmNameEdit() {
+        setup(newSuccessState.editingName())
+        val newName = "Pepper"
+        typeNewName(newName)
+        tapDialogConfirm()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+    }
+
+    @Test
+    fun newSuccessState_tappingDialogCancelCallsEventCancelNameEdit() {
+        setup(newSuccessState.editingName())
+        val newName = "Croissant"
+        typeNewName(newName)
+        tapDialogCancel()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+    }
+
+    @Ignore("not clear how to tap outside dialog")
+    @Test
+    fun newSuccessState_tappingOutsideDialogCallsEventCancelNameEdit() {
+        setup(newSuccessState.editingName())
+        val newName = "Zucchini"
+        typeNewName(newName)
+        composeTestRule.onNodeWithText(successState.session.name!!).performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
     }
 
     @Test
@@ -498,9 +558,19 @@ class SessionDetailViewTest {
             .performTextReplacement(newName)
     }
 
-    private fun tapDoneEditingName() {
+    private fun tapKeyboardDone() {
         composeTestRule.onNodeWithContentDescription(appContext.getString(R.string.name_input))
             .performImeAction()
+    }
+
+    private fun tapDialogConfirm() {
+        composeTestRule.onNodeWithText(appContext.getString(R.string.confirm))
+            .performClick()
+    }
+
+    private fun tapDialogCancel() {
+        composeTestRule.onNodeWithText(appContext.getString(R.string.cancel))
+            .performClick()
     }
 
     private fun assertShowsTags(tags: List<TagUiModel>) {

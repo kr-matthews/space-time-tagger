@@ -27,4 +27,5 @@
     <string name="tap_anywhere">Tap Anywhere to Add a Tag</string>
     <string name="edit">Edit</string>
     <string name="session_name">Session Name</string>
+    <string name="clear_text">Clear Text</string>
 </resources>

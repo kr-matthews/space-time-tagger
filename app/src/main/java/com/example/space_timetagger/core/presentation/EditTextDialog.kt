@@ -12,6 +12,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -23,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -55,7 +58,6 @@ fun EditTextDialog(
         focusRequester.requestFocus()
     }
 
-    // TODO: option to clear text
     Dialog(onDismissRequest = onCancelClick) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -71,6 +73,16 @@ fun EditTextDialog(
                 value = text,
                 onValueChange = setText,
                 placeholder = { stringResource(R.string.untitled) },
+                trailingIcon = {
+                    IconButton(
+                        onClick = { setText("") }
+                    ) {
+                        Icon(
+                            painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                            contentDescription = stringResource(R.string.clear_text),
+                        )
+                    }
+                },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Done,

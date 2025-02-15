@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.space_timetagger.R
 import kotlinx.coroutines.delay
@@ -64,6 +65,7 @@ fun EditTextDialog(
         ) {
             Text(
                 text = title,
+                fontSize = 24.sp,
             )
             TextField(
                 value = text,

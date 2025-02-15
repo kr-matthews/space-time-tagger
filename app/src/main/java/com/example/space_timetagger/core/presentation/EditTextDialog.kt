@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.space_timetagger.R
+import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -109,13 +110,15 @@ fun EditTextDialog(
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun EditTextDialogPreview() {
-    EditTextDialog(
-        title = "Fruit",
-        initialText = "Pineapple",
-        onConfirmClick = {},
-        onCancelClick = {},
-    )
+    SpaceTimeTaggerTheme {
+        EditTextDialog(
+            title = "Fruit",
+            initialText = "Pineapple",
+            onConfirmClick = {},
+            onCancelClick = {},
+        )
+    }
 }

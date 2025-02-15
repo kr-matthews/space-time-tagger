@@ -27,9 +27,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.InfoDialog
 import com.example.space_timetagger.core.presentation.LabelledSwitch
-import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
+import com.example.space_timetagger.core.presentation.ScreenPreviews
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -214,7 +214,7 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
     )
 }
 
-@MyPreview
+@ScreenPreviews
 @Composable
 private fun SettingsViewPreview(
     @PreviewParameter(SettingsStateProvider::class) viewState: SettingsViewState,

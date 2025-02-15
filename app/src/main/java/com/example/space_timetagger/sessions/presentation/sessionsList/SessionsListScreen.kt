@@ -19,9 +19,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
-import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
+import com.example.space_timetagger.core.presentation.ScreenPreviews
 import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
@@ -132,7 +132,7 @@ class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState
     )
 }
 
-@MyPreview
+@ScreenPreviews
 @Composable
 private fun SessionsPreview(
     @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListViewState,

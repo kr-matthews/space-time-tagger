@@ -23,7 +23,7 @@ fun TopBarEditIcon(
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun TopBarEditIconPreview() {
     SpaceTimeTaggerTheme {

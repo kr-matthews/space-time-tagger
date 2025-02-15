@@ -1,6 +1,5 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
+import com.example.space_timetagger.core.presentation.ComponentPreviews
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
-import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.core.presentation.formatShortDateLongTime
 import com.example.space_timetagger.core.presentation.thenIf
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
@@ -190,7 +189,7 @@ private fun NoTags(
     )
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun TagPreview() {
     SpaceTimeTaggerTheme {
@@ -198,9 +197,6 @@ private fun TagPreview() {
             index = 2,
             tag = tag,
             {},
-            Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .padding(8.dp)
         )
     }
 }

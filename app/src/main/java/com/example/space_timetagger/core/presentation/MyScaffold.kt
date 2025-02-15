@@ -21,7 +21,7 @@ fun MyScaffold(
     }
 }
 
-@MyPreview
+@ScreenPreviews
 @Composable
 private fun MyScaffoldPreview() {
     SpaceTimeTaggerTheme {

@@ -60,7 +60,7 @@ fun ConfirmationDialog(
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun ConfirmationDialogPreview() {
     SpaceTimeTaggerTheme {

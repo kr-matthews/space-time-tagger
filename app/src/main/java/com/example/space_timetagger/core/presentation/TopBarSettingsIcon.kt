@@ -23,7 +23,7 @@ fun TopBarSettingsIcon(
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun TopBarSettingsIconPreview() {
     SpaceTimeTaggerTheme {

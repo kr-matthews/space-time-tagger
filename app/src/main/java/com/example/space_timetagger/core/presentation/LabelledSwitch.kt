@@ -37,7 +37,7 @@ fun LabelledSwitch(
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun LabelledSwitchPreviewOn() {
     SpaceTimeTaggerTheme {
@@ -45,7 +45,7 @@ private fun LabelledSwitchPreviewOn() {
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun LabelledSwitchPreviewOff() {
     SpaceTimeTaggerTheme {

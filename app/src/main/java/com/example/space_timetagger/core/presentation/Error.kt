@@ -28,7 +28,7 @@ fun Error(
     )
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun ErrorPreview() {
     SpaceTimeTaggerTheme {

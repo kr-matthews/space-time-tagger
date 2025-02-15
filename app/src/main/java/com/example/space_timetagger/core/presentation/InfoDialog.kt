@@ -48,7 +48,7 @@ fun InfoDialog(
     }
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 private fun InfoDialogPreview() {
     SpaceTimeTaggerTheme {

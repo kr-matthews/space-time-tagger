@@ -41,7 +41,7 @@ fun MyTopBar(
     )
 }
 
-@MyPreview
+@ComponentPreviews
 @Composable
 fun MyTopBarPreview() {
     SpaceTimeTaggerTheme {

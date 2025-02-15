@@ -10,9 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
@@ -41,8 +38,7 @@ fun LabelledSwitch(
 }
 
 @Suppress("EmptyFunctionBlock")
-@PreviewLightDark
-@Preview(device = Devices.TABLET)
+@MyPreview
 @Composable
 private fun LabelledSwitchPreviewOn() {
     SpaceTimeTaggerTheme {
@@ -51,8 +47,7 @@ private fun LabelledSwitchPreviewOn() {
 }
 
 @Suppress("EmptyFunctionBlock")
-@PreviewLightDark
-@Preview(device = Devices.TABLET)
+@MyPreview
 @Composable
 private fun LabelledSwitchPreviewOff() {
     SpaceTimeTaggerTheme {

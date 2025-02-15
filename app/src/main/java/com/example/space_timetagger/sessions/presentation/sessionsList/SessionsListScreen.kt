@@ -12,9 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -22,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.Error
+import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
 import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
@@ -135,8 +133,7 @@ class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState
 }
 
 @Suppress("EmptyFunctionBlock")
-@PreviewLightDark
-@Preview(device = Devices.TABLET)
+@MyPreview
 @Composable
 private fun SessionsPreview(
     @PreviewParameter(SessionsListStateProvider::class) viewState: SessionsListViewState,

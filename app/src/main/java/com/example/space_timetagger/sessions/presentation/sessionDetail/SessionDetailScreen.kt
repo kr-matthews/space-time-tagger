@@ -13,9 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -24,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.EditTextDialog
 import com.example.space_timetagger.core.presentation.Error
+import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
 import com.example.space_timetagger.core.presentation.TopBarEditIcon
@@ -212,8 +210,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
     )
 }
 
-@PreviewLightDark
-@Preview(device = Devices.TABLET)
+@MyPreview
 @Composable
 private fun SessionDetailPreview(
     @PreviewParameter(ViewStateProvider::class) viewState: SessionDetailViewState,

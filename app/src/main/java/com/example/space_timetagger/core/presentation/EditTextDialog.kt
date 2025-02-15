@@ -31,9 +31,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -112,8 +109,7 @@ fun EditTextDialog(
     }
 }
 
-@PreviewLightDark
-@Preview(device = Devices.TABLET)
+@MyPreview
 @Composable
 private fun EditTextDialogPreview() {
     EditTextDialog(

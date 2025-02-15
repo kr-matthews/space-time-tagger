@@ -29,10 +29,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
@@ -169,7 +169,7 @@ private fun NoSessions(
 }
 
 @Suppress("EmptyFunctionBlock")
-@PreviewLightDark
+@MyPreview
 @Composable
 private fun SessionBoxPreview() {
     SpaceTimeTaggerTheme {

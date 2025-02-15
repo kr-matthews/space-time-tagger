@@ -30,10 +30,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.MyPreview
 import com.example.space_timetagger.core.presentation.formatShortDateLongTime
 import com.example.space_timetagger.core.presentation.thenIf
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
@@ -190,7 +190,7 @@ private fun NoTags(
     )
 }
 
-@PreviewLightDark
+@MyPreview
 @Composable
 private fun TagPreview() {
     SpaceTimeTaggerTheme {

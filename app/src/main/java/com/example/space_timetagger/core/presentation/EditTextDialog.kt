@@ -75,6 +75,7 @@ fun EditTextDialog(
                 ),
                 keyboardActions = KeyboardActions(onDone = { onConfirmClick(text) }),
                 modifier = Modifier
+                    .fillMaxWidth()
                     .focusRequester(focusRequester)
                     .semantics { this.contentDescription = contentDescription }
             )

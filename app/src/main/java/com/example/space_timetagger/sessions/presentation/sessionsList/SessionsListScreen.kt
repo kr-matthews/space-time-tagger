@@ -132,7 +132,6 @@ class SessionsListStateProvider : PreviewParameterProvider<SessionsListViewState
     )
 }
 
-@Suppress("EmptyFunctionBlock")
 @MyPreview
 @Composable
 private fun SessionsPreview(

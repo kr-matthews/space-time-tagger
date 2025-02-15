@@ -37,7 +37,6 @@ fun LabelledSwitch(
     }
 }
 
-@Suppress("EmptyFunctionBlock")
 @MyPreview
 @Composable
 private fun LabelledSwitchPreviewOn() {
@@ -46,7 +45,6 @@ private fun LabelledSwitchPreviewOn() {
     }
 }
 
-@Suppress("EmptyFunctionBlock")
 @MyPreview
 @Composable
 private fun LabelledSwitchPreviewOff() {

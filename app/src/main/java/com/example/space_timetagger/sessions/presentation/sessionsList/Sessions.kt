@@ -168,7 +168,6 @@ private fun NoSessions(
     )
 }
 
-@Suppress("EmptyFunctionBlock")
 @MyPreview
 @Composable
 private fun SessionBoxPreview() {

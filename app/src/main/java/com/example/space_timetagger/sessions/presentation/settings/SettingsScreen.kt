@@ -214,7 +214,6 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
     )
 }
 
-@Suppress("EmptyFunctionBlock")
 @MyPreview
 @Composable
 private fun SettingsViewPreview(

@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.example.space_timetagger.sessions.navigation.SttNavHost
+import com.example.space_timetagger.sessions.navigation.MyNavHost
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import kotlinx.coroutines.launch
 
@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
             SpaceTimeTaggerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SttNavHost(navController, Modifier.padding(innerPadding))
+                    MyNavHost(navController, Modifier.padding(innerPadding))
                 }
             }
         }

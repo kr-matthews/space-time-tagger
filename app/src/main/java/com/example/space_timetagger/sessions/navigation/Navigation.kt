@@ -21,7 +21,7 @@ data class Session(val id: String)
 data object Settings
 
 @Composable
-fun SttNavHost(navController: NavHostController, modifier: Modifier) {
+fun MyNavHost(navController: NavHostController, modifier: Modifier) {
     NavHost(navController = navController, startDestination = Sessions) {
         composable<Sessions> {
             SessionsListScreen(

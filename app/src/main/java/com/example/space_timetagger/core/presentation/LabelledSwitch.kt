@@ -41,7 +41,7 @@ fun LabelledSwitch(
 @Composable
 private fun LabelledSwitchPreviewOn() {
     SpaceTimeTaggerTheme {
-        LabelledSwitch("Custom Setting", true, { })
+        LabelledSwitch("Custom Setting", true, {})
     }
 }
 

@@ -48,14 +48,8 @@ fun SessionDetailScreen(
             is SessionDetailEvent.TapBack -> onBackTap()
             is SessionDetailEvent.TapSettings -> onSettingsTap()
             // TODO: move into SessionDetailView and add UI tests?
-            is SessionDetailEvent.TapNewTagButton -> {
-                tagBeingAddedToast.show()
-            }
-
-            is SessionDetailEvent.TapAnywhere -> {
-                tagBeingAddedToast.show()
-            }
-
+            is SessionDetailEvent.TapNewTagButton -> tagBeingAddedToast.show()
+            is SessionDetailEvent.TapAnywhere -> tagBeingAddedToast.show()
             else -> {}
         }
     }

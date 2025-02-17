@@ -20,6 +20,7 @@ navigationCompose = "2.8.5"
 kotlinPluginSerialization = "2.0.20"
 datastorePreferences = "1.1.2"
 datastoreCoreAndroid = "1.1.2"
+roomCompiler = "2.6.1"
 coreKtxVersion = "1.6.1"
 kotlinxCoroutinesPlayServices = "1.10.1"
 playServicesLocation = "21.3.0"
@@ -50,6 +51,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferences" }
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomCompiler" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomCompiler" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }

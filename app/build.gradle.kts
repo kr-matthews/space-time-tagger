@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.space_timetagger"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.space_timetagger"

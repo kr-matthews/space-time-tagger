@@ -1,5 +1,7 @@
 package com.example.space_timetagger.sessions.data.repository.test
 
+import assertk.assertThat
+import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -24,6 +26,6 @@ class SessionsRepositoryImplTest {
 
     @Test
     fun dummyTest() = runTest {
-        assert(true)
+        assertThat(true).isTrue()
     }
 }

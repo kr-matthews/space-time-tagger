@@ -1,5 +1,6 @@
 package com.example.space_timetagger.sessions.data.repository
 
+import com.example.space_timetagger.sessions.domain.datasource.SessionsDataSource
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.SessionChange
 import com.example.space_timetagger.sessions.domain.models.SessionsChange
@@ -11,13 +12,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
-class SessionsRepositoryImpl : SessionsRepository {
-    private val _sessionsWithChangesWithChange: MutableStateFlow<Pair<List<Pair<Session, SessionChange>>, SessionsChange?>> =
-        MutableStateFlow(Pair(emptyList(), null))
+class SessionsRepositoryImpl(
+    private val sessionsDataSource: SessionsDataSource,
+) : SessionsRepository {
 
     override fun sessions() = _sessionsWithChangesWithChange.asStateFlow().map { (list, _) ->
         list.map { (session, _) -> session }
     }
+    private val _sessionsWithChangesWithChange: MutableStateFlow<Pair<List<Pair<Session, SessionChange>>, SessionsChange?>> =
+        MutableStateFlow(Pair(emptyList(), null))
+
 
     override fun sessionsAndLastChange(): Flow<Pair<List<Session>, SessionsChange?>> =
         _sessionsWithChangesWithChange.asStateFlow().map { (list, lastChange) ->

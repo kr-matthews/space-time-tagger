@@ -14,14 +14,14 @@ class RoomSessionsDataSource(
     private val ioDispatcher: CoroutineDispatcher
 ) : SessionsDataSource {
     override fun getSessions(): Flow<List<Session>> =
-        sessionsDao.getSessions().map { it.map(SessionEntity::toSession) }
+        sessionsDao.getSessionsWithTags().map { it.map(SessionWithTags::toSession) }
 
     override fun getSession(id: SessionId): Flow<Session> =
-        sessionsDao.getSession(id).map(SessionEntity::toSession)
+        sessionsDao.getSessionWithTags(id).map(SessionWithTags::toSession)
 
     override suspend fun upsertSession(session: Session) =
         withContext(ioDispatcher) {
-            sessionsDao.upsertSession(session.toEntity())
+            sessionsDao.upsertSessionWithTags(session.toSessionWithTags())
         }
 
     override suspend fun deleteSession(id: SessionId) =

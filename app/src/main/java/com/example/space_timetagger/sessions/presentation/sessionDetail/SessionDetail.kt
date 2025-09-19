@@ -38,7 +38,7 @@ import com.example.space_timetagger.core.presentation.thenIf
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 @Composable
 fun SessionDetail(
@@ -69,7 +69,7 @@ fun SessionDetail(
                 condition = session.tapAnywhereIsEnabled,
                 ifTrue = {
                     clickable(
-                        onClick = { onEvent(SessionDetailEvent.TapAnywhere(OffsetDateTime.now())) },
+                        onClick = { onEvent(SessionDetailEvent.TapAnywhere(LocalDateTime.now())) },
                     )
                 },
             )
@@ -141,7 +141,7 @@ private fun Tag(
 @Composable
 private fun SessionOptions(
     deleteAllIsEnabled: Boolean,
-    onTapAddNewTag: (OffsetDateTime) -> Unit,
+    onTapAddNewTag: (LocalDateTime) -> Unit,
     onTapConfirmDeleteAllTags: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -151,7 +151,7 @@ private fun SessionOptions(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth()
     ) {
-        Button(onClick = { onTapAddNewTag(OffsetDateTime.now()) }) {
+        Button(onClick = { onTapAddNewTag(LocalDateTime.now()) }) {
             Text(stringResource(R.string.add_tag))
         }
         Button(

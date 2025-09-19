@@ -1,6 +1,6 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 sealed interface SessionDetailEvent {
     data object TapBack : SessionDetailEvent
@@ -8,9 +8,9 @@ sealed interface SessionDetailEvent {
     data object TapEdit : SessionDetailEvent
     data class ConfirmNameEdit(val newName: String) : SessionDetailEvent
     data object CancelNameEdit : SessionDetailEvent
-    data class TapNewTagButton(val time: OffsetDateTime) : SessionDetailEvent
+    data class TapNewTagButton(val time: LocalDateTime) : SessionDetailEvent
     data class TapConfirmDeleteTag(val tagId: String) : SessionDetailEvent
     data object TapConfirmDeleteAllTags : SessionDetailEvent
-    data class TapAnywhere(val time: OffsetDateTime) : SessionDetailEvent
+    data class TapAnywhere(val time: LocalDateTime) : SessionDetailEvent
     data class AutoScrollToTag(val id: String) : SessionDetailEvent
 }

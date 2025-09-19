@@ -7,9 +7,7 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
 import com.example.space_timetagger.location.domain.models.LatLng
 import com.example.space_timetagger.sessions.domain.models.Tag
-import java.time.Instant
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import java.time.LocalDateTime
 
 @Entity(
     tableName = "tags",
@@ -23,7 +21,7 @@ import java.time.ZoneOffset
 data class TagEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(index = true) val sessionId: String,
-    @ColumnInfo(name = "date_time") val dateTime: Long,
+    @ColumnInfo(name = "date_time") val dateTime: String,
     val lat: Double?,
     val long: Double?,
 )
@@ -31,13 +29,13 @@ data class TagEntity(
 fun Tag.toEntity(sessionId: String) = TagEntity(
     id = id,
     sessionId = sessionId,
-    dateTime = dateTime.toEpochSecond(),
+    dateTime = dateTime.toString(),
     lat = location?.latitude,
     long = location?.longitude,
 )
 
 fun TagEntity.toTag() = Tag(
     id = id,
-    dateTime = OffsetDateTime.ofInstant(Instant.ofEpochSecond(dateTime), ZoneOffset.UTC),
+    dateTime = LocalDateTime.parse(dateTime),
     location = lat?.let { long?.let { LatLng(lat, long) } },
 )

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 class SessionViewModel(
     private val sessionId: String,
@@ -79,7 +79,7 @@ class SessionViewModel(
         }
     }
 
-    private fun addTag(now: OffsetDateTime) {
+    private fun addTag(now: LocalDateTime) {
         viewModelScope.launch {
             val taggingLocationIsEnabled =
                 preferencesRepository.taggingLocationIsEnabled.firstOrNull() == true
@@ -105,7 +105,7 @@ class SessionViewModel(
         }
     }
 
-    private fun onTapAnywhere(time: OffsetDateTime) {
+    private fun onTapAnywhere(time: LocalDateTime) {
         viewModelScope.launch {
             if (tapAnywhereIsEnabled.firstOrNull() == true) {
                 addTag(time)

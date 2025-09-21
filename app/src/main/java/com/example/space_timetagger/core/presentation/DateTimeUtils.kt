@@ -4,4 +4,4 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 fun LocalDateTime.formatShortDateLongTime(): String =
-    format(DateTimeFormatter.ofPattern("MMM dd, HH:mm.ss"))
+    format(DateTimeFormatter.ofPattern("MMM dd, HH:mm:ss"))

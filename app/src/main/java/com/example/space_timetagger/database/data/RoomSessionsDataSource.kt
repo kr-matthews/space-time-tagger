@@ -5,6 +5,7 @@ import com.example.space_timetagger.sessions.domain.datasource.SessionId
 import com.example.space_timetagger.sessions.domain.datasource.SessionsDataSource
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.Tag
+import com.example.space_timetagger.sessions.domain.models.copyAndSortTags
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,10 +16,15 @@ class RoomSessionsDataSource(
     private val ioDispatcher: CoroutineDispatcher
 ) : SessionsDataSource {
     override fun getSessions(): Flow<List<Session>> =
-        sessionsDao.getSessionsWithTags().map { it.map(SessionWithTags::toSession) }
+        sessionsDao.getSessionsWithTags().map {
+            it.map(SessionWithTags::toSession)
+                .map(Session::copyAndSortTags)
+        }
 
     override fun getSession(id: SessionId): Flow<Session> =
-        sessionsDao.getSessionWithTags(id).map(SessionWithTags::toSession)
+        sessionsDao.getSessionWithTags(id)
+            .map(SessionWithTags::toSession)
+            .map(Session::copyAndSortTags)
 
     override suspend fun upsertSessionWithoutTags(session: Session) =
         withContext(ioDispatcher) {

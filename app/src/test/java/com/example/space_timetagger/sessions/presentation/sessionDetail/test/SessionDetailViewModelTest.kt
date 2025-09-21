@@ -230,7 +230,7 @@ class SessionDetailViewModelTest {
         initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapConfirmDeleteTag(mockTag.id))
         advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).removeTagFromSession(validId, mockTag.id)
+        verify(mockSessionsRepository, times(1)).removeTag(mockTag.id)
     }
 
     @Test

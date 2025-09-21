@@ -28,7 +28,7 @@ class SessionsRepositoryImpl(
 
     override suspend fun newSession(name: String?): String {
         val newSession = Session(name = name)
-        sessionsDataSource.upsertSession(newSession)
+        sessionsDataSource.upsertSessionWithoutTags(newSession)
         // TODO: remove return value (?)
         return newSession.id
     }
@@ -36,31 +36,20 @@ class SessionsRepositoryImpl(
     override suspend fun renameSession(id: String, newName: String?) {
         session(id).first()?.let { session ->
             val renamedSession = session.copy(name = newName)
-            sessionsDataSource.upsertSession(renamedSession)
+            sessionsDataSource.upsertSessionWithoutTags(renamedSession)
         }
     }
 
-    override suspend fun addTagToSession(id: String, tag: Tag) {
-        session(id).first()?.let { session ->
-            val newTags = session.tags.toMutableList().apply { add(tag) }
-            val updatedSession = session.copy(tags = newTags)
-            sessionsDataSource.upsertSession(updatedSession)
-        }
+    override suspend fun addTagToSession(sessionId: String, tag: Tag) {
+        sessionsDataSource.upsertTag(sessionId, tag)
     }
 
-    override suspend fun removeTagFromSession(id: String, tagId: String) {
-        session(id).first()?.let { session ->
-            val newTags = session.tags.toMutableList().filterNot { it.id == tagId }
-            val updatedSession = session.copy(tags = newTags)
-            sessionsDataSource.upsertSession(updatedSession)
-        }
+    override suspend fun removeTag(id: String) {
+        sessionsDataSource.deleteTag(id)
     }
 
     override suspend fun removeAllTagsFromSession(id: String) {
-        session(id).first()?.let { session ->
-            val updatedSession = session.copy(tags = emptyList())
-            sessionsDataSource.upsertSession(updatedSession)
-        }
+        sessionsDataSource.clearTags(id)
     }
 
     override suspend fun deleteSession(id: String) {

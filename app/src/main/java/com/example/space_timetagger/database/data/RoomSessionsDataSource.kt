@@ -4,6 +4,7 @@ import com.example.space_timetagger.database.domain.SessionsDao
 import com.example.space_timetagger.sessions.domain.datasource.SessionId
 import com.example.space_timetagger.sessions.domain.datasource.SessionsDataSource
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.Tag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,9 +20,9 @@ class RoomSessionsDataSource(
     override fun getSession(id: SessionId): Flow<Session> =
         sessionsDao.getSessionWithTags(id).map(SessionWithTags::toSession)
 
-    override suspend fun upsertSession(session: Session) =
+    override suspend fun upsertSessionWithoutTags(session: Session) =
         withContext(ioDispatcher) {
-            sessionsDao.upsertSessionWithTags(session.toSessionWithTags())
+            sessionsDao.upsertSession(session.toEntity())
         }
 
     override suspend fun deleteSession(id: SessionId) =
@@ -32,5 +33,20 @@ class RoomSessionsDataSource(
     override suspend fun clearSessions() =
         withContext(ioDispatcher) {
             sessionsDao.clearSessions()
+        }
+
+    override suspend fun upsertTag(sessionId: String, tag: Tag) =
+        withContext(ioDispatcher) {
+            sessionsDao.upsertTag(tag.toEntity(sessionId))
+        }
+
+    override suspend fun deleteTag(id: String) =
+        withContext(ioDispatcher) {
+            sessionsDao.deleteTag(id)
+        }
+
+    override suspend fun clearTags(sessionId: String) =
+        withContext(ioDispatcher) {
+            sessionsDao.deleteTags(sessionId)
         }
 }

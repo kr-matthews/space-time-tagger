@@ -13,8 +13,8 @@ interface SessionsRepository {
     fun sessionAndLastChange(id: String): Flow<Pair<Session, SessionChange>?>
     suspend fun newSession(name: String? = null): String
     suspend fun renameSession(id: String, newName: String?)
-    suspend fun addTagToSession(id: String, tag: Tag)
-    suspend fun removeTagFromSession(id: String, tagId: String)
+    suspend fun addTagToSession(sessionId: String, tag: Tag)
+    suspend fun removeTag(id: String)
     suspend fun removeAllTagsFromSession(id: String)
     suspend fun deleteSession(id: String)
     suspend fun deleteAllSessions()

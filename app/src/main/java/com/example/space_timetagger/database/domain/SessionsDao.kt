@@ -23,17 +23,17 @@ interface SessionsDao {
     fun upsertSession(sessionEntity: SessionEntity)
 
     @Upsert
-    fun upsertTags(tagEntities: List<TagEntity>)
-
-    @Transaction
-    suspend fun upsertSessionWithTags(sessionWithTags: SessionWithTags) {
-        upsertSession(sessionWithTags.sessionEntity)
-        upsertTags(sessionWithTags.tagEntities)
-    }
+    fun upsertTag(tagEntity: TagEntity)
 
     @Query("DELETE FROM sessions WHERE id=:id")
     fun deleteSession(id: String)
 
     @Query("DELETE FROM sessions")
     fun clearSessions()
+
+    @Query("DELETE FROM tags WHERE id=:id")
+    fun deleteTag(id: String)
+
+    @Query("DELETE FROM tags WHERE sessionId=:sessionId")
+    fun deleteTags(sessionId: String)
 }

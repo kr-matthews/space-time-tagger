@@ -23,7 +23,8 @@ class SessionsViewModel(
     val viewState =
         combine(sessionsAndLastChange, idNavigatedTo) { (sessions, lastChange), idNavigatedTo ->
             val justCreatedId = (lastChange as? SessionsChange.Create)?.id
-            val needsToNavigate = justCreatedId != null && justCreatedId != idNavigatedTo
+            val justCreatedIdExists = sessions.any { it.id == justCreatedId }
+            val needsToNavigate = justCreatedIdExists && justCreatedId != idNavigatedTo
             val idToNavigateTo = if (needsToNavigate) justCreatedId else null
 
             SessionsListViewState.Success(

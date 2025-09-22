@@ -14,7 +14,7 @@ interface SessionsRepository {
     suspend fun newSession(name: String? = null): String
     suspend fun renameSession(id: String, newName: String?)
     suspend fun addTagToSession(sessionId: String, tag: Tag)
-    suspend fun removeTag(id: String)
+    suspend fun removeTag(sessionId: String, tagId: String)
     suspend fun removeAllTagsFromSession(id: String)
     suspend fun deleteSession(id: String)
     suspend fun deleteAllSessions()

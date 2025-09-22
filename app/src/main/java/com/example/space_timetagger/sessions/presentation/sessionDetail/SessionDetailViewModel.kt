@@ -95,7 +95,7 @@ class SessionViewModel(
 
     private fun deleteTag(id: String) {
         viewModelScope.launch {
-            sessionsRepository.removeTag(id)
+            sessionsRepository.removeTag(sessionId, id)
         }
     }
 

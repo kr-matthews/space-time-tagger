@@ -23,10 +23,13 @@ class SessionsViewModel(
     private val lastIdNavigatedTo = MutableStateFlow<String?>(null)
 
     val viewState =
-        combine(sessions, lastChange, lastIdNavigatedTo) { sessions, lastChange, idNavigatedTo ->
+        combine(
+            sessions,
+            lastChange,
+            lastIdNavigatedTo
+        ) { sessions, lastChange, idNavigatedTo ->
             val justCreatedId = (lastChange as? SessionsChange.Create)?.id
-            val justCreatedIdExists = sessions.any { it.id == justCreatedId }
-            val needsToNavigate = justCreatedIdExists && justCreatedId != idNavigatedTo
+            val needsToNavigate = justCreatedId != null && justCreatedId != idNavigatedTo
             val idToNavigateTo = if (needsToNavigate) justCreatedId else null
 
             SessionsListViewState.Success(

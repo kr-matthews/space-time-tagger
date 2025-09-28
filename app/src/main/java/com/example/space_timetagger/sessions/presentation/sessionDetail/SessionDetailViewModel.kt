@@ -129,7 +129,7 @@ class SessionViewModelFactory(
 }
 
 private fun buildSessionDetailUiModel(
-    sessionAndLastChange: Pair<Session, SessionChange>,
+    sessionAndLastChange: Pair<Session, SessionChange?>,
     scrolledToTagId: String?,
     tapAnywhereIsEnabled: Boolean,
     nameIsBeingEdited: Boolean,

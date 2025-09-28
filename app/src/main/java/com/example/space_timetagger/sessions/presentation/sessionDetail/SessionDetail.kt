@@ -48,9 +48,9 @@ fun SessionDetail(
 ) {
     val lazyColumnState = rememberLazyListState()
 
-    LaunchedEffect(key1 = session.tagIdToScrollTo) {
+    LaunchedEffect(key1 = session.tagIdToScrollTo, session.tags) {
         session.tagIdToScrollTo?.let { tagId ->
-            val tagIndex = session.tags.indexOfFirst { it.id === tagId }
+            val tagIndex = session.tags.indexOfFirst { it.id == tagId }
             if (tagIndex != -1) {
                 lazyColumnState.animateScrollToItem(tagIndex)
                 onEvent(SessionDetailEvent.AutoScrollToTag(tagId))

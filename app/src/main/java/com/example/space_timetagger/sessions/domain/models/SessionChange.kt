@@ -5,5 +5,6 @@ sealed interface SessionChange {
     data object Rename : SessionChange
     data class AddTag(val id: String) : SessionChange
     data class DeleteTag(val id: String) : SessionChange
-    data object Clear : SessionChange
+    data object ClearTags : SessionChange
+    data object Delete : SessionChange
 }

@@ -1,7 +1,7 @@
 package com.example.space_timetagger.core.presentation
 
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-fun OffsetDateTime.formatShortDateLongTime(): String =
-    format(DateTimeFormatter.ofPattern("MMM dd, HH:mm.ss"))
+fun LocalDateTime.formatShortDateLongTime(): String =
+    format(DateTimeFormatter.ofPattern("MMM dd, HH:mm:ss"))

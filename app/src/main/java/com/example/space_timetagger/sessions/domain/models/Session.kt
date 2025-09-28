@@ -7,3 +7,5 @@ data class Session(
     val name: String? = null,
     val tags: List<Tag> = listOf(),
 )
+
+fun Session.copyAndSortTags() = this.copy(tags = tags.sortedBy(Tag::dateTime))

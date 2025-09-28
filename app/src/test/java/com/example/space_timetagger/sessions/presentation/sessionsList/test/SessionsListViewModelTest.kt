@@ -4,16 +4,16 @@ import assertk.assertThat
 import assertk.assertions.extracting
 import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
-import com.example.space_timetagger.sessions.domain.models.SessionsChange
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
+import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewState
-import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -34,25 +34,21 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class SessionsListViewModelTest {
-    private val lastChange = SessionsChange.Create(mockSessions.last().id)
-
     @get:Rule
     var coroutineTestRule = CoroutineTestRule()
 
     @Mock
     private val mockSessionsRepository = mock<SessionsRepository>()
 
-    private lateinit var viewModel: SessionsViewModel
+    private lateinit var viewModel: SessionsListViewModel
 
     @Before
     fun setup() = runTest {
-        whenever(mockSessionsRepository.sessionsAndLastChange()).thenReturn(
-            flowOf(Pair(mockSessions, lastChange))
-        )
+        whenever(mockSessionsRepository.sessions()).thenReturn(flowOf(mockSessions))
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
         )
-        viewModel = SessionsViewModel(mockSessionsRepository)
+        viewModel = SessionsListViewModel(mockSessionsRepository)
     }
 
     @Test
@@ -70,9 +66,9 @@ class SessionsListViewModelTest {
     }
 
     @Test
-    fun initially_hasIdToNavigateToBasedOnRepository() = runTest {
+    fun initially_hasNullIdToNavigateTo() = runTest {
         val initialViewState = viewModel.viewState.first()
-        assertThat(initialViewState::idToNavigateTo).isEqualTo(lastChange.id)
+        assertThat(initialViewState::idToNavigateTo).isNull()
     }
 
     // FIXME: test that if repository flow updates, view state will update
@@ -100,10 +96,13 @@ class SessionsListViewModelTest {
     }
 
     @Test
-    fun eventAutoNavigateToSession_callsRepositoryFunc() = runTest {
-        assertThat(viewModel.viewState.first()::idToNavigateTo).isEqualTo(lastChange.id)
+    fun eventAutoNavigateToSession_clearsIdToNavigateTo() = runTest {
+        viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
+        val sessionId =
+            (viewModel.viewState.first() as SessionsListViewState.Success).idToNavigateTo
+        assertThat(sessionId).isNotNull()
 
-        viewModel.handleEvent(SessionsListEvent.AutoNavigateToSession(mockSessions.last().id))
+        viewModel.handleEvent(SessionsListEvent.AutoNavigateToSession(sessionId!!))
         advanceUntilIdle()
         assertThat(viewModel.viewState.first()::idToNavigateTo).isNull()
     }

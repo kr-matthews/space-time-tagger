@@ -1,12 +1,12 @@
 package com.example.space_timetagger.sessions.presentation.models
 
 import com.example.space_timetagger.sessions.domain.models.Tag
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class TagUiModel(
     val id: String = UUID.randomUUID().toString(),
-    val dateTime: OffsetDateTime,
+    val dateTime: LocalDateTime,
 )
 
 fun Tag.toUiModel() = TagUiModel(id, dateTime)

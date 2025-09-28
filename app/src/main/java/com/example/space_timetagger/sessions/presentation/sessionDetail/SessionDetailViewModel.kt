@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 class SessionViewModel(
     private val sessionId: String,
@@ -25,27 +25,31 @@ class SessionViewModel(
     private val preferencesRepository: PreferencesRepository,
     private val locationRepository: LocationRepository,
 ) : ViewModel() {
-    private val sessionAndLastChange = sessionsRepository.sessionAndLastChange(sessionId)
+    private val session = sessionsRepository.session(sessionId)
+
+    private val lastChange: MutableStateFlow<SessionChange?> = MutableStateFlow(null)
 
     private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
 
     private val nameIsBeingEdited = MutableStateFlow(false)
 
-    private val scrolledToTagId = MutableStateFlow<String?>(null)
+    private val lastScrolledToTagId = MutableStateFlow<String?>(null)
 
     val viewState =
         combine(
-            sessionAndLastChange,
+            session,
+            lastChange,
             tapAnywhereIsEnabled,
             nameIsBeingEdited,
-            scrolledToTagId
-        ) { sessionAndLastChange, tapAnywhereIsEnabled, nameIsBeingEdited, scrolledToTagId ->
+            lastScrolledToTagId
+        ) { session, lastChange, tapAnywhereIsEnabled, nameIsBeingEdited, lastScrolledToTagId ->
             when {
-                sessionAndLastChange == null -> SessionDetailViewState.Error
+                session == null -> SessionDetailViewState.Error
                 else -> SessionDetailViewState.Success(
                     buildSessionDetailUiModel(
-                        sessionAndLastChange,
-                        scrolledToTagId,
+                        session,
+                        lastChange,
+                        lastScrolledToTagId,
                         tapAnywhereIsEnabled,
                         nameIsBeingEdited,
                     )
@@ -64,7 +68,7 @@ class SessionViewModel(
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
             is SessionDetailEvent.TapAnywhere -> onTapAnywhere(event.time)
-            is SessionDetailEvent.AutoScrollToTag -> scrolledToTagId.update { event.id }
+            is SessionDetailEvent.AutoScrollToTag -> lastScrolledToTagId.update { event.id }
         }
     }
 
@@ -76,10 +80,11 @@ class SessionViewModel(
     private fun setName(name: String?) {
         viewModelScope.launch {
             sessionsRepository.renameSession(sessionId, name)
+            lastChange.update { SessionChange.Rename }
         }
     }
 
-    private fun addTag(now: OffsetDateTime) {
+    private fun addTag(now: LocalDateTime) {
         viewModelScope.launch {
             val taggingLocationIsEnabled =
                 preferencesRepository.taggingLocationIsEnabled.firstOrNull() == true
@@ -90,22 +95,25 @@ class SessionViewModel(
             }
             val tag = Tag(dateTime = now, location = currentLocation)
             sessionsRepository.addTagToSession(sessionId, tag)
+            lastChange.update { SessionChange.AddTag(tag.id) }
         }
     }
 
     private fun deleteTag(id: String) {
         viewModelScope.launch {
-            sessionsRepository.removeTagFromSession(sessionId, id)
+            sessionsRepository.removeTag(sessionId, id)
+            lastChange.update { SessionChange.DeleteTag(id) }
         }
     }
 
     private fun deleteAllTags() {
         viewModelScope.launch {
             sessionsRepository.removeAllTagsFromSession(sessionId)
+            lastChange.update { SessionChange.ClearTags }
         }
     }
 
-    private fun onTapAnywhere(time: OffsetDateTime) {
+    private fun onTapAnywhere(time: LocalDateTime) {
         viewModelScope.launch {
             if (tapAnywhereIsEnabled.firstOrNull() == true) {
                 addTag(time)
@@ -129,14 +137,14 @@ class SessionViewModelFactory(
 }
 
 private fun buildSessionDetailUiModel(
-    sessionAndLastChange: Pair<Session, SessionChange>,
-    scrolledToTagId: String?,
+    session: Session,
+    lastChange: SessionChange?,
+    lastScrolledToTagId: String?,
     tapAnywhereIsEnabled: Boolean,
     nameIsBeingEdited: Boolean,
 ): SessionDetailUiModel {
-    val (session, lastChange) = sessionAndLastChange
     val justAddedTagId = (lastChange as? SessionChange.AddTag)?.id
-    val needToScrollToJustAddedTag = justAddedTagId != null && justAddedTagId != scrolledToTagId
+    val needToScrollToJustAddedTag = justAddedTagId != null && justAddedTagId != lastScrolledToTagId
     val tagIdToScrollTo = if (needToScrollToJustAddedTag) justAddedTagId else null
 
     return SessionDetailUiModel(

@@ -22,17 +22,15 @@ install it on an android phone with developer mode enabled.
 - Session Detail screen to see/add/delete tags within a session.
 - Settings screen to toggle whether current location is stored in tags (requesting permission if
   necessary).
+- Data persisted via a room database.
 - Allow app to run over the lock screen.
 - Optionally allow app to keep the screen on.
-
-Note: No data is persisted after the app closes. This will change soon.
 
 ### Potential Future
 
 See [enhancements](https://github.com/kr-matthews/space-time-tagger/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
 on GitHub.
 
-- Persist session data.
 - Integration tests.
 - Map view of tags.
 - Improve styling and colours.

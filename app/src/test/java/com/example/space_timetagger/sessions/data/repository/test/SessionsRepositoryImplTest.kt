@@ -1,13 +1,13 @@
 package com.example.space_timetagger.sessions.data.repository.test
 
+import assertk.assertThat
+import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
-import com.example.space_timetagger.sessions.data.repository.SessionsRepositoryImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -18,11 +18,14 @@ class SessionsRepositoryImplTest {
     @get:Rule
     var coroutineTestRule = CoroutineTestRule()
 
-    @Mock
-    private val mockSessionsRepository = SessionsRepositoryImpl()
+//    @Mock
+//    private val mockSessionsRepository = SessionsRepositoryImpl()
+
+
+    // TODO
 
     @Test
     fun dummyTest() = runTest {
-        assert(true)
+        assertThat(true).isTrue()
     }
 }

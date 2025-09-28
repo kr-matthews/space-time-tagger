@@ -31,7 +31,7 @@ fun SessionsListScreen(
     onNavigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
+    val viewModel = viewModel<SessionsListViewModel>(factory = SessionsViewModelFactory())
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListViewState.Loading)
 
     fun onEvent(event: SessionsListEvent) {
@@ -44,11 +44,14 @@ fun SessionsListScreen(
     }
 
     val idToNavigateTo = (viewState as? SessionsListViewState.Success)?.idToNavigateTo
+    val sessions = (viewState as? SessionsListViewState.Success)?.sessions
 
-    LaunchedEffect(key1 = idToNavigateTo) {
-        idToNavigateTo?.let { id ->
-            onNavigateToSession(id)
-            onEvent(SessionsListEvent.AutoNavigateToSession(id))
+    LaunchedEffect(key1 = idToNavigateTo, key2 = sessions) {
+        sessions?.find {
+            it.id == idToNavigateTo
+        }?.let {
+            onNavigateToSession(it.id)
+            onEvent(SessionsListEvent.AutoNavigateToSession(it.id))
         }
     }
 

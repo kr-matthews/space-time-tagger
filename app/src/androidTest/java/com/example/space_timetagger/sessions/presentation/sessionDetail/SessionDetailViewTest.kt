@@ -31,8 +31,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import java.time.LocalDateTime
 
 class SessionDetailViewTest {
 
@@ -42,7 +41,7 @@ class SessionDetailViewTest {
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val mockHandleEvent: (SessionDetailEvent) -> Unit = mock()
-    private val now: OffsetDateTime = OffsetDateTime.of(2024, 7, 19, 8, 33, 6, 5, ZoneOffset.UTC)
+    private val now: LocalDateTime = LocalDateTime.of(2024, 7, 19, 8, 33, 6, 5)
     private val lotsOfTags =
         List(333) { i -> TagUiModel(dateTime = now.minusSeconds((i + 1) * (i + 1) - i + 5L)) }
 

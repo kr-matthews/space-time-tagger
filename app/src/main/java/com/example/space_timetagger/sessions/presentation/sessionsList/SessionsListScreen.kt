@@ -31,7 +31,7 @@ fun SessionsListScreen(
     onNavigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = viewModel<SessionsViewModel>(factory = SessionsViewModelFactory())
+    val viewModel = viewModel<SessionsListViewModel>(factory = SessionsViewModelFactory())
     val viewState by viewModel.viewState.collectAsStateWithLifecycle(SessionsListViewState.Loading)
 
     fun onEvent(event: SessionsListEvent) {

@@ -12,8 +12,8 @@ import com.example.space_timetagger.sessions.domain.models.SessionsChange
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
+import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListViewState
-import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -42,7 +42,7 @@ class SessionsListViewModelTest {
     @Mock
     private val mockSessionsRepository = mock<SessionsRepository>()
 
-    private lateinit var viewModel: SessionsViewModel
+    private lateinit var viewModel: SessionsListViewModel
 
     @Before
     fun setup() = runTest {
@@ -52,7 +52,7 @@ class SessionsListViewModelTest {
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
         )
-        viewModel = SessionsViewModel(mockSessionsRepository)
+        viewModel = SessionsListViewModel(mockSessionsRepository)
     }
 
     @Test

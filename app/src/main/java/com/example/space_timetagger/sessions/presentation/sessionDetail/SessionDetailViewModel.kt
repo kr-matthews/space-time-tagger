@@ -42,14 +42,14 @@ class SessionViewModel(
             tapAnywhereIsEnabled,
             nameIsBeingEdited,
             lastScrolledToTagId
-        ) { session, lastChange, tapAnywhereIsEnabled, nameIsBeingEdited, scrolledToTagId ->
+        ) { session, lastChange, tapAnywhereIsEnabled, nameIsBeingEdited, lastScrolledToTagId ->
             when {
                 session == null -> SessionDetailViewState.Error
                 else -> SessionDetailViewState.Success(
                     buildSessionDetailUiModel(
                         session,
                         lastChange,
-                        scrolledToTagId,
+                        lastScrolledToTagId,
                         tapAnywhereIsEnabled,
                         nameIsBeingEdited,
                     )
@@ -139,12 +139,12 @@ class SessionViewModelFactory(
 private fun buildSessionDetailUiModel(
     session: Session,
     lastChange: SessionChange?,
-    scrolledToTagId: String?,
+    lastScrolledToTagId: String?,
     tapAnywhereIsEnabled: Boolean,
     nameIsBeingEdited: Boolean,
 ): SessionDetailUiModel {
     val justAddedTagId = (lastChange as? SessionChange.AddTag)?.id
-    val needToScrollToJustAddedTag = justAddedTagId != null && justAddedTagId != scrolledToTagId
+    val needToScrollToJustAddedTag = justAddedTagId != null && justAddedTagId != lastScrolledToTagId
     val tagIdToScrollTo = if (needToScrollToJustAddedTag) justAddedTagId else null
 
     return SessionDetailUiModel(

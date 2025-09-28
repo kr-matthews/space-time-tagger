@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SessionsViewModel(
+class SessionsListViewModel(
     private val sessionsRepository: SessionsRepository,
 ) : ViewModel() {
     private val sessions = sessionsRepository.sessions()
@@ -27,9 +27,9 @@ class SessionsViewModel(
             sessions,
             lastChange,
             lastIdNavigatedTo
-        ) { sessions, lastChange, idNavigatedTo ->
+        ) { sessions, lastChange, lastIdNavigatedTo ->
             val justCreatedId = (lastChange as? SessionsChange.Create)?.id
-            val needsToNavigate = justCreatedId != null && justCreatedId != idNavigatedTo
+            val needsToNavigate = justCreatedId != null && justCreatedId != lastIdNavigatedTo
             val idToNavigateTo = if (needsToNavigate) justCreatedId else null
 
             SessionsListViewState.Success(
@@ -75,6 +75,6 @@ class SessionsViewModel(
 @Suppress("UNCHECKED_CAST")
 class SessionsViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SessionsViewModel(App.appModule.sessionsRepository) as T
+        return SessionsListViewModel(App.appModule.sessionsRepository) as T
     }
 }

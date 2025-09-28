@@ -48,7 +48,7 @@ fun SessionDetail(
 ) {
     val lazyColumnState = rememberLazyListState()
 
-    LaunchedEffect(key1 = session.tagIdToScrollTo, session.tags) {
+    LaunchedEffect(key1 = session.tagIdToScrollTo, key2 = session.tags) {
         session.tagIdToScrollTo?.let { tagId ->
             val tagIndex = session.tags.indexOfFirst { it.id == tagId }
             if (tagIndex != -1) {

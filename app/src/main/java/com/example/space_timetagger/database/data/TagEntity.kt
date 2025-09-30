@@ -24,6 +24,7 @@ data class TagEntity(
     @ColumnInfo(name = "date_time") val dateTime: String,
     val lat: Double?,
     val long: Double?,
+    @ColumnInfo(name = "is_archived") val isArchived: Boolean,
 )
 
 fun Tag.toEntity(sessionId: String) = TagEntity(
@@ -32,10 +33,12 @@ fun Tag.toEntity(sessionId: String) = TagEntity(
     dateTime = dateTime.toString(),
     lat = location?.latitude,
     long = location?.longitude,
+    isArchived = isArchived,
 )
 
 fun TagEntity.toTag() = Tag(
     id = id,
     dateTime = LocalDateTime.parse(dateTime),
     location = lat?.let { long?.let { LatLng(lat, long) } },
+    isArchived = isArchived,
 )

@@ -7,6 +7,7 @@ import java.util.UUID
 data class TagUiModel(
     val id: String = UUID.randomUUID().toString(),
     val dateTime: LocalDateTime,
+    val isArchived: Boolean = false,
 )
 
-fun Tag.toUiModel() = TagUiModel(id, dateTime)
+fun Tag.toUiModel() = TagUiModel(id, dateTime, isArchived)

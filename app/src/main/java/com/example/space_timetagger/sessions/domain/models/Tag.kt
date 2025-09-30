@@ -8,4 +8,5 @@ data class Tag(
     val id: String = UUID.randomUUID().toString(),
     val dateTime: LocalDateTime,
     val location: LatLng? = null,
+    val isArchived: Boolean = false,
 )

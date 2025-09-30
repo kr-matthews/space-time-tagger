@@ -85,7 +85,7 @@ private fun SessionBox(
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
 
     val isUnnamed = session.name.isNullOrBlank()
-    val title = if (isUnnamed) stringResource(R.string.untitled) else session.name!!
+    val title = if (isUnnamed) stringResource(R.string.untitled) else session.name
     val textStyle = if (isUnnamed) FontStyle.Italic else null
 
     Card(modifier.clickable(onClick = onTap)) {

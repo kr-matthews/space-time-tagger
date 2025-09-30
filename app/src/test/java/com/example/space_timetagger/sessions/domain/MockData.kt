@@ -9,7 +9,7 @@ import kotlin.random.Random
 val mockDateTime: LocalDateTime = LocalDateTime.of(2024, 7, 28, 16, 0, 58, 0)
 val mockTags = List(13) { i ->
     Tag(
-        dateTime = mockDateTime.plusSeconds(Random.nextInt(i * i, (i + 1) * (i + 1)).toLong())
+        dateTime = mockDateTime.plusSeconds(Random.nextInt(i * i, (i + 1) * (i + 1)).toLong()),
     )
 }
 val mockTag = mockTags[0]

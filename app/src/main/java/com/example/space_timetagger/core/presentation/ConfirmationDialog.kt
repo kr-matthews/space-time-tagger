@@ -22,15 +22,12 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun ConfirmationDialog(
-    onDismissRequest: () -> Unit,
-    action: () -> Unit,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+    onDismiss: (() -> Unit)? = null,
 ) {
-    val onConfirmation = {
-        action()
-        onDismissRequest()
-    }
 
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(onDismissRequest = onDismiss ?: onCancel) {
         Column(
             Modifier
                 .background(MaterialTheme.colorScheme.surface)
@@ -46,11 +43,11 @@ fun ConfirmationDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Spacer(Modifier.weight(1f))
-                Button(onClick = onConfirmation) {
+                Button(onClick = onConfirm) {
                     Text(stringResource(R.string.confirm))
                 }
                 Button(
-                    onClick = onDismissRequest,
+                    onClick = onCancel,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                 ) {
                     Text(stringResource(R.string.cancel))
@@ -64,6 +61,6 @@ fun ConfirmationDialog(
 @Composable
 private fun ConfirmationDialogPreview() {
     SpaceTimeTaggerTheme {
-        ConfirmationDialog(onDismissRequest = {}, action = {})
+        ConfirmationDialog(onConfirm = {}, onCancel = {})
     }
 }

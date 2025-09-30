@@ -20,14 +20,14 @@ class ConfirmationDialogTest {
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val onDismissRequest: () -> Unit = mock()
-    private val action: () -> Unit = mock()
+    private val onConfirm: () -> Unit = mock()
+    private val onCancel: () -> Unit = mock()
 
     @Before
     fun setup() {
         composeTestRule.setContent {
             SpaceTimeTaggerTheme {
-                ConfirmationDialog(onDismissRequest, action)
+                ConfirmationDialog(onConfirm, onCancel)
             }
         }
     }
@@ -35,14 +35,16 @@ class ConfirmationDialogTest {
     @Test
     fun confirmButton_callsActionAndDismissRequest() {
         composeTestRule.onNodeWithText(appContext.getString(R.string.confirm)).performClick()
-        verify(action, times(1)).invoke()
-        verify(onDismissRequest, times(1)).invoke()
+        verify(onConfirm, times(1)).invoke()
+        verify(onCancel, times(0)).invoke()
     }
 
     @Test
     fun cancelButton_callsOnlyDismissRequest() {
         composeTestRule.onNodeWithText(appContext.getString(R.string.cancel)).performClick()
-        verify(action, times(0)).invoke()
-        verify(onDismissRequest, times(1)).invoke()
+        verify(onConfirm, times(0)).invoke()
+        verify(onCancel, times(1)).invoke()
     }
+
+    // TODO: test onDismiss functionality - not sure how to click outside of the dialog
 }

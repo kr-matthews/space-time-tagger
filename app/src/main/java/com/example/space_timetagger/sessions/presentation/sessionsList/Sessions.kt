@@ -114,8 +114,11 @@ private fun SessionBox(
 
     if (dialogIsOpen) {
         ConfirmationDialog(
-            onDismissRequest = { setDialogIsOpen(false) },
-            action = onTapConfirmDelete,
+            onConfirm = {
+                setDialogIsOpen(false)
+                onTapConfirmDelete()
+            },
+            onCancel = { setDialogIsOpen(false) },
         )
     }
 }
@@ -147,8 +150,11 @@ private fun SessionsOptions(
 
     if (dialogIsOpen) {
         ConfirmationDialog(
-            onDismissRequest = { setDialogIsOpen(false) },
-            action = onConfirmDeleteAllSessions,
+            onConfirm = {
+                setDialogIsOpen(false)
+                onConfirmDeleteAllSessions()
+            },
+            onCancel = { setDialogIsOpen(false) },
         )
     }
 }

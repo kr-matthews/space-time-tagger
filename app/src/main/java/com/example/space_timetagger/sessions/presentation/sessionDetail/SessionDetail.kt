@@ -132,8 +132,11 @@ private fun Tag(
 
     if (dialogIsOpen) {
         ConfirmationDialog(
-            onDismissRequest = { setDialogIsOpen(false) },
-            action = onTapConfirmDelete,
+            onConfirm = {
+                onTapConfirmDelete()
+                setDialogIsOpen(false)
+            },
+            onCancel = { setDialogIsOpen(false) },
         )
     }
 }
@@ -165,8 +168,11 @@ private fun SessionOptions(
 
     if (dialogIsOpen) {
         ConfirmationDialog(
-            onDismissRequest = { setDialogIsOpen(false) },
-            action = onTapConfirmDeleteAllTags,
+            onConfirm = {
+                setDialogIsOpen(false)
+                onTapConfirmDeleteAllTags()
+            },
+            onCancel = { setDialogIsOpen(false) },
         )
     }
 }

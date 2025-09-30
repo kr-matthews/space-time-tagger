@@ -29,6 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ComponentPreviews
@@ -195,9 +197,28 @@ private fun NoTags(
     )
 }
 
+class TagProvider : PreviewParameterProvider<TagUiModel> {
+    override val values = sequenceOf(
+        TagUiModel(
+            dateTime = LocalDateTime.now().minusDays(2).minusSeconds(25),
+            isArchived = false,
+        ),
+        TagUiModel(
+            dateTime = LocalDateTime.now().minusMinutes(7).minusSeconds(59),
+            isArchived = true,
+        ),
+        TagUiModel(
+            dateTime = LocalDateTime.now().minusSeconds(8),
+            isArchived = false,
+        ),
+    )
+}
+
 @ComponentPreviews
 @Composable
-private fun TagPreview() {
+private fun TagPreview(
+    @PreviewParameter(TagProvider::class) tag: TagUiModel,
+) {
     SpaceTimeTaggerTheme {
         Tag(
             index = 2,

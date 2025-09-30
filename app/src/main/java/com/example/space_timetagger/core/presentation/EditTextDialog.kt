@@ -42,8 +42,9 @@ import kotlinx.coroutines.delay
 fun EditTextDialog(
     title: String,
     initialText: String?,
-    onConfirmClick: (newText: String) -> Unit,
-    onCancelClick: () -> Unit
+    onConfirm: (newText: String) -> Unit,
+    onCancel: () -> Unit,
+    onDismiss: (() -> Unit)? = null,
 ) {
     val (text, setText) = rememberSaveable { mutableStateOf(initialText ?: "") }
     val contentDescription = stringResource(R.string.name_input)
@@ -56,7 +57,7 @@ fun EditTextDialog(
         focusRequester.requestFocus()
     }
 
-    Dialog(onDismissRequest = onCancelClick) {
+    Dialog(onDismissRequest = onDismiss ?: onCancel) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
@@ -85,7 +86,7 @@ fun EditTextDialog(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Done,
                 ),
-                keyboardActions = KeyboardActions(onDone = { onConfirmClick(text) }),
+                keyboardActions = KeyboardActions(onDone = { onConfirm(text) }),
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester)
@@ -96,11 +97,11 @@ fun EditTextDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Spacer(Modifier.weight(1f))
-                Button(onClick = { onConfirmClick(text) }) {
+                Button(onClick = { onConfirm(text) }) {
                     Text(stringResource(R.string.confirm))
                 }
                 Button(
-                    onClick = onCancelClick,
+                    onClick = onCancel,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                 ) {
                     Text(stringResource(R.string.cancel))
@@ -117,8 +118,8 @@ private fun EditTextDialogPreview() {
         EditTextDialog(
             title = "Fruit",
             initialText = "Pineapple",
-            onConfirmClick = {},
-            onCancelClick = {},
+            onConfirm = {},
+            onCancel = {},
         )
     }
 }

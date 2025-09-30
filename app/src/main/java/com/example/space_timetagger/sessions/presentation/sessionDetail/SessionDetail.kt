@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -77,6 +78,8 @@ fun SessionDetail(
             )
     ) {
         if (session.tags.isNotEmpty()) {
+            val tagCountDigits = session.tags.size.toString().length
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 state = lazyColumnState,
@@ -84,9 +87,16 @@ fun SessionDetail(
             ) {
                 itemsIndexed(session.tags, key = { _, item -> item.dateTime }) { index, tag ->
                     Tag(
-                        index = index,
+                        number = (index + 1).toString().padStart(tagCountDigits, '0'),
                         tag = tag,
-                        onTapConfirmDelete = { onEvent(SessionDetailEvent.TapConfirmDeleteTag(tag.id)) },
+                        onTapConfirmDelete = {
+                            onEvent(
+                                SessionDetailEvent.TapConfirmDeleteTag(
+                                    tag.id
+                                )
+                            )
+                        },
+                        onTapTagCheckbox = { onEvent(SessionDetailEvent.TapTagCheckbox(tag.id)) },
                     )
                 }
             }
@@ -106,20 +116,26 @@ fun SessionDetail(
 
 @Composable
 private fun Tag(
-    index: Int,
+    number: String,
     tag: TagUiModel,
     onTapConfirmDelete: () -> Unit,
+    onTapTagCheckbox: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (dialogIsOpen, setDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
 
     Card(modifier) {
+        // checkbox has built-in padding, so can't use horizontalArrangement = Arrangement.spacedBy(8.dp),
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 8.dp)
         ) {
-            Text(text = "#${index + 1}", fontWeight = FontWeight.W800)
+            Checkbox(checked = tag.isArchived, onCheckedChange = { onTapTagCheckbox() })
+            // todo: styling for archived
+            Text(
+                text = "#$number",
+                fontWeight = FontWeight.W800,
+                modifier = Modifier.padding(end = 8.dp)
+            )
             Text(text = tag.dateTime.formatShortDateLongTime())
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { setDialogIsOpen(true) }) {
@@ -221,8 +237,9 @@ private fun TagPreview(
 ) {
     SpaceTimeTaggerTheme {
         Tag(
-            index = 2,
+            number = "03",
             tag = tag,
+            {},
             {},
         )
     }

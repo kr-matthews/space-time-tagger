@@ -14,6 +14,7 @@ import com.example.space_timetagger.sessions.presentation.models.SessionDetailUi
 import com.example.space_timetagger.sessions.presentation.models.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -65,6 +66,7 @@ class SessionViewModel(
             is SessionDetailEvent.ConfirmNameEdit -> onDoneEditingName(event.newName)
             SessionDetailEvent.CancelNameEdit -> nameIsBeingEdited.update { false }
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
+            is SessionDetailEvent.TapTagCheckbox -> toggleTagArchived(event.tagId)
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
             SessionDetailEvent.TapConfirmDeleteAllTags -> deleteAllTags()
             is SessionDetailEvent.TapAnywhere -> onTapAnywhere(event.time)
@@ -96,6 +98,16 @@ class SessionViewModel(
             val tag = Tag(dateTime = now, location = currentLocation)
             sessionsRepository.addTagToSession(sessionId, tag)
             lastChange.update { SessionChange.AddTag(tag.id) }
+        }
+    }
+
+    private fun toggleTagArchived(id: String) {
+        viewModelScope.launch {
+            val tag = session.first()?.tags?.find { it.id == id }
+            tag?.let {
+                sessionsRepository.toggleTagArchived(sessionId, it)
+                lastChange.update { SessionChange.ToggleTagArchived(id) }
+            }
         }
     }
 

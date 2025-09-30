@@ -31,6 +31,10 @@ class SessionsRepositoryImpl(
         sessionsDataSource.upsertTag(sessionId, tag)
     }
 
+    override suspend fun toggleTagArchived(sessionId: String, tag: Tag) {
+        sessionsDataSource.upsertTag(sessionId, tag.copy(isArchived = !tag.isArchived))
+    }
+
     override suspend fun removeTag(sessionId: String, tagId: String) {
         sessionsDataSource.deleteTag(tagId)
     }

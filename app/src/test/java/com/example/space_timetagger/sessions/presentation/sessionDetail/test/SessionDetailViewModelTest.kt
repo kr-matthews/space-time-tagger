@@ -199,6 +199,18 @@ class SessionDetailViewModelTest {
     }
 
     @Test
+    fun eventTapTagCheckbox_callsRepositoryFunc() = runTest {
+        val tag = mockSession.tags[2]
+        initViewModel()
+        viewModel.handleEvent(SessionDetailEvent.TapTagCheckbox(tag.id))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).toggleTagArchived(
+            eq(validId),
+            eq(tag),
+        )
+    }
+
+    @Test
     fun eventTapNewTagButtonWithLocationEnabled_callsRepositoryFunc() = runTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         initViewModel()

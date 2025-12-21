@@ -5,7 +5,6 @@ import com.example.space_timetagger.sessions.domain.models.Tag
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-
 val mockDateTime: LocalDateTime = LocalDateTime.of(2024, 7, 28, 16, 0, 58, 0)
 val mockTags = List(13) { i ->
     Tag(

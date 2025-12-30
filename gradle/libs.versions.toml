@@ -21,9 +21,9 @@ livecycleViewmodelCompose = "2.9.4"
 activityCompose = "1.11.0"
 composeBom = "2025.09.00"
 navigationCompose = "2.9.5"
-datastorePreferences = "1.1.7"
-datastoreCoreAndroid = "1.1.7"
-roomCompiler = "2.8.1"
+datastorePreferences = "1.2.0"
+datastoreCoreAndroid = "1.2.0"
+roomCompiler = "2.8.4"
 coreKtxVersion = "1.7.0"
 
 [libraries]

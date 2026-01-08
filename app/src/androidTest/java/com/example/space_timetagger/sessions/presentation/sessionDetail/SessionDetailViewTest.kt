@@ -176,6 +176,13 @@ class SessionDetailViewTest {
     }
 
     @Test
+    fun successState_togglingATagCallsEventTapTagCheckbox() {
+        setup(successState)
+        toggleTagCheckbox(aTag)
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapTagCheckbox(aTag.id))
+    }
+
+    @Test
     fun successState_tappingAddButtonCallsEventTapNewTagButton() {
         setup(successState)
         assertAddTagButtonWorks()
@@ -580,6 +587,17 @@ class SessionDetailViewTest {
                 performClick()
             }
         composeTestRule.onNodeWithText(appContext.getString(R.string.confirm)).performClick()
+    }
+
+    private fun toggleTagCheckbox(tag: TagUiModel) {
+        composeTestRule.onNodeWithText(tag.dateTime.formatShortDateLongTime())
+            .onParent()
+            .onChildren()
+            .filterToOne(SemanticsMatcher.keyIsDefined(SemanticsProperties.ToggleableState)).apply {
+                assertHasClickAction()
+                assertIsEnabled()
+                performClick()
+            }
     }
 
     private fun assertAddTagButtonWorks() {

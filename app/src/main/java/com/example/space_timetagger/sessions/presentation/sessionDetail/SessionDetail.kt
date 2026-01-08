@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -128,9 +129,9 @@ private fun Tag(
         // checkbox has built-in padding, so can't use horizontalArrangement = Arrangement.spacedBy(8.dp),
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.thenIf(tag.isArchived, { graphicsLayer(alpha = 0.5f) })
         ) {
             Checkbox(checked = tag.isArchived, onCheckedChange = { onTapTagCheckbox() })
-            // todo: styling for archived
             Text(
                 text = "#$number",
                 fontWeight = FontWeight.W800,

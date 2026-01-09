@@ -6,6 +6,11 @@ import java.util.UUID
 data class SessionOverviewUiModel(
     val id: String = UUID.randomUUID().toString(),
     val name: String? = null,
+    val progress: Float? = null,
 )
 
-fun Session.toOverviewUiModel() = SessionOverviewUiModel(id, name)
+fun Session.toOverviewUiModel() = SessionOverviewUiModel(
+    id,
+    name,
+    with(tags) { if (isEmpty()) null else count { it.isArchived } / size.toFloat() }
+)

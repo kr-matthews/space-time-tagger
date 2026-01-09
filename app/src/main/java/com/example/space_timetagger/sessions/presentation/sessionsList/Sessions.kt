@@ -28,6 +28,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ComponentPreviews
@@ -173,12 +175,18 @@ private fun NoSessions(
     )
 }
 
+class SessionOverviewProvider : PreviewParameterProvider<SessionOverviewUiModel> {
+    override val values = someSessions.take(5).asSequence()
+}
+
 @ComponentPreviews
 @Composable
-private fun SessionBoxPreview() {
+private fun SessionBoxPreview(
+    @PreviewParameter(SessionOverviewProvider::class) sessionOverview: SessionOverviewUiModel,
+) {
     SpaceTimeTaggerTheme {
         SessionBox(
-            SessionOverviewUiModel(name = "Session Preview"),
+            sessionOverview,
             {},
             {},
         )

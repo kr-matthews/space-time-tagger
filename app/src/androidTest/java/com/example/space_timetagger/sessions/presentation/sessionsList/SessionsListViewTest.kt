@@ -37,13 +37,13 @@ class SessionsListViewTest {
     private val mockHandleEvent: (SessionsListEvent) -> Unit = mock()
 
     private val sessions = listOf(
-        SessionOverviewUiModel(name = "Apple"),
-        SessionOverviewUiModel(name = "Banana"),
-        SessionOverviewUiModel(name = null),
-        SessionOverviewUiModel(name = "Cherry"),
-        SessionOverviewUiModel(name = "Dragon fruit"),
-        SessionOverviewUiModel(name = "Elderberry"),
-        SessionOverviewUiModel(name = null),
+        SessionOverviewUiModel(name = "Apple", progress = null),
+        SessionOverviewUiModel(name = "Banana", progress = 0f),
+        SessionOverviewUiModel(name = null, progress = 1 / 23f),
+        SessionOverviewUiModel(name = "Cherry", progress = 3 / 5f),
+        SessionOverviewUiModel(name = "Dragon fruit", progress = 1f),
+        SessionOverviewUiModel(name = "Elderberry", progress = null),
+        SessionOverviewUiModel(name = null, progress = null),
     )
     private val aNamedSession = sessions.filter { it.name != null }.let {
         val index = 1.coerceAtMost(it.size - 1)

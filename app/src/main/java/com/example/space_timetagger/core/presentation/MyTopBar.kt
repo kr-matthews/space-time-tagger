@@ -47,13 +47,13 @@ fun MyTopBarPreview() {
             title = "Preview title",
             onBackTap = {},
         ) {
-            TopBarSettingsIcon(onTap = {})
             IconButton(onClick = {}) {
                 Icon(
-                    painter = painterResource(android.R.drawable.ic_menu_help),
+                    painter = painterResource(R.drawable.ic_pencil),
                     contentDescription = "",
                 )
             }
+            TopBarSettingsIcon(onTap = {})
         }
     }
 }

@@ -25,6 +25,7 @@ install it on an android phone with developer mode enabled.
 - Data persisted via a room database.
 - Allow app to run over the lock screen.
 - Optionally allow app to keep the screen on.
+- Can archive/complete tags, and see progress bar.
 
 ### Potential Future
 
@@ -38,7 +39,6 @@ on GitHub.
 - Settings for default session names.
 - Ability to 'start' a session (introducing a relative timestamp, in addition to the absolute
   timestamp).
-- Ability to mark sessions and/or tags as complete/archived (rather than deleting them).
 
 ## Original Intentions
 

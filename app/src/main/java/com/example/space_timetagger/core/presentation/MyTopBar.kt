@@ -28,7 +28,7 @@ fun MyTopBar(
             onBackTap?.let {
                 IconButton(onClick = it) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back),
+                        painter = painterResource(R.drawable.ic_arrow_left),
                         contentDescription = stringResource(R.string.back)
                     )
                 }

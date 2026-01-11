@@ -164,6 +164,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 tagIdToScrollTo = someTags.last().id,
                 deleteAllIsEnabled = true,
                 tapAnywhereIsEnabled = false,
+                progress = with(someTags) { if (isEmpty()) null else count { it.isArchived } / size.toFloat() }
             ),
         ),
         SessionDetailViewState.Success(
@@ -175,6 +176,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 tagIdToScrollTo = null,
                 deleteAllIsEnabled = false,
                 tapAnywhereIsEnabled = false,
+                progress = with(noTags) { if (isEmpty()) null else count { it.isArchived } / size.toFloat() }
             ),
         ),
         SessionDetailViewState.Success(
@@ -186,6 +188,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 tagIdToScrollTo = manyTags.last().id,
                 deleteAllIsEnabled = true,
                 tapAnywhereIsEnabled = true,
+                progress = with(manyTags) { if (isEmpty()) null else count { it.isArchived } / size.toFloat() }
             ),
         ),
         SessionDetailViewState.Loading,
@@ -199,6 +202,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 tagIdToScrollTo = null,
                 deleteAllIsEnabled = true,
                 tapAnywhereIsEnabled = true,
+                progress = with(someTags) { if (isEmpty()) null else count { it.isArchived } / size.toFloat() }
             ),
         ),
     )

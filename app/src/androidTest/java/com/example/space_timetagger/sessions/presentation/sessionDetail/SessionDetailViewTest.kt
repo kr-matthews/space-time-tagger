@@ -52,6 +52,7 @@ class SessionDetailViewTest {
         tagIdToScrollTo = null,
         deleteAllIsEnabled = true,
         tapAnywhereIsEnabled = false,
+        progress = 0f,
     )
     private val newSession = SessionDetailUiModel(
         name = null,

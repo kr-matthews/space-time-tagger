@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -107,6 +109,13 @@ fun SessionDetail(
             NoTags(
                 tapAnywhereIsEnabled = session.tapAnywhereIsEnabled,
                 modifier = Modifier.weight(1f),
+            )
+        }
+        session.progress?.let {
+            LinearProgressIndicator(
+                { it },
+                trackColor = Color.Transparent,
+                modifier = Modifier.fillMaxWidth()
             )
         }
         SessionOptions(

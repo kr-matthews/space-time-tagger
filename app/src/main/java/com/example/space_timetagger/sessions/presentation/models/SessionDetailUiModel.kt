@@ -10,4 +10,5 @@ data class SessionDetailUiModel(
     val tagIdToScrollTo: String?,
     val deleteAllIsEnabled: Boolean,
     val tapAnywhereIsEnabled: Boolean,
+    val progress: Float? = null,
 )

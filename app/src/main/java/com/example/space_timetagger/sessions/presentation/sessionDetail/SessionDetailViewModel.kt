@@ -167,5 +167,6 @@ private fun buildSessionDetailUiModel(
         tagIdToScrollTo = tagIdToScrollTo,
         deleteAllIsEnabled = session.tags.isNotEmpty(),
         tapAnywhereIsEnabled = tapAnywhereIsEnabled,
+        progress = with(session.tags) { if (isEmpty()) null else count { it.isArchived } / size.toFloat() }
     )
 }

@@ -141,7 +141,7 @@ private fun Tag(
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { setDialogIsOpen(true) }) {
                 Icon(
-                    painter = painterResource(android.R.drawable.ic_menu_delete),
+                    painter = painterResource(R.drawable.ic_trash_x),
                     contentDescription = stringResource(R.string.delete),
                     modifier = Modifier.size(26.dp)
                 )

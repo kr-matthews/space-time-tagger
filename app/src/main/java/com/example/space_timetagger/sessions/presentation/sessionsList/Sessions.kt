@@ -99,7 +99,6 @@ private fun SessionBox(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .thenIf(session.progress == 1f, { alpha(0.5f) })
                 .padding(horizontal = 8.dp)
         ) {
             Text(
@@ -107,7 +106,9 @@ private fun SessionBox(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontStyle = textStyle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .thenIf(session.progress == 1f, { alpha(0.5f) })
             )
             IconButton(onClick = { setDialogIsOpen(true) }) {
                 Icon(

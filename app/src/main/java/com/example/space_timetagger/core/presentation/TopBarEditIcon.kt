@@ -17,7 +17,7 @@ fun TopBarEditIcon(
 ) {
     IconButton(onClick = onTap, modifier = modifier) {
         Icon(
-            painter = painterResource(android.R.drawable.ic_menu_edit),
+            painter = painterResource(R.drawable.ic_pencil),
             contentDescription = stringResource(R.string.edit),
         )
     }

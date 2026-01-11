@@ -77,7 +77,7 @@ fun EditTextDialog(
                         onClick = { setText("") }
                     ) {
                         Icon(
-                            painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                            painter = painterResource(R.drawable.ic_x_circled),
                             contentDescription = stringResource(R.string.clear_text),
                         )
                     }

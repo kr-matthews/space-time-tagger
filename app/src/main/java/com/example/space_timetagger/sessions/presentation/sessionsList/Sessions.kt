@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -34,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ComponentPreviews
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.thenIf
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
@@ -95,6 +99,7 @@ private fun SessionBox(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .thenIf(session.progress == 1f, { alpha(0.5f) })
                 .padding(horizontal = 8.dp)
         ) {
             Text(
@@ -111,6 +116,13 @@ private fun SessionBox(
                     modifier = Modifier.size(26.dp)
                 )
             }
+        }
+        session.progress?.let {
+            LinearProgressIndicator(
+                { it },
+                trackColor = Color.Transparent,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 

@@ -17,7 +17,7 @@ fun TopBarSettingsIcon(
 ) {
     IconButton(onClick = onTap, modifier = modifier) {
         Icon(
-            painter = painterResource(android.R.drawable.ic_menu_preferences),
+            painter = painterResource(R.drawable.ic_cog),
             contentDescription = stringResource(R.string.settings),
         )
     }

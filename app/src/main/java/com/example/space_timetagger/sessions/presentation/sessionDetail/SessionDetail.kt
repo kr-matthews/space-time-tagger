@@ -3,6 +3,7 @@ package com.example.space_timetagger.sessions.presentation.sessionDetail
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -83,6 +84,7 @@ fun SessionDetail(
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 24.dp),
                 state = lazyColumnState,
                 modifier = Modifier.weight(1f)
             ) {

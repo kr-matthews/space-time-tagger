@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -75,6 +76,10 @@ class SettingsViewModel(
             SettingsEvent.LocationPermissionDialogDismissed -> {
                 locationPermissionExplanationIsVisible.update { false }
             }
+
+            is SettingsEvent.TapSessionNameStrategyOption -> onTapSessionNameStrategy(
+                strategy = event.sessionNameStrategy
+            )
         }
     }
 
@@ -127,6 +132,12 @@ class SettingsViewModel(
     private suspend fun enableTaggingLocation() = preferencesRepository.enableTaggingLocation()
 
     private suspend fun disableTaggingLocation() = preferencesRepository.disableTaggingLocation()
+
+    private fun onTapSessionNameStrategy(strategy: SessionNameStrategy) {
+        viewModelScope.launch {
+            preferencesRepository.setSessionNameStrategy(strategy)
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -1,5 +1,7 @@
 package com.example.space_timetagger.sessions.presentation.settings
 
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
+
 sealed interface SettingsEvent {
     data object TapBack : SettingsEvent
     data object TapKeepScreenOnToggle : SettingsEvent
@@ -8,6 +10,10 @@ sealed interface SettingsEvent {
     ) : SettingsEvent
 
     data object TapTapAnywhereToggle : SettingsEvent
+    data class TapSessionNameStrategyOption(
+        val sessionNameStrategy: SessionNameStrategy,
+    ) : SettingsEvent
+
     data object LocationPermissionRequestLaunched : SettingsEvent
     data object LocationPermissionGranted : SettingsEvent
     data object LocationPermissionDenied : SettingsEvent

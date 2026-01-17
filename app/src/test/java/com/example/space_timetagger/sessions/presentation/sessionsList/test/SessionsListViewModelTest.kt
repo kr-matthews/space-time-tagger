@@ -102,8 +102,7 @@ class SessionsListViewModelTest {
     @Test
     fun eventAutoNavigateToSession_clearsIdToNavigateTo() = runTest {
         viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
-        val sessionId =
-            (viewModel.viewState.first() as SessionsListViewState.Success).idToNavigateTo
+        val sessionId = viewModel.viewState.first().idToNavigateTo
         assertThat(sessionId).isNotNull()
 
         viewModel.handleEvent(SessionsListEvent.AutoNavigateToSession(sessionId!!))

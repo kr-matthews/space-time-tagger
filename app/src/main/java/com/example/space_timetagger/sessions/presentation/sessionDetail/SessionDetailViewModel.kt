@@ -8,6 +8,7 @@ import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.location.domain.repository.LocationRepository
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.SessionChange
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
@@ -33,6 +34,16 @@ class SessionViewModel(
     private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
 
     private val nameIsBeingEdited = MutableStateFlow(false)
+
+    init {
+        viewModelScope.launch {
+            nameIsBeingEdited.update {
+                preferencesRepository.sessionNameStrategy.firstOrNull() == SessionNameStrategy.ASK
+                        // ideally, only ask on initial open, but don't want to track that
+                        && session.firstOrNull()?.name == null
+            }
+        }
+    }
 
     private val lastScrolledToTagId = MutableStateFlow<String?>(null)
 

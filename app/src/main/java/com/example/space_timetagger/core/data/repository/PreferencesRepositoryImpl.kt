@@ -6,7 +6,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
+import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
+import com.example.space_timetagger.sessions.domain.models.toSessionNameStrategy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +22,7 @@ import kotlinx.coroutines.launch
 val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
 val TAGGING_LOCATION = booleanPreferencesKey("tagging_location")
 val TAP_ANYWHERE = booleanPreferencesKey("tap_anywhere")
+val SESSION_NAME_STRATEGY = stringPreferencesKey("session_name_strategy")
 
 class PreferencesRepositoryImpl(
     private val preferencesDataStore: DataStore<Preferences>,
@@ -64,6 +69,17 @@ class PreferencesRepositoryImpl(
     override suspend fun enableTapAnywhere() = toggleTapAnywhere(true)
 
     override suspend fun disableTapAnywhere() = toggleTapAnywhere(false)
+
+    override val sessionNameStrategy: Flow<SessionNameStrategy> = getPreference(
+        SESSION_NAME_STRATEGY,
+        defaultSessionNameStrategy.name,
+    ).map(String::toSessionNameStrategy)
+
+    override suspend fun setSessionNameStrategy(strategy: SessionNameStrategy) {
+        preferencesDataStore.edit { preferences ->
+            preferences[SESSION_NAME_STRATEGY] = strategy.name
+        }
+    }
 
     private suspend fun toggleTapAnywhere(isEnabled: Boolean) {
         preferencesDataStore.edit { preferences ->

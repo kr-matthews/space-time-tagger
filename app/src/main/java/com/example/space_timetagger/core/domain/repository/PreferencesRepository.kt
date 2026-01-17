@@ -1,5 +1,6 @@
 package com.example.space_timetagger.core.domain.repository
 
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import kotlinx.coroutines.flow.Flow
 
 interface PreferencesRepository {
@@ -12,4 +13,6 @@ interface PreferencesRepository {
     val tapAnywhereIsEnabled: Flow<Boolean>
     suspend fun enableTapAnywhere()
     suspend fun disableTapAnywhere()
+    val sessionNameStrategy: Flow<SessionNameStrategy>
+    suspend fun setSessionNameStrategy(strategy: SessionNameStrategy)
 }

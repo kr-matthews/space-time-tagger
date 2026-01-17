@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.InfoDialog
+import com.example.space_timetagger.core.presentation.LabelledDropdown
 import com.example.space_timetagger.core.presentation.LabelledSwitch
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
@@ -126,6 +127,12 @@ fun SettingsContent(
             label = stringResource(R.string.tap_anywhere),
             isChecked = viewState.tapAnywhereIsEnabled,
             onTap = { onEvent(SettingsEvent.TapTapAnywhereToggle) },
+        )
+        LabelledDropdown(
+            label = stringResource(R.string.session_name_strategy),
+            display = viewState.sessionNameStrategy.displayWithExample(),
+            options = SessionNameStrategy.entries,
+            onTapOption = { onEvent(SettingsEvent.TapSessionNameStrategyOption(it)) },
         )
     }
 }

@@ -15,7 +15,7 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
 fun LabelledSwitch(
-    name: String,
+    label: String,
     isChecked: Boolean,
     onTap: () -> Unit,
     modifier: Modifier = Modifier,
@@ -27,11 +27,11 @@ fun LabelledSwitch(
             .clickable(onClick = onTap)
             .padding(horizontal = 8.dp)
     ) {
-        Text(text = name)
+        Text(text = label)
         Spacer(Modifier.weight(1f))
         Switch(
             checked = isChecked,
-            // if it's null then ui tests won't recognize it as toggleable
+            // handled on the Row; but if it's null then ui tests won't recognize it as toggleable
             onCheckedChange = { onTap() },
         )
     }

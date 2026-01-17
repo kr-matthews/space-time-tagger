@@ -112,17 +112,17 @@ fun SettingsContent(
             .padding(8.dp)
     ) {
         LabelledSwitch(
-            name = stringResource(R.string.keep_screen_on),
+            label = stringResource(R.string.keep_screen_on),
             isChecked = viewState.keepScreenOnIsEnabled,
             onTap = { onEvent(SettingsEvent.TapKeepScreenOnToggle) },
         )
         LabelledSwitch(
-            name = stringResource(R.string.capture_location),
+            label = stringResource(R.string.capture_location),
             isChecked = viewState.taggingLocationIsEnabled,
             onTap = { onEvent(SettingsEvent.TapLocationTaggingToggle(hasLocationPermission)) },
         )
         LabelledSwitch(
-            name = stringResource(R.string.tap_anywhere),
+            label = stringResource(R.string.tap_anywhere),
             isChecked = viewState.tapAnywhereIsEnabled,
             onTap = { onEvent(SettingsEvent.TapTapAnywhereToggle) },
         )

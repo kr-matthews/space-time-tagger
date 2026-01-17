@@ -30,6 +30,7 @@ import com.example.space_timetagger.core.presentation.LabelledSwitch
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
 import com.example.space_timetagger.core.presentation.ScreenPreviews
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 
 @Composable
@@ -187,6 +188,7 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
             keepScreenOnIsEnabled = false,
             taggingLocationIsEnabled = false,
             tapAnywhereIsEnabled = false,
+            sessionNameStrategy = SessionNameStrategy.EMPTY,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = false,
         ),
@@ -194,6 +196,7 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
             keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = false,
             tapAnywhereIsEnabled = false,
+            sessionNameStrategy = SessionNameStrategy.ASK,
             locationPermissionMustBeRequested = true,
             locationPermissionExplanationIsVisible = false,
         ),
@@ -201,6 +204,7 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
             keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = false,
             tapAnywhereIsEnabled = true,
+            sessionNameStrategy = SessionNameStrategy.DAY_OF_WEEK,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = true,
         ),
@@ -208,6 +212,7 @@ class SettingsStateProvider : PreviewParameterProvider<SettingsViewState> {
             keepScreenOnIsEnabled = true,
             taggingLocationIsEnabled = true,
             tapAnywhereIsEnabled = true,
+            sessionNameStrategy = SessionNameStrategy.DAY_OF_WEEK_AND_DAY,
             locationPermissionMustBeRequested = false,
             locationPermissionExplanationIsVisible = false,
         ),

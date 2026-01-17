@@ -17,20 +17,34 @@ class SettingsViewModel(
     private val keepScreenOnIsEnabled = preferencesRepository.keepScreenOnIsEnabled
     private val taggingLocationIsEnabled = preferencesRepository.taggingLocationIsEnabled
     private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
+    private val sessionNameStrategy = preferencesRepository.sessionNameStrategy
     private val locationPermissionMustBeRequested = MutableStateFlow(false)
     private val locationPermissionExplanationIsVisible = MutableStateFlow(false)
 
-    val viewState = combine(
+    private val toggles = combine(
         keepScreenOnIsEnabled,
         taggingLocationIsEnabled,
         tapAnywhereIsEnabled,
+    ) { keepScreenOnIsEnabled, taggingLocationIsEnabled, tapAnywhereIsEnabled ->
+        Triple(
+            keepScreenOnIsEnabled,
+            taggingLocationIsEnabled,
+            tapAnywhereIsEnabled,
+        )
+    }
+
+    // can only handle 5 flows, so combining the toggles into 1
+    val viewState = combine(
+        toggles,
+        sessionNameStrategy,
         locationPermissionMustBeRequested,
         locationPermissionExplanationIsVisible,
-    ) { keepScreenOnIsEnabled, taggingLocationIsEnabled, tapAnywhereIsEnabled, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
+    ) { (keepScreenOnIsEnabled, taggingLocationIsEnabled, tapAnywhereIsEnabled), sessionNameStrategy, locationPermissionMustBeRequested, locationPermissionExplanationIsVisible ->
         SettingsViewState.Success(
             keepScreenOnIsEnabled = keepScreenOnIsEnabled,
             taggingLocationIsEnabled = taggingLocationIsEnabled,
             tapAnywhereIsEnabled = tapAnywhereIsEnabled,
+            sessionNameStrategy = sessionNameStrategy,
             locationPermissionMustBeRequested = locationPermissionMustBeRequested,
             locationPermissionExplanationIsVisible = locationPermissionExplanationIsVisible,
         )

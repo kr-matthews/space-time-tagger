@@ -4,17 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.space_timetagger.App
+import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.SessionsChange
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.toOverviewUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SessionsListViewModel(
     private val sessionsRepository: SessionsRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val sessions = sessionsRepository.sessions()
 
@@ -50,8 +53,9 @@ class SessionsListViewModel(
         }
     }
 
-    private fun createNewSession(name: String? = null) {
+    private fun createNewSession() {
         viewModelScope.launch {
+            val name = preferencesRepository.sessionNameStrategy.firstOrNull()?.invoke()
             val id = sessionsRepository.newSession(name)
             lastChange.update { SessionsChange.Create(id) }
         }
@@ -75,6 +79,9 @@ class SessionsListViewModel(
 @Suppress("UNCHECKED_CAST")
 class SessionsViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SessionsListViewModel(App.appModule.sessionsRepository) as T
+        return SessionsListViewModel(
+            App.appModule.sessionsRepository,
+            App.appModule.preferencesRepository,
+        ) as T
     }
 }

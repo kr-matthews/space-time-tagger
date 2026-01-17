@@ -7,6 +7,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.example.space_timetagger.CoroutineTestRule
+import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
@@ -40,6 +41,9 @@ class SessionsListViewModelTest {
     @Mock
     private val mockSessionsRepository = mock<SessionsRepository>()
 
+    @Mock
+    private val mockPreferencesRepository = mock<PreferencesRepository>()
+
     private lateinit var viewModel: SessionsListViewModel
 
     @Before
@@ -48,7 +52,7 @@ class SessionsListViewModelTest {
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
         )
-        viewModel = SessionsListViewModel(mockSessionsRepository)
+        viewModel = SessionsListViewModel(mockSessionsRepository, mockPreferencesRepository)
     }
 
     @Test

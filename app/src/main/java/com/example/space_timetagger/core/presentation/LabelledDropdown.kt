@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,7 +44,12 @@ fun <T : Enum<T>> LabelledDropdown(
             .padding(horizontal = 8.dp)
             .clickable { setIsOpen(true) }
     ) {
-        Text(text = label)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.height(40.dp)
+        ) {
+            Text(text = label)
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {

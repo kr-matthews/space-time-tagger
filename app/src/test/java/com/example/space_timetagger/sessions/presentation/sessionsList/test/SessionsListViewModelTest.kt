@@ -10,6 +10,7 @@ import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
 import com.example.space_timetagger.sessions.presentation.sessionsList.SessionsListEvent
@@ -51,6 +52,9 @@ class SessionsListViewModelTest {
         whenever(mockSessionsRepository.sessions()).thenReturn(flowOf(mockSessions))
         whenever(mockSessionsRepository.newSession()).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
+        )
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(defaultSessionNameStrategy),
         )
         viewModel = SessionsListViewModel(mockSessionsRepository, mockPreferencesRepository)
     }

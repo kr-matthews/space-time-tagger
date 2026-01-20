@@ -17,6 +17,7 @@ import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
 import com.example.space_timetagger.sessions.domain.models.Tag
+import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.TagUiModel
 import com.example.space_timetagger.sessions.presentation.sessionDetail.SessionDetailEvent
@@ -71,6 +72,9 @@ class SessionDetailViewModelTest {
         whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(defaultSessionNameStrategy),
+        )
         whenever(mockLocationRepository.findCurrentLocation()).thenReturn(latLng)
     }
 

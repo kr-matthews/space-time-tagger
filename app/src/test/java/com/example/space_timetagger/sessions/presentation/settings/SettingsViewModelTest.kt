@@ -5,6 +5,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -43,6 +44,9 @@ class SettingsViewModelTest {
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         whenever(mockPreferencesRepository.keepScreenOnIsEnabled).thenReturn(flowOf(true))
         whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(true))
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(defaultSessionNameStrategy),
+        )
     }
 
     @Test

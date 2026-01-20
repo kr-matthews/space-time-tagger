@@ -1,5 +1,6 @@
 package com.example.space_timetagger.sessions.presentation.sessionsList
 
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
@@ -9,6 +10,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasProgressBarRangeInfo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onChildren
@@ -66,9 +68,9 @@ class SessionsListViewTest {
     // success
 
     @Test
-    fun successState_doesNotHaveProgressIndicator() {
+    fun successState_doesNotHaveIndeterminateProgressIndicator() { //
         setup(successState)
-        getProgressIndicator().assertDoesNotExist()
+        getIndeterminateProgressIndicator().assertDoesNotExist()
     }
 
     @Test
@@ -131,9 +133,9 @@ class SessionsListViewTest {
     // success, no sessions
 
     @Test
-    fun emptySuccessState_doesNotHaveProgressIndicator() {
+    fun emptySuccessState_doesNotHaveIndeterminateProgressIndicator() {
         setup(emptySuccessState)
-        getProgressIndicator().assertDoesNotExist()
+        getIndeterminateProgressIndicator().assertDoesNotExist()
     }
 
     @Test
@@ -172,9 +174,9 @@ class SessionsListViewTest {
     // loading
 
     @Test
-    fun loadingState_doesHasProgressIndicator() {
+    fun loadingState_doesHasIndeterminateProgressIndicator() {
         setup(loadingState)
-        getProgressIndicator().assertIsDisplayed()
+        getIndeterminateProgressIndicator().assertIsDisplayed()
     }
 
     @Test
@@ -186,9 +188,9 @@ class SessionsListViewTest {
     // error
 
     @Test
-    fun errorState_doesNotHaveProgressIndicator() {
+    fun errorState_doesNotHaveIndeterminateProgressIndicator() {
         setup(errorState)
-        getProgressIndicator().assertDoesNotExist()
+        getIndeterminateProgressIndicator().assertDoesNotExist()
     }
 
     @Test
@@ -218,8 +220,9 @@ class SessionsListViewTest {
 
     // helpers
 
-    private fun getProgressIndicator() =
-        composeTestRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))
+    private fun getIndeterminateProgressIndicator() =
+        composeTestRule.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))
+            .filterToOne(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
 
     private fun getErrorMessage() =
         composeTestRule.onNodeWithText(appContext.getString(R.string.error_sessions_list))

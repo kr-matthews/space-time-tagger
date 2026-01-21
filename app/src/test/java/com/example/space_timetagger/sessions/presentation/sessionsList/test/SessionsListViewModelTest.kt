@@ -28,6 +28,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.internal.stubbing.answers.ReturnsElementsOf
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -50,7 +51,7 @@ class SessionsListViewModelTest {
     @Before
     fun setup() = runTest {
         whenever(mockSessionsRepository.sessions()).thenReturn(flowOf(mockSessions))
-        whenever(mockSessionsRepository.newSession()).thenAnswer(
+        whenever(mockSessionsRepository.newSession(anyOrNull())).thenAnswer(
             ReturnsElementsOf(List(10) { i -> "fake-id-of-new-session-$i" })
         )
         whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
@@ -85,7 +86,7 @@ class SessionsListViewModelTest {
     fun eventTapNewSessionButton_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).newSession(null)
+        verify(mockSessionsRepository, times(1)).newSession(anyOrNull())
     }
 
     @Test

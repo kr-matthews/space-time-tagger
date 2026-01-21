@@ -161,6 +161,8 @@ class SessionDetailViewModelTest {
     @Test
     fun eventTapEdit_turnsEditModeOn() = runTest {
         initViewModel()
+        // wait for the init block to finish
+        advanceUntilIdle()
         viewModel.handleEvent(SessionDetailEvent.TapEdit)
         assertThat(session()::nameIsBeingEdited).isTrue()
     }

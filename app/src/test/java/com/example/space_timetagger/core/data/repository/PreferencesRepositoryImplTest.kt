@@ -7,10 +7,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.preferencesOf
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
+import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -71,6 +74,14 @@ class PreferencesRepositoryImplTest {
     }
 
     @Test
+    fun initiallyWithEmptyPreferences_sessionNameStrategyProducesDefault() = runTest {
+        initializeRepository(mockEmptyPreferences)
+        assertThat(preferencesRepository.sessionNameStrategy.first()).isEqualTo(
+            defaultSessionNameStrategy,
+        )
+    }
+
+    @Test
     fun initiallyWithEnabledKeepScreenOnPreferences_taggingLocationIsEnabledProducesTrue() =
         runTest {
             initializeRepository(mockEnabledKeepScreenOnPreferences)
@@ -96,6 +107,15 @@ class PreferencesRepositoryImplTest {
         runTest {
             initializeRepository(mockDisabledTapAnywherePreferences)
             assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isFalse()
+        }
+
+    @Test
+    fun initiallyWithGivenNameStrategyPreferences_sessionNameStrategyProducesThatStrategy() =
+        runTest {
+            initializeRepository(mockDayOfWeekAndTimeSessionNameStrategyPreferences)
+            assertThat(preferencesRepository.sessionNameStrategy.first()).isEqualTo(
+                SessionNameStrategy.DAY_OF_WEEK_AND_DAY,
+            )
         }
 
     @Test
@@ -153,6 +173,16 @@ class PreferencesRepositoryImplTest {
         assertThat(preferencesRepository.tapAnywhereIsEnabled.first()).isFalse()
     }
 
+    @Ignore("Says checked exception is invalid for this method, not sure why")
+    @Test
+    fun whenDataStoreThrowsIOException_sessionNameStrategyProducesDefault() = runTest {
+        whenever(preferencesDataStore.data).thenThrow(IOException())
+        initializeRepository(null)
+        assertThat(preferencesRepository.sessionNameStrategy.first()).isEqualTo(
+            defaultSessionNameStrategy,
+        )
+    }
+
     // unsure how best to write test
     @Test
     fun enableKeepScreenOn_callsDataStoreEdit() = runTest {
@@ -201,6 +231,14 @@ class PreferencesRepositoryImplTest {
         verify(preferencesDataStore).edit(any())
     }
 
+    // unsure how best to write test
+    @Test
+    fun setSessionNameStrategy_callsDataStoreEdit() = runTest {
+        initializeRepository(mockAskSessionNameStrategy)
+        preferencesRepository.setSessionNameStrategy(SessionNameStrategy.DAY_OF_WEEK)
+        verify(preferencesDataStore).edit(any())
+    }
+
     private val mockEmptyPreferences = emptyPreferences()
     private val mockEnabledLocationPreferences = preferencesOf(TAGGING_LOCATION to true)
     private val mockDisabledLocationPreferences = preferencesOf(TAGGING_LOCATION to false)
@@ -208,6 +246,10 @@ class PreferencesRepositoryImplTest {
     private val mockDisabledKeepScreenOnPreferences = preferencesOf(KEEP_SCREEN_ON to false)
     private val mockEnabledTapAnywherePreferences = preferencesOf(TAP_ANYWHERE to true)
     private val mockDisabledTapAnywherePreferences = preferencesOf(TAP_ANYWHERE to false)
+    private val mockAskSessionNameStrategy =
+        preferencesOf(SESSION_NAME_STRATEGY to SessionNameStrategy.ASK.toString())
+    private val mockDayOfWeekAndTimeSessionNameStrategyPreferences =
+        preferencesOf(SESSION_NAME_STRATEGY to SessionNameStrategy.DAY_OF_WEEK_AND_TIME.toString())
     private val mockAllPreferencesOn = preferencesOf(
         TAGGING_LOCATION to true,
         KEEP_SCREEN_ON to true,

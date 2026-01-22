@@ -10,6 +10,7 @@ import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.sessions.domain.mockSessions
 import com.example.space_timetagger.sessions.domain.models.Session
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import com.example.space_timetagger.sessions.presentation.models.SessionOverviewUiModel
@@ -83,10 +84,20 @@ class SessionsListViewModelTest {
     // FIXME: test that if repository flow updates, view state will update
 
     @Test
-    fun eventTapNewSessionButton_callsRepositoryFunc() = runTest {
+    fun eventTapNewSessionButtonWithDefaultStrategy_callsRepositoryFunc() = runTest {
         viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
         advanceUntilIdle()
-        verify(mockSessionsRepository, times(1)).newSession(anyOrNull())
+        verify(mockSessionsRepository, times(1)).newSession(defaultSessionNameStrategy.invoke())
+    }
+
+    @Test
+    fun eventTapNewSessionButtonWithDateStrategy_callsRepositoryFunc() = runTest {
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(SessionNameStrategy.DATE),
+        )
+        viewModel.handleEvent(SessionsListEvent.TapNewSessionButton)
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).newSession(SessionNameStrategy.DATE.invoke())
     }
 
     @Test

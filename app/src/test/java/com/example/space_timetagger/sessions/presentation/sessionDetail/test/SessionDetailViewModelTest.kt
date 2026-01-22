@@ -16,6 +16,7 @@ import com.example.space_timetagger.location.domain.repository.LocationRepositor
 import com.example.space_timetagger.sessions.domain.mockDateTime
 import com.example.space_timetagger.sessions.domain.mockSession
 import com.example.space_timetagger.sessions.domain.mockTag
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -112,9 +114,25 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun initialSuccessState_hasEditModeOff() = runTest {
+    fun initialSuccessStateWithoutAskPreference_hasEditModeOff() = runTest {
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(SessionNameStrategy.EMPTY),
+        )
         initViewModel()
+        advanceUntilIdle()
         assertThat(session()::nameIsBeingEdited).isFalse()
+    }
+
+    // FIXME
+    @Ignore("Might need turbine in order to properly test flows?")
+    @Test
+    fun initialSuccessStateWithAskPreference_hasEditModeOn() = runTest {
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(SessionNameStrategy.ASK),
+        )
+        initViewModel()
+        advanceUntilIdle()
+        assertThat(session()::nameIsBeingEdited).isTrue()
     }
 
     @Test

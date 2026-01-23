@@ -14,6 +14,7 @@ import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.space_timetagger.R
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 import org.junit.Rule
 import org.junit.Test
@@ -47,7 +48,8 @@ class SettingsViewTest {
         taggingLocationIsEnabled = false,
         tapAnywhereIsEnabled = true,
     )
-    private val successState = mixedState
+    private val successState =
+        mixedState.copy(sessionNameStrategy = SessionNameStrategy.DAY_OF_WEEK)
     private val requestLaunchState = SettingsViewState.Success(
         keepScreenOnIsEnabled = true,
         taggingLocationIsEnabled = false,
@@ -146,7 +148,23 @@ class SettingsViewTest {
         verify(mockHandleEvent, times(1)).invoke(SettingsEvent.TapTapAnywhereToggle)
     }
 
-    // switch states
+    @Test
+    fun tapAStrategy_callsEventTapSessionNameStrategyOption() {
+        val newStrategy = SessionNameStrategy.DATE
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(appContext.getString(R.string.session_name_strategy))
+            .performClick()
+        composeTestRule
+            .onNodeWithText(newStrategy.toString())
+            .performClick()
+        verify(
+            mockHandleEvent,
+            times(1)
+        ).invoke(SettingsEvent.TapSessionNameStrategyOption(newStrategy))
+    }
+
+    // states
 
     @Test
     fun allEnabledState_hasAllSwitchesOn() {
@@ -180,6 +198,14 @@ class SettingsViewTest {
             assertIsDisplayed()
             assertIsOff()
         }
+    }
+
+    @Test
+    fun successState_hasCorrectStrategy() {
+        setup(successState)
+        composeTestRule
+            .onNodeWithText(successState.sessionNameStrategy.displayWithExample())
+            .assertIsDisplayed()
     }
 
     // request launch

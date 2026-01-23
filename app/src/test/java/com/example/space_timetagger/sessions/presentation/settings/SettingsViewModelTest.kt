@@ -1,10 +1,12 @@
 package com.example.space_timetagger.sessions.presentation.settings
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.example.space_timetagger.CoroutineTestRule
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
+import com.example.space_timetagger.sessions.domain.models.SessionNameStrategy
 import com.example.space_timetagger.sessions.domain.models.defaultSessionNameStrategy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -96,6 +98,14 @@ class SettingsViewModelTest {
         initViewModel()
         assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
         assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+    }
+
+    @Test
+    fun initialState_SessionNameStrategyIsReflected() = runTest {
+        val strategy = SessionNameStrategy.ASK
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(flowOf(strategy))
+        initViewModel()
+        assertThat(viewModel.viewState.first()::sessionNameStrategy).isEqualTo(strategy)
     }
 
     // FIXME: test that if repository flow updates, view state will update
@@ -225,6 +235,18 @@ class SettingsViewModelTest {
         verify(mockPreferencesRepository, never()).enableTaggingLocation()
         assertThat(viewModel.viewState.first()::locationPermissionMustBeRequested).isFalse()
         assertThat(viewModel.viewState.first()::locationPermissionExplanationIsVisible).isFalse()
+    }
+
+    @Test
+    fun eventTapSessionNameStrategyOption_callsRepositoryFunction() = runTest {
+        val strategy = SessionNameStrategy.EMPTY
+        whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
+            flowOf(defaultSessionNameStrategy)
+        )
+        initViewModel()
+        viewModel.handleEvent(SettingsEvent.TapSessionNameStrategyOption(strategy))
+        advanceUntilIdle()
+        verify(mockPreferencesRepository, times(1)).setSessionNameStrategy(strategy)
     }
 
     @Test

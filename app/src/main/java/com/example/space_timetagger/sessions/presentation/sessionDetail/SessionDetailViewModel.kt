@@ -73,7 +73,9 @@ class SessionViewModel(
         when (event) {
             SessionDetailEvent.TapBack -> Unit // navigate, in compose
             SessionDetailEvent.TapSettings -> Unit // navigate, in compose
-            SessionDetailEvent.TapEdit -> nameIsBeingEdited.update { true }
+            SessionDetailEvent.TapRename -> nameIsBeingEdited.update { true }
+            SessionDetailEvent.TapTimeOffset -> Unit // todo
+            SessionDetailEvent.TapDelete -> Unit // todo
             is SessionDetailEvent.ConfirmNameEdit -> onDoneEditingName(event.newName)
             SessionDetailEvent.CancelNameEdit -> nameIsBeingEdited.update { false }
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)

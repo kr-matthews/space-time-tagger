@@ -112,10 +112,10 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun successState_tappingEditCallsEventTapEdit() {
+    fun successState_tappingEditCallsEventTapRename() {
         setup(successState)
-        tapEdit()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapEdit)
+        tapRename()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapRename)
     }
 
     @Test
@@ -237,10 +237,10 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun newSuccessState_tappingEditCallsEventTapEdit() {
+    fun newSuccessState_tappingEditCallsEventTapRename() {
         setup(newSuccessState)
-        tapEdit()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapEdit)
+        tapRename()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapRename)
     }
 
     @Test
@@ -332,8 +332,8 @@ class SessionDetailViewTest {
     @Test
     fun tapAnywhereState_tappingEditDoesNotCallEventTapAnywhere() {
         setup(tapAnywhereState)
-        tapEdit()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapEdit)
+        tapRename()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapRename)
         verifyTapAnywhereIsNotCalled()
     }
 
@@ -514,10 +514,10 @@ class SessionDetailViewTest {
 
     @Ignore("Refresh state never produced by view model, and action would trigger event")
     @Test
-    fun refreshState_tappingEditDoesNotCallEventTapEdit() {
+    fun refreshState_tappingEditDoesNotCallEventTapRename() {
         setup(refreshState)
-        tapEdit()
-        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapEdit)
+        tapRename()
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.TapRename)
     }
 
     @Test
@@ -549,8 +549,10 @@ class SessionDetailViewTest {
     private fun getErrorMessage() =
         composeTestRule.onNodeWithText(appContext.getString(R.string.error_session_detail))
 
-    private fun tapEdit() {
-        composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.edit)))
+    private fun tapRename() {
+        composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.dropdown_icon)))
+            .performClick()
+        composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.rename)))
             .performClick()
     }
 

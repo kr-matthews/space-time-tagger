@@ -177,18 +177,18 @@ class SessionDetailViewModelTest {
     // session exists - handle events
 
     @Test
-    fun eventTapEdit_turnsEditModeOn() = runTest {
+    fun eventTapRename_turnsEditModeOn() = runTest {
         initViewModel()
         // wait for the init block to finish
         advanceUntilIdle()
-        viewModel.handleEvent(SessionDetailEvent.TapEdit)
+        viewModel.handleEvent(SessionDetailEvent.TapRename)
         assertThat(session()::nameIsBeingEdited).isTrue()
     }
 
     @Test
     fun eventCancelNameEdit_turnsEditModeOff() = runTest {
         initViewModel()
-        viewModel.handleEvent(SessionDetailEvent.TapEdit)
+        viewModel.handleEvent(SessionDetailEvent.TapRename)
         viewModel.handleEvent(SessionDetailEvent.CancelNameEdit)
         assertThat(session()::nameIsBeingEdited).isFalse()
     }
@@ -196,7 +196,7 @@ class SessionDetailViewModelTest {
     @Test
     fun eventConfirmNameEdit_turnsEditModeOff() = runTest {
         initViewModel()
-        viewModel.handleEvent(SessionDetailEvent.TapEdit)
+        viewModel.handleEvent(SessionDetailEvent.TapRename)
         viewModel.handleEvent(SessionDetailEvent.ConfirmNameEdit("new dummy name"))
         assertThat(session()::nameIsBeingEdited).isFalse()
     }

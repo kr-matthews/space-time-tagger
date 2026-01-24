@@ -1,17 +1,25 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -24,7 +32,6 @@ import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.core.presentation.MyScaffold
 import com.example.space_timetagger.core.presentation.MyTopBar
 import com.example.space_timetagger.core.presentation.ScreenPreviews
-import com.example.space_timetagger.core.presentation.TopBarEditIcon
 import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
@@ -95,9 +102,10 @@ fun SessionDetailView(
             SessionDetailTopBar(
                 title = title,
                 onBackTap = { onEvent(SessionDetailEvent.TapBack) },
-                onEditTap = (viewState as? SessionDetailViewState.Success)?.let {
-                    { onEvent(SessionDetailEvent.TapEdit) }
-                },
+                withOptions = viewState is SessionDetailViewState.Success,
+                onRenameTap = { onEvent(SessionDetailEvent.TapRename) },
+                onTimeOffsetTap = { onEvent(SessionDetailEvent.TapTimeOffset) },
+                onDeleteTap = { onEvent(SessionDetailEvent.TapDelete) },
                 onSettingsTap = { onEvent(SessionDetailEvent.TapSettings) },
             )
         },
@@ -141,14 +149,69 @@ fun SessionDetailView(
 private fun SessionDetailTopBar(
     title: String,
     onBackTap: () -> Unit,
-    onEditTap: (() -> Unit)?,
+    withOptions: Boolean,
+    onRenameTap: (() -> Unit)?,
+    onTimeOffsetTap: () -> Unit,
+    onDeleteTap: () -> Unit,
     onSettingsTap: () -> Unit,
 ) {
+    val (isOpen, setIsOpen) = remember { mutableStateOf(false) }
+
     MyTopBar(
         title = title,
         onBackTap = onBackTap,
     ) {
-        onEditTap?.let { TopBarEditIcon(onTap = it) }
+        if (withOptions) {
+            Image(
+                painter = painterResource(R.drawable.ic_arrow_dropdown),
+                contentDescription = stringResource(R.string.dropdown_icon),
+                modifier = Modifier.clickable { setIsOpen(true) }
+            )
+            DropdownMenu(
+                expanded = isOpen,
+                onDismissRequest = { setIsOpen(false) },
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.rename)) },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_pencil),
+                            contentDescription = stringResource(R.string.rename),
+                        )
+                    },
+                    onClick = {
+                        onRenameTap?.invoke()
+                        setIsOpen(false)
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.time_offset)) },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_clock_plus),
+                            contentDescription = stringResource(R.string.time_offset),
+                        )
+                    },
+                    onClick = {
+                        onTimeOffsetTap()
+                        setIsOpen(false)
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.delete)) },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_trash_x),
+                            contentDescription = stringResource(R.string.delete),
+                        )
+                    },
+                    onClick = {
+                        onDeleteTap()
+                        setIsOpen(false)
+                    }
+                )
+            }
+        }
         TopBarSettingsIcon(onTap = onSettingsTap)
     }
 }

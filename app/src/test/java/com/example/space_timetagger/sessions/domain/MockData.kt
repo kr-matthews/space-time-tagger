@@ -4,6 +4,8 @@ import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.Tag
 import java.time.LocalDateTime
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 val mockDateTime: LocalDateTime = LocalDateTime.of(2024, 7, 28, 16, 0, 58, 0)
 val mockTags = List(13) { i ->
@@ -16,5 +18,6 @@ val mockSession = Session(name = "Test Session", tags = mockTags)
 val mockSession2 = Session(
     name = "2nd session",
     tags = mockTags.map { Tag(dateTime = it.dateTime.plusDays(2).plusSeconds(94)) },
+    timeOffset = 1.minutes + 48.seconds,
 )
 val mockSessions = listOf(mockSession, mockSession2)

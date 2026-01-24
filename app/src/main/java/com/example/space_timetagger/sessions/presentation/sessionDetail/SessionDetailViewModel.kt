@@ -75,7 +75,7 @@ class SessionViewModel(
             SessionDetailEvent.TapSettings -> Unit // navigate, in compose
             SessionDetailEvent.TapRename -> nameIsBeingEdited.update { true }
             SessionDetailEvent.TapTimeOffset -> Unit // todo
-            SessionDetailEvent.TapDelete -> Unit // todo
+            SessionDetailEvent.TapConfirmDelete -> deleteSession()
             is SessionDetailEvent.ConfirmNameEdit -> onDoneEditingName(event.newName)
             SessionDetailEvent.CancelNameEdit -> nameIsBeingEdited.update { false }
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
@@ -135,6 +135,12 @@ class SessionViewModel(
         viewModelScope.launch {
             sessionsRepository.removeAllTagsFromSession(sessionId)
             lastChange.update { SessionChange.ClearTags }
+        }
+    }
+
+    private fun deleteSession() {
+        viewModelScope.launch {
+            sessionsRepository.deleteSession(sessionId)
         }
     }
 

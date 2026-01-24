@@ -36,6 +36,7 @@ fun MyNavHost(navController: NavHostController, modifier: Modifier) {
             SessionDetailScreen(
                 id = session.id,
                 onBackTap = navController::popBackStack,
+                onDeleteTap = navController::popBackStack,
                 onSettingsTap = { navController.navigate(Settings) },
                 modifier = modifier
             )

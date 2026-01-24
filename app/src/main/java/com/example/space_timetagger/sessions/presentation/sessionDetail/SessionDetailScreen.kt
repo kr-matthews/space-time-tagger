@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
+import com.example.space_timetagger.core.presentation.ConfirmationDialog
 import com.example.space_timetagger.core.presentation.EditTextDialog
 import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.core.presentation.MyScaffold
@@ -40,6 +42,7 @@ import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
 fun SessionDetailScreen(
     id: String,
     onBackTap: () -> Unit,
+    onDeleteTap: () -> Unit,
     onSettingsTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -54,6 +57,7 @@ fun SessionDetailScreen(
         when (event) {
             is SessionDetailEvent.TapBack -> onBackTap()
             is SessionDetailEvent.TapSettings -> onSettingsTap()
+            is SessionDetailEvent.TapConfirmDelete -> onDeleteTap()
             // TODO: move into SessionDetailView and add UI tests?
             is SessionDetailEvent.TapNewTagButton -> tagBeingAddedToast.show()
             is SessionDetailEvent.TapAnywhere -> tagBeingAddedToast.show()
@@ -105,7 +109,7 @@ fun SessionDetailView(
                 withOptions = viewState is SessionDetailViewState.Success,
                 onRenameTap = { onEvent(SessionDetailEvent.TapRename) },
                 onTimeOffsetTap = { onEvent(SessionDetailEvent.TapTimeOffset) },
-                onDeleteTap = { onEvent(SessionDetailEvent.TapDelete) },
+                onConfirmDeleteTap = { onEvent(SessionDetailEvent.TapConfirmDelete) },
                 onSettingsTap = { onEvent(SessionDetailEvent.TapSettings) },
             )
         },
@@ -152,10 +156,11 @@ private fun SessionDetailTopBar(
     withOptions: Boolean,
     onRenameTap: () -> Unit,
     onTimeOffsetTap: () -> Unit,
-    onDeleteTap: () -> Unit,
+    onConfirmDeleteTap: () -> Unit,
     onSettingsTap: () -> Unit,
 ) {
-    val (isOpen, setIsOpen) = remember { mutableStateOf(false) }
+    val (deleteDialogIsOpen, setDeleteDialogIsOpen) = rememberSaveable { mutableStateOf(false) }
+    val (dropdownIsOpen, setDropdownIsOpen) = remember { mutableStateOf(false) }
 
     MyTopBar(
         title = title,
@@ -165,11 +170,11 @@ private fun SessionDetailTopBar(
             Image(
                 painter = painterResource(R.drawable.ic_arrow_dropdown),
                 contentDescription = stringResource(R.string.dropdown_icon),
-                modifier = Modifier.clickable { setIsOpen(true) }
+                modifier = Modifier.clickable { setDropdownIsOpen(true) }
             )
             DropdownMenu(
-                expanded = isOpen,
-                onDismissRequest = { setIsOpen(false) },
+                expanded = dropdownIsOpen,
+                onDismissRequest = { setDropdownIsOpen(false) },
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.rename)) },
@@ -181,7 +186,7 @@ private fun SessionDetailTopBar(
                     },
                     onClick = {
                         onRenameTap()
-                        setIsOpen(false)
+                        setDropdownIsOpen(false)
                     }
                 )
                 DropdownMenuItem(
@@ -194,7 +199,7 @@ private fun SessionDetailTopBar(
                     },
                     onClick = {
                         onTimeOffsetTap()
-                        setIsOpen(false)
+                        setDropdownIsOpen(false)
                     }
                 )
                 DropdownMenuItem(
@@ -206,13 +211,23 @@ private fun SessionDetailTopBar(
                         )
                     },
                     onClick = {
-                        onDeleteTap()
-                        setIsOpen(false)
+                        setDeleteDialogIsOpen(true)
+                        setDropdownIsOpen(false)
                     }
                 )
             }
         }
         TopBarSettingsIcon(onTap = onSettingsTap)
+    }
+
+    if (deleteDialogIsOpen) {
+        ConfirmationDialog(
+            onConfirm = {
+                setDeleteDialogIsOpen(false)
+                onConfirmDeleteTap()
+            },
+            onCancel = { setDeleteDialogIsOpen(false) },
+        )
     }
 }
 

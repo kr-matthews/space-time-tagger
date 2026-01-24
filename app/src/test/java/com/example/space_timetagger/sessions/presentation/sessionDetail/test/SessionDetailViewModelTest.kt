@@ -70,7 +70,7 @@ class SessionDetailViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession))
+        whenever(mockSessionsRepository.session(validId)).thenReturn(flowOf(mockSession.copy(id = validId)))
         whenever(mockSessionsRepository.session(nonExistentId)).thenReturn(flowOf(null))
         whenever(mockPreferencesRepository.taggingLocationIsEnabled).thenReturn(flowOf(true))
         whenever(mockPreferencesRepository.tapAnywhereIsEnabled).thenReturn(flowOf(false))
@@ -208,6 +208,14 @@ class SessionDetailViewModelTest {
         viewModel.handleEvent(SessionDetailEvent.ConfirmNameEdit(newName))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).renameSession(validId, newName)
+    }
+
+    @Test
+    fun eventTapConfirmDelete_callsRepositoryFunc() = runTest {
+        initViewModel()
+        viewModel.handleEvent(SessionDetailEvent.TapConfirmDelete)
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).deleteSession(validId)
     }
 
     @Test

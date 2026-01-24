@@ -1,5 +1,6 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
@@ -136,7 +137,7 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun successState_tappingDialogConfirmCallsEventConfirmNameEdit() {
+    fun successState_tappingRenameDialogConfirmCallsEventConfirmNameEdit() {
         setup(successState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
@@ -145,7 +146,7 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun successState_tappingDialogCancelCallsEventCancelNameEdit() {
+    fun successState_tappingRenameDialogCancelCallsEventCancelNameEdit() {
         setup(successState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
@@ -156,7 +157,7 @@ class SessionDetailViewTest {
 
     @Ignore("not clear how to tap outside dialog")
     @Test
-    fun successState_tappingOutsideDialogCallsEventCancelNameEdit() {
+    fun successState_tappingOutsideRenameDialogCallsEventCancelNameEdit() {
         setup(successState.editingName())
         val newName = "Spinach"
         typeNewName(newName)
@@ -261,7 +262,7 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun newSuccessState_tappingDialogConfirmCallsEventConfirmNameEdit() {
+    fun newSuccessState_tappingRenameDialogConfirmCallsEventConfirmNameEdit() {
         setup(newSuccessState.editingName())
         val newName = "Pepper"
         typeNewName(newName)
@@ -270,7 +271,7 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun newSuccessState_tappingDialogCancelCallsEventCancelNameEdit() {
+    fun newSuccessState_tappingRenameDialogCancelCallsEventCancelNameEdit() {
         setup(newSuccessState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
@@ -281,13 +282,21 @@ class SessionDetailViewTest {
 
     @Ignore("not clear how to tap outside dialog")
     @Test
-    fun newSuccessState_tappingOutsideDialogCallsEventCancelNameEdit() {
+    fun newSuccessState_tappingOutsideRenameDialogCallsEventCancelNameEdit() {
         setup(newSuccessState.editingName())
         val newName = "Zucchini"
         typeNewName(newName)
         composeTestRule.onNodeWithText(successState.session.name!!).performClick()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
         verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+    }
+
+    @Test
+    fun newSuccessState_tappingDeleteDialogConfirmCallsEventTapConfirmDelete() {
+        setup(newSuccessState)
+        tapDelete()
+        tapDialogConfirm()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapConfirmDelete)
     }
 
     @Test
@@ -549,11 +558,19 @@ class SessionDetailViewTest {
     private fun getErrorMessage() =
         composeTestRule.onNodeWithText(appContext.getString(R.string.error_session_detail))
 
-    private fun tapRename() {
+    private fun tapDropdownOption(@StringRes resId: Int) {
         composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.dropdown_icon)))
             .performClick()
-        composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.rename)))
+        composeTestRule.onNode(hasContentDescription(appContext.getString(resId)))
             .performClick()
+    }
+
+    private fun tapRename() {
+        tapDropdownOption(R.string.rename)
+    }
+
+    private fun tapDelete() {
+        tapDropdownOption(R.string.delete)
     }
 
     private fun typeNewName(newName: String) {

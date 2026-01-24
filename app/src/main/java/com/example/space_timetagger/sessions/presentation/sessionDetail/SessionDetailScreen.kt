@@ -150,7 +150,7 @@ private fun SessionDetailTopBar(
     title: String,
     onBackTap: () -> Unit,
     withOptions: Boolean,
-    onRenameTap: (() -> Unit)?,
+    onRenameTap: () -> Unit,
     onTimeOffsetTap: () -> Unit,
     onDeleteTap: () -> Unit,
     onSettingsTap: () -> Unit,
@@ -180,7 +180,7 @@ private fun SessionDetailTopBar(
                         )
                     },
                     onClick = {
-                        onRenameTap?.invoke()
+                        onRenameTap()
                         setIsOpen(false)
                     }
                 )

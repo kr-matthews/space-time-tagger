@@ -186,26 +186,26 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun eventCancelNameEdit_turnsEditModeOff() = runTest {
+    fun eventCancelRename_turnsEditModeOff() = runTest {
         initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapRename)
-        viewModel.handleEvent(SessionDetailEvent.CancelNameEdit)
+        viewModel.handleEvent(SessionDetailEvent.CancelRename)
         assertThat(session()::nameIsBeingEdited).isFalse()
     }
 
     @Test
-    fun eventConfirmNameEdit_turnsEditModeOff() = runTest {
+    fun eventConfirmRename_turnsEditModeOff() = runTest {
         initViewModel()
         viewModel.handleEvent(SessionDetailEvent.TapRename)
-        viewModel.handleEvent(SessionDetailEvent.ConfirmNameEdit("new dummy name"))
+        viewModel.handleEvent(SessionDetailEvent.ConfirmRename("new dummy name"))
         assertThat(session()::nameIsBeingEdited).isFalse()
     }
 
     @Test
-    fun eventConfirmNameEdit_callsRepositoryFunc() = runTest {
+    fun eventConfirmRename_callsRepositoryFunc() = runTest {
         initViewModel()
         val newName = "Updated Name String"
-        viewModel.handleEvent(SessionDetailEvent.ConfirmNameEdit(newName))
+        viewModel.handleEvent(SessionDetailEvent.ConfirmRename(newName))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).renameSession(validId, newName)
     }

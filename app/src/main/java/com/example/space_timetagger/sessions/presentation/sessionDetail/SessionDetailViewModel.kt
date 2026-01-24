@@ -76,8 +76,8 @@ class SessionViewModel(
             SessionDetailEvent.TapRename -> nameIsBeingEdited.update { true }
             SessionDetailEvent.TapTimeOffset -> Unit // todo
             SessionDetailEvent.TapConfirmDelete -> deleteSession()
-            is SessionDetailEvent.ConfirmNameEdit -> onDoneEditingName(event.newName)
-            SessionDetailEvent.CancelNameEdit -> nameIsBeingEdited.update { false }
+            is SessionDetailEvent.ConfirmRename -> onDoneEditingName(event.newName)
+            SessionDetailEvent.CancelRename -> nameIsBeingEdited.update { false }
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
             is SessionDetailEvent.TapTagCheckbox -> toggleTagArchived(event.tagId)
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)

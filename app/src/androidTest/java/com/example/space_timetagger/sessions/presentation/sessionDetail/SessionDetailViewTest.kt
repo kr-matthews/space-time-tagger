@@ -120,50 +120,50 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun successState_typingNewNameDoesNotCallEventConfirmNameEdit() {
+    fun successState_typingNewNameDoesNotCallEventConfirmRenameRename() {
         setup(successState.editingName())
         val newName = "Banana"
         typeNewName(newName)
-        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.ConfirmRename(newName))
     }
 
     @Test
-    fun successState_tappingKeyboardDoneCallsEventConfirmNameEdit() {
+    fun successState_tappingKeyboardDoneCallsEventConfirmRenameRename() {
         setup(successState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
         tapKeyboardDone()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmRename(newName))
     }
 
     @Test
-    fun successState_tappingRenameDialogConfirmCallsEventConfirmNameEdit() {
+    fun successState_tappingRenameDialogConfirmCallsEventConfirmRenameRename() {
         setup(successState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
         tapDialogConfirm()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmRename(newName))
     }
 
     @Test
-    fun successState_tappingRenameDialogCancelCallsEventCancelNameEdit() {
+    fun successState_tappingRenameDialogCancelCallsEventCancelRenameRename() {
         setup(successState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
         tapDialogCancel()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
-        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelRename)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmRename>())
     }
 
     @Ignore("not clear how to tap outside dialog")
     @Test
-    fun successState_tappingOutsideRenameDialogCallsEventCancelNameEdit() {
+    fun successState_tappingOutsideRenameDialogCallsEventCancelRenameRename() {
         setup(successState.editingName())
         val newName = "Spinach"
         typeNewName(newName)
         composeTestRule.onNodeWithText(successState.session.name!!).performClick()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
-        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelRename)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmRename>())
     }
 
     @Test
@@ -245,50 +245,50 @@ class SessionDetailViewTest {
     }
 
     @Test
-    fun newSuccessState_typingNewNameDoesNotCallEventConfirmNameEdit() {
+    fun newSuccessState_typingNewNameDoesNotCallEventConfirmRenameRename() {
         setup(newSuccessState.editingName())
         val newName = "Donut"
         typeNewName(newName)
-        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+        verify(mockHandleEvent, never()).invoke(SessionDetailEvent.ConfirmRename(newName))
     }
 
     @Test
-    fun newSuccessState_tappingKeyboardDoneCallsEventConfirmNameEdit() {
+    fun newSuccessState_tappingKeyboardDoneCallsEventConfirmRenameRename() {
         setup(newSuccessState.editingName())
         val newName = "Eclair"
         typeNewName(newName)
         tapKeyboardDone()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmRename(newName))
     }
 
     @Test
-    fun newSuccessState_tappingRenameDialogConfirmCallsEventConfirmNameEdit() {
+    fun newSuccessState_tappingRenameDialogConfirmCallsEventConfirmRenameRename() {
         setup(newSuccessState.editingName())
         val newName = "Pepper"
         typeNewName(newName)
         tapDialogConfirm()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmNameEdit(newName))
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.ConfirmRename(newName))
     }
 
     @Test
-    fun newSuccessState_tappingRenameDialogCancelCallsEventCancelNameEdit() {
+    fun newSuccessState_tappingRenameDialogCancelCallsEventCancelRenameRename() {
         setup(newSuccessState.editingName())
         val newName = "Croissant"
         typeNewName(newName)
         tapDialogCancel()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
-        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelRename)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmRename>())
     }
 
     @Ignore("not clear how to tap outside dialog")
     @Test
-    fun newSuccessState_tappingOutsideRenameDialogCallsEventCancelNameEdit() {
+    fun newSuccessState_tappingOutsideRenameDialogCallsEventCancelRenameRename() {
         setup(newSuccessState.editingName())
         val newName = "Zucchini"
         typeNewName(newName)
         composeTestRule.onNodeWithText(successState.session.name!!).performClick()
-        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelNameEdit)
-        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmNameEdit>())
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelRename)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmRename>())
     }
 
     @Test

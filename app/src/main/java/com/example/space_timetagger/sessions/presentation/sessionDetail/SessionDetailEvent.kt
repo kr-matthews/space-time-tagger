@@ -8,8 +8,8 @@ sealed interface SessionDetailEvent {
     data object TapRename : SessionDetailEvent
     data object TapTimeOffset : SessionDetailEvent
     data object TapConfirmDelete : SessionDetailEvent
-    data class ConfirmNameEdit(val newName: String) : SessionDetailEvent
-    data object CancelNameEdit : SessionDetailEvent
+    data class ConfirmRename(val newName: String) : SessionDetailEvent
+    data object CancelRename : SessionDetailEvent
     data class TapNewTagButton(val time: LocalDateTime) : SessionDetailEvent
     data class TapTagCheckbox(val tagId: String) : SessionDetailEvent
     data class TapConfirmDeleteTag(val tagId: String) : SessionDetailEvent

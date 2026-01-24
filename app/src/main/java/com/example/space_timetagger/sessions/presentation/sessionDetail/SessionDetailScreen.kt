@@ -83,8 +83,8 @@ fun SessionDetailView(
         EditTextDialog(
             title = stringResource(R.string.session_name),
             initialText = session.name,
-            onConfirm = { onEvent(SessionDetailEvent.ConfirmNameEdit(it)) },
-            onCancel = { onEvent(SessionDetailEvent.CancelNameEdit) },
+            onConfirm = { onEvent(SessionDetailEvent.ConfirmRename(it)) },
+            onCancel = { onEvent(SessionDetailEvent.CancelRename) },
         )
     }
 

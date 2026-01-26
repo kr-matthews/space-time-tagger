@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.space_timetagger.database.domain.SessionsDao
 
-@Database(entities = [SessionEntity::class, TagEntity::class], version = 2)
+@Database(entities = [SessionEntity::class, TagEntity::class], version = 3)
 abstract class SessionsDatabase : RoomDatabase() {
     abstract val sessionsDao: SessionsDao
 }

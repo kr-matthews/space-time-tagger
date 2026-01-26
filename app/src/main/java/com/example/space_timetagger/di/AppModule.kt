@@ -6,6 +6,7 @@ import com.example.space_timetagger.core.data.datastore.preferencesDataStore
 import com.example.space_timetagger.core.data.repository.PreferencesRepositoryImpl
 import com.example.space_timetagger.core.domain.repository.PreferencesRepository
 import com.example.space_timetagger.database.data.MIGRATION_1_2
+import com.example.space_timetagger.database.data.MIGRATION_2_3
 import com.example.space_timetagger.database.data.RoomSessionsDataSource
 import com.example.space_timetagger.database.data.SessionsDatabase
 import com.example.space_timetagger.location.data.repository.LocationRepositoryImpl
@@ -27,6 +28,7 @@ class AppModuleImpl(applicationContext: Context) : AppModule {
     private val sessionsDatabase =
         Room.databaseBuilder(applicationContext, SessionsDatabase::class.java, "sessions.db")
             .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .build()
     private val ioDispatcher = Dispatchers.IO
     private val sessionsDataSource =

@@ -1,5 +1,6 @@
 package com.example.space_timetagger.database.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.space_timetagger.sessions.domain.models.Session
@@ -11,7 +12,7 @@ import kotlin.time.toDuration
 data class SessionEntity(
     @PrimaryKey val id: String,
     val name: String?,
-    val timeOffsetSeconds: Long?,
+    @ColumnInfo(name = "time_offset_seconds") val timeOffsetSeconds: Long?,
 )
 
 fun Session.toEntity() = SessionEntity(

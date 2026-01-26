@@ -6,6 +6,7 @@ data class SessionDetailUiModel(
     val id: String = UUID.randomUUID().toString(),
     val name: String?,
     val nameIsBeingEdited: Boolean,
+    val timeOffsetIsBeingEdited: Boolean,
     val tags: List<TagUiModel>,
     val tagIdToScrollTo: String?,
     val deleteAllIsEnabled: Boolean,

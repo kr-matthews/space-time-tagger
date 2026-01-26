@@ -51,6 +51,7 @@ class SessionDetailViewTest {
     private val session = SessionDetailUiModel(
         name = "Test session name",
         nameIsBeingEdited = false,
+        timeOffsetIsBeingEdited = false,
         tags = List(6) { i -> TagUiModel(dateTime = now.minusSeconds(i * i + 2L)) },
         tagIdToScrollTo = null,
         deleteAllIsEnabled = true,
@@ -60,6 +61,7 @@ class SessionDetailViewTest {
     private val newSession = SessionDetailUiModel(
         name = null,
         nameIsBeingEdited = false,
+        timeOffsetIsBeingEdited = false,
         tags = listOf(),
         tagIdToScrollTo = null,
         deleteAllIsEnabled = false,

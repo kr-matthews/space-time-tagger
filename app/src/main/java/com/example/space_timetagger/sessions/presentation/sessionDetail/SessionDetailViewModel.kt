@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import kotlin.time.Duration
 
 class SessionViewModel(
     private val sessionId: String,
@@ -34,6 +35,17 @@ class SessionViewModel(
     private val tapAnywhereIsEnabled = preferencesRepository.tapAnywhereIsEnabled
 
     private val nameIsBeingEdited = MutableStateFlow(false)
+    private val timeOffsetIsBeingEdited = MutableStateFlow(false)
+
+    private val beingEditedValues = combine(
+        nameIsBeingEdited,
+        timeOffsetIsBeingEdited,
+    ) { nameIsBeingEdited, timeOffsetIsBeingEdited ->
+        Pair(
+            nameIsBeingEdited,
+            timeOffsetIsBeingEdited,
+        )
+    }
 
     init {
         viewModelScope.launch {
@@ -47,14 +59,15 @@ class SessionViewModel(
 
     private val lastScrolledToTagId = MutableStateFlow<String?>(null)
 
+    // can only handle 5 flows, so combining the edited values into 1
     val viewState =
         combine(
             session,
             lastChange,
             tapAnywhereIsEnabled,
-            nameIsBeingEdited,
+            beingEditedValues,
             lastScrolledToTagId
-        ) { session, lastChange, tapAnywhereIsEnabled, nameIsBeingEdited, lastScrolledToTagId ->
+        ) { session, lastChange, tapAnywhereIsEnabled, (nameIsBeingEdited, timeOffsetIsBeingEdited), lastScrolledToTagId ->
             when {
                 session == null -> SessionDetailViewState.Error
                 else -> SessionDetailViewState.Success(
@@ -64,6 +77,7 @@ class SessionViewModel(
                         lastScrolledToTagId,
                         tapAnywhereIsEnabled,
                         nameIsBeingEdited,
+                        timeOffsetIsBeingEdited,
                     )
                 )
             }
@@ -74,10 +88,12 @@ class SessionViewModel(
             SessionDetailEvent.TapBack -> Unit // navigate, in compose
             SessionDetailEvent.TapSettings -> Unit // navigate, in compose
             SessionDetailEvent.TapRename -> nameIsBeingEdited.update { true }
-            SessionDetailEvent.TapTimeOffset -> Unit // todo
+            SessionDetailEvent.TapTimeOffset -> timeOffsetIsBeingEdited.update { true }
             SessionDetailEvent.TapConfirmDelete -> deleteSession()
             is SessionDetailEvent.ConfirmRename -> onDoneEditingName(event.newName)
             SessionDetailEvent.CancelRename -> nameIsBeingEdited.update { false }
+            is SessionDetailEvent.ConfirmTimeOffset -> onDoneEditingTimeOffset(event.timeOffset)
+            SessionDetailEvent.CancelTimeOffset -> timeOffsetIsBeingEdited.update { false }
             is SessionDetailEvent.TapNewTagButton -> addTag(event.time)
             is SessionDetailEvent.TapTagCheckbox -> toggleTagArchived(event.tagId)
             is SessionDetailEvent.TapConfirmDeleteTag -> deleteTag(event.tagId)
@@ -96,6 +112,18 @@ class SessionViewModel(
         viewModelScope.launch {
             sessionsRepository.renameSession(sessionId, name)
             lastChange.update { SessionChange.Rename }
+        }
+    }
+
+    private fun onDoneEditingTimeOffset(newOffset: Duration?) {
+        setTimeOffset(newOffset)
+        timeOffsetIsBeingEdited.update { false }
+    }
+
+    private fun setTimeOffset(newOffset: Duration?) {
+        viewModelScope.launch {
+            sessionsRepository.setTimeOffset(sessionId, newOffset)
+            lastChange.update { SessionChange.SetTimeOffset }
         }
     }
 
@@ -173,6 +201,7 @@ private fun buildSessionDetailUiModel(
     lastScrolledToTagId: String?,
     tapAnywhereIsEnabled: Boolean,
     nameIsBeingEdited: Boolean,
+    timeOffsetIsBeingEdited: Boolean,
 ): SessionDetailUiModel {
     val justAddedTagId = (lastChange as? SessionChange.AddTag)?.id
     val needToScrollToJustAddedTag = justAddedTagId != null && justAddedTagId != lastScrolledToTagId
@@ -182,6 +211,7 @@ private fun buildSessionDetailUiModel(
         id = session.id,
         name = session.name,
         nameIsBeingEdited = nameIsBeingEdited,
+        timeOffsetIsBeingEdited = timeOffsetIsBeingEdited,
         tags = session.tags.map(Tag::toUiModel),
         tagIdToScrollTo = tagIdToScrollTo,
         deleteAllIsEnabled = session.tags.isNotEmpty(),

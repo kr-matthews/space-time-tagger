@@ -1,6 +1,7 @@
 package com.example.space_timetagger.sessions.presentation.sessionDetail
 
 import java.time.LocalDateTime
+import kotlin.time.Duration
 
 sealed interface SessionDetailEvent {
     data object TapBack : SessionDetailEvent
@@ -10,6 +11,8 @@ sealed interface SessionDetailEvent {
     data object TapConfirmDelete : SessionDetailEvent
     data class ConfirmRename(val newName: String) : SessionDetailEvent
     data object CancelRename : SessionDetailEvent
+    data class ConfirmTimeOffset(val timeOffset: Duration) : SessionDetailEvent
+    data object CancelTimeOffset : SessionDetailEvent
     data class TapNewTagButton(val time: LocalDateTime) : SessionDetailEvent
     data class TapTagCheckbox(val tagId: String) : SessionDetailEvent
     data class TapConfirmDeleteTag(val tagId: String) : SessionDetailEvent

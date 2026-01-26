@@ -6,6 +6,7 @@ import com.example.space_timetagger.sessions.domain.models.Tag
 import com.example.space_timetagger.sessions.domain.repository.SessionsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlin.time.Duration
 
 class SessionsRepositoryImpl(
     private val sessionsDataSource: SessionsDataSource,
@@ -24,6 +25,13 @@ class SessionsRepositoryImpl(
         session(id).first()?.let { session ->
             val renamedSession = session.copy(name = newName)
             sessionsDataSource.upsertSessionWithoutTags(renamedSession)
+        }
+    }
+
+    override suspend fun setTimeOffset(id: String, timeOffset: Duration?) {
+        session(id).first()?.let { session ->
+            val updatedSession = session.copy(timeOffset = timeOffset)
+            sessionsDataSource.upsertSessionWithoutTags(updatedSession)
         }
     }
 

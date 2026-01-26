@@ -3,12 +3,14 @@ package com.example.space_timetagger.sessions.domain.repository
 import com.example.space_timetagger.sessions.domain.models.Session
 import com.example.space_timetagger.sessions.domain.models.Tag
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration
 
 interface SessionsRepository {
     fun sessions(): Flow<List<Session>>
     fun session(id: String): Flow<Session?>
     suspend fun newSession(name: String? = null): String
     suspend fun renameSession(id: String, newName: String?)
+    suspend fun setTimeOffset(id: String, timeOffset: Duration?)
     suspend fun addTagToSession(sessionId: String, tag: Tag)
     suspend fun toggleTagArchived(sessionId: String, tag: Tag)
     suspend fun removeTag(sessionId: String, tagId: String)

@@ -37,6 +37,10 @@ import com.example.space_timetagger.core.presentation.ScreenPreviews
 import com.example.space_timetagger.core.presentation.TopBarSettingsIcon
 import com.example.space_timetagger.sessions.presentation.models.SessionDetailUiModel
 import com.example.space_timetagger.ui.theme.SpaceTimeTaggerTheme
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun SessionDetailScreen(
@@ -237,6 +241,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
             SessionDetailUiModel(
                 id = "id",
                 name = "Shopping Trip",
+                timeOffset = null,
                 nameIsBeingEdited = false,
                 timeOffsetIsBeingEdited = false,
                 tags = someTags,
@@ -251,6 +256,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 id = "id",
                 name = "Session with no tags",
                 nameIsBeingEdited = false,
+                timeOffset = Duration.ZERO,
                 timeOffsetIsBeingEdited = false,
                 tags = noTags,
                 tagIdToScrollTo = null,
@@ -264,6 +270,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 id = "id",
                 name = null,
                 nameIsBeingEdited = false,
+                timeOffset = 2.minutes,
                 timeOffsetIsBeingEdited = false,
                 tags = manyTags,
                 tagIdToScrollTo = manyTags.last().id,
@@ -279,6 +286,7 @@ class ViewStateProvider : PreviewParameterProvider<SessionDetailViewState> {
                 id = "id",
                 name = "Refreshing 10pm",
                 nameIsBeingEdited = false,
+                timeOffset = 1.days + 43.seconds,
                 timeOffsetIsBeingEdited = false,
                 tags = someTags,
                 tagIdToScrollTo = null,

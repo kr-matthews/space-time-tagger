@@ -210,6 +210,7 @@ private fun buildSessionDetailUiModel(
     return SessionDetailUiModel(
         id = session.id,
         name = session.name,
+        timeOffset = session.timeOffset,
         nameIsBeingEdited = nameIsBeingEdited,
         timeOffsetIsBeingEdited = timeOffsetIsBeingEdited,
         tags = session.tags.map(Tag::toUiModel),

@@ -35,6 +35,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
+import kotlin.time.Duration
 
 class SessionDetailViewTest {
 
@@ -51,6 +52,7 @@ class SessionDetailViewTest {
     private val session = SessionDetailUiModel(
         name = "Test session name",
         nameIsBeingEdited = false,
+        timeOffset = null,
         timeOffsetIsBeingEdited = false,
         tags = List(6) { i -> TagUiModel(dateTime = now.minusSeconds(i * i + 2L)) },
         tagIdToScrollTo = null,
@@ -61,6 +63,7 @@ class SessionDetailViewTest {
     private val newSession = SessionDetailUiModel(
         name = null,
         nameIsBeingEdited = false,
+        timeOffset = Duration.ZERO,
         timeOffsetIsBeingEdited = false,
         tags = listOf(),
         tagIdToScrollTo = null,

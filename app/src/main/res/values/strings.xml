@@ -28,7 +28,11 @@
     <string name="edit">Edit</string>
     <string name="rename">Rename</string>
     <string name="time_offset">Time Offset</string>
+    <string name="hours_abbr">Hr.</string>
+    <string name="minutes_abbr">Min.</string>
+    <string name="seconds_abbr">Sec.</string>
     <string name="session_name">Session Name</string>
     <string name="clear_text">Clear Text</string>
+    <string name="clear_duration">Clear Duration</string>
     <string name="dropdown_icon">dropdown icon</string>
 </resources>

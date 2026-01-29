@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.space_timetagger.R
 import com.example.space_timetagger.core.presentation.ConfirmationDialog
+import com.example.space_timetagger.core.presentation.EditDurationDialog
 import com.example.space_timetagger.core.presentation.EditTextDialog
 import com.example.space_timetagger.core.presentation.Error
 import com.example.space_timetagger.core.presentation.MyScaffold
@@ -89,6 +90,14 @@ fun SessionDetailView(
             initialText = session.name,
             onConfirm = { onEvent(SessionDetailEvent.ConfirmRename(it)) },
             onCancel = { onEvent(SessionDetailEvent.CancelRename) },
+        )
+    }
+    if (session?.timeOffsetIsBeingEdited == true) {
+        EditDurationDialog(
+            title = stringResource(R.string.time_offset),
+            initialDuration = session.timeOffset,
+            onConfirm = { onEvent(SessionDetailEvent.ConfirmTimeOffset(it)) },
+            onCancel = { onEvent(SessionDetailEvent.CancelTimeOffset) },
         )
     }
 

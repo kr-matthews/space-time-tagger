@@ -140,15 +140,19 @@ private fun Tag(
         // checkbox has built-in padding, so can't use horizontalArrangement = Arrangement.spacedBy(8.dp),
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.thenIf(tag.isArchived, { graphicsLayer(alpha = 0.5f) })
         ) {
             Checkbox(checked = tag.isArchived, onCheckedChange = { onTapTagCheckbox() })
             Text(
                 text = "#$number",
                 fontWeight = FontWeight.W800,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .thenIf(tag.isArchived, { graphicsLayer(alpha = 0.5f) })
             )
-            Text(text = tag.dateTime.formatShortDateLongTime())
+            Text(
+                text = tag.dateTime.formatShortDateLongTime(),
+                modifier = Modifier.thenIf(tag.isArchived, { graphicsLayer(alpha = 0.5f) })
+            )
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { setDialogIsOpen(true) }) {
                 Icon(

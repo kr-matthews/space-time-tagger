@@ -213,7 +213,7 @@ private fun buildSessionDetailUiModel(
         timeOffset = session.timeOffset,
         nameIsBeingEdited = nameIsBeingEdited,
         timeOffsetIsBeingEdited = timeOffsetIsBeingEdited,
-        tags = session.tags.map(Tag::toUiModel),
+        tags = session.tags.map { it.toUiModel(session.timeOffset ?: Duration.ZERO) },
         tagIdToScrollTo = tagIdToScrollTo,
         deleteAllIsEnabled = session.tags.isNotEmpty(),
         tapAnywhereIsEnabled = tapAnywhereIsEnabled,

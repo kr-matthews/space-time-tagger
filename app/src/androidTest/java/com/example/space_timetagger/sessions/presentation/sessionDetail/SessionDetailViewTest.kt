@@ -12,6 +12,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasProgressBarRangeInfo
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -36,6 +37,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class SessionDetailViewTest {
 
@@ -169,6 +172,67 @@ class SessionDetailViewTest {
         composeTestRule.onNodeWithText(successState.session.name!!).performClick()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelRename)
         verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmRename>())
+    }
+
+    @Test
+    fun successState_tappingTimeOffsetCallsEventTapTimeOffset() {
+        setup(successState)
+        tapTimeOffset()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapTimeOffset)
+    }
+
+    @Test
+    fun successState_typingNewDurationDoesNotCallEventConfirmTimeOffset() {
+        setup(successState.editingTimeOffset())
+        typeMinutes(47)
+        typeSeconds(99)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmTimeOffset>())
+    }
+
+    @Test
+    fun successState_tappingKeyboardDoneCallsEventConfirmTimeOffset() {
+        setup(successState.editingTimeOffset())
+        val newMinutes = 498
+        val newSeconds = 1
+        typeMinutes(newMinutes)
+        typeSeconds(newSeconds)
+        tapKeyboardDone(appContext.getString(R.string.minutes_abbr))
+        verify(mockHandleEvent, times(1)).invoke(
+            SessionDetailEvent.ConfirmTimeOffset(newMinutes.minutes + newSeconds.seconds)
+        )
+    }
+
+    @Test
+    fun successState_tappingTimeOffsetDialogConfirmCallsEventConfirmTimeOffset() {
+        setup(successState.editingTimeOffset())
+        val newMinutes = 47
+        val newSeconds = 99
+        typeMinutes(newMinutes)
+        typeSeconds(newSeconds)
+        tapDialogConfirm()
+        verify(mockHandleEvent, times(1)).invoke(
+            SessionDetailEvent.ConfirmTimeOffset(newMinutes.minutes + newSeconds.seconds)
+        )
+    }
+
+    @Test
+    fun successState_tappingTimeOffsetDialogCancelCallsEventCancelTimeOffset() {
+        setup(successState.editingTimeOffset())
+        typeMinutes(47)
+        typeSeconds(99)
+        tapDialogCancel()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelTimeOffset)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmTimeOffset>())
+    }
+
+    @Ignore("not clear how to tap outside dialog")
+    @Test
+    fun successState_tappingOutsideTimeOffsetDialogCallsEventCancelTimeOffset() {
+        setup(successState.editingTimeOffset())
+        typeMinutes(9)
+        composeTestRule.onNodeWithText(successState.session.name!!).performClick()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.CancelTimeOffset)
+        verify(mockHandleEvent, never()).invoke(any<SessionDetailEvent.ConfirmTimeOffset>())
     }
 
     @Test
@@ -348,6 +412,23 @@ class SessionDetailViewTest {
         setup(tapAnywhereState)
         tapRename()
         verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapRename)
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Test
+    fun tapAnywhereState_tappingTimeOffsetDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        tapTimeOffset()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapTimeOffset)
+        verifyTapAnywhereIsNotCalled()
+    }
+
+    @Test
+    fun tapAnywhereState_tappingDeleteDoesNotCallEventTapAnywhere() {
+        setup(tapAnywhereState)
+        tapDelete()
+        tapDialogConfirm()
+        verify(mockHandleEvent, times(1)).invoke(SessionDetailEvent.TapConfirmDelete)
         verifyTapAnywhereIsNotCalled()
     }
 
@@ -566,12 +647,16 @@ class SessionDetailViewTest {
     private fun tapDropdownOption(@StringRes resId: Int) {
         composeTestRule.onNode(hasContentDescription(appContext.getString(R.string.dropdown_icon)))
             .performClick()
-        composeTestRule.onNode(hasContentDescription(appContext.getString(resId)))
+        composeTestRule.onNode(hasText(appContext.getString(resId)))
             .performClick()
     }
 
     private fun tapRename() {
         tapDropdownOption(R.string.rename)
+    }
+
+    private fun tapTimeOffset() {
+        tapDropdownOption(R.string.time_offset)
     }
 
     private fun tapDelete() {
@@ -583,8 +668,18 @@ class SessionDetailViewTest {
             .performTextReplacement(newName)
     }
 
-    private fun tapKeyboardDone() {
-        composeTestRule.onNodeWithContentDescription(appContext.getString(R.string.name_input))
+    private fun typeMinutes(newMinutes: Number) {
+        composeTestRule.onNodeWithContentDescription(appContext.getString(R.string.minutes_abbr))
+            .performTextReplacement(newMinutes.toString())
+    }
+
+    private fun typeSeconds(newSeconds: Number) {
+        composeTestRule.onNodeWithContentDescription(appContext.getString(R.string.seconds_abbr))
+            .performTextReplacement(newSeconds.toString())
+    }
+
+    private fun tapKeyboardDone(label: String = appContext.getString(R.string.name_input)) {
+        composeTestRule.onNodeWithContentDescription(label)
             .performImeAction()
     }
 
@@ -671,3 +766,6 @@ class SessionDetailViewTest {
 
 private fun SessionDetailViewState.Success.editingName() =
     copy(session = session.copy(nameIsBeingEdited = true))
+
+private fun SessionDetailViewState.Success.editingTimeOffset() =
+    copy(session = session.copy(timeOffsetIsBeingEdited = true))

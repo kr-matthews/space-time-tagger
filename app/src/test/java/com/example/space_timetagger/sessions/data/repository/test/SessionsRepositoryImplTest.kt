@@ -25,6 +25,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -89,6 +90,23 @@ class SessionsRepositoryImplTest {
         mockSessionsRepository.renameSession(mockSession.id, null)
         verify(sessionsDataSource, times(1)).upsertSessionWithoutTags(
             argThat { session -> session.id == mockSession.id && session.name == null },
+        )
+    }
+
+    @Test
+    fun setTimeOffset_callsDataSourceUpsert() = runTest {
+        val newDuration = 7.minutes
+        mockSessionsRepository.setTimeOffset(mockSession.id, newDuration)
+        verify(sessionsDataSource, times(1)).upsertSessionWithoutTags(
+            argThat { session -> session.id == mockSession.id && session.timeOffset == newDuration },
+        )
+    }
+
+    @Test
+    fun setTimeOffset_withoutDuration_callsDataSourceUpsert() = runTest {
+        mockSessionsRepository.setTimeOffset(mockSession.id, null)
+        verify(sessionsDataSource, times(1)).upsertSessionWithoutTags(
+            argThat { session -> session.id == mockSession.id && session.timeOffset == null },
         )
     }
 

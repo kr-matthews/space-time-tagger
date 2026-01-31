@@ -45,6 +45,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -114,13 +115,14 @@ class SessionDetailViewModelTest {
     }
 
     @Test
-    fun initialSuccessStateWithoutAskPreference_hasEditModeOff() = runTest {
+    fun initialSuccessStateWithoutAskPreference_hasEditModesOff() = runTest {
         whenever(mockPreferencesRepository.sessionNameStrategy).thenReturn(
             flowOf(SessionNameStrategy.EMPTY),
         )
         initViewModel()
         advanceUntilIdle()
         assertThat(session()::nameIsBeingEdited).isFalse()
+        assertThat(session()::timeOffsetIsBeingEdited).isFalse()
     }
 
     // FIXME
@@ -208,6 +210,40 @@ class SessionDetailViewModelTest {
         viewModel.handleEvent(SessionDetailEvent.ConfirmRename(newName))
         advanceUntilIdle()
         verify(mockSessionsRepository, times(1)).renameSession(validId, newName)
+    }
+
+    @Test
+    fun eventTapTimeOffset_turnsEditModeOn() = runTest {
+        initViewModel()
+        // wait for the init block to finish
+        advanceUntilIdle()
+        viewModel.handleEvent(SessionDetailEvent.TapTimeOffset)
+        assertThat(session()::timeOffsetIsBeingEdited).isTrue()
+    }
+
+    @Test
+    fun eventCancelTimeOffset_turnsEditModeOff() = runTest {
+        initViewModel()
+        viewModel.handleEvent(SessionDetailEvent.TapTimeOffset)
+        viewModel.handleEvent(SessionDetailEvent.CancelTimeOffset)
+        assertThat(session()::timeOffsetIsBeingEdited).isFalse()
+    }
+
+    @Test
+    fun eventConfirmTimeOffset_turnsEditModeOff() = runTest {
+        initViewModel()
+        viewModel.handleEvent(SessionDetailEvent.TapTimeOffset)
+        viewModel.handleEvent(SessionDetailEvent.ConfirmTimeOffset(3853.seconds))
+        assertThat(session()::timeOffsetIsBeingEdited).isFalse()
+    }
+
+    @Test
+    fun eventConfirmTimeOffset_callsRepositoryFunc() = runTest {
+        initViewModel()
+        val newDuration = (-127).seconds
+        viewModel.handleEvent(SessionDetailEvent.ConfirmTimeOffset(newDuration))
+        advanceUntilIdle()
+        verify(mockSessionsRepository, times(1)).setTimeOffset(validId, newDuration)
     }
 
     @Test
